@@ -71,18 +71,22 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
         placeholder="Search collaborators..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4"
+        className="mb-4 bg-background"
       />
       {filteredCollaborators?.map((collab) => (
-        <div key={collab.musician.id} className="flex items-center justify-between p-4 bg-card rounded-lg animate-fade-in">
+        <div key={collab.musician.id} className="flex items-center justify-between p-4 bg-card/50 rounded-lg animate-fade-in">
           <div className="flex items-center gap-4">
-            <Avatar>
-              <AvatarImage src={collab.musician.profile?.avatar_url || undefined} />
+            <Avatar className="h-12 w-12 ring-1 ring-border">
+              <AvatarImage 
+                src={collab.musician.profile?.avatar_url || undefined}
+                alt={collab.musician.profile?.username || 'User avatar'}
+                className="object-cover w-full h-full"
+              />
               <AvatarFallback>
-                <User className="h-4 w-4" />
+                <User className="h-6 w-6" />
               </AvatarFallback>
             </Avatar>
-            <span>
+            <span className="font-medium">
               {collab.musician.profile?.full_name || 
                collab.musician.profile?.username || 
                collab.musician.name}

@@ -59,18 +59,24 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
         placeholder="Search following..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4"
+        className="mb-4 bg-background"
       />
       {filteredFollowing?.map((follow) => (
-        <div key={follow.followed.id} className="flex items-center justify-between p-4 bg-card rounded-lg animate-fade-in">
+        <div key={follow.followed.id} className="flex items-center justify-between p-4 bg-card/50 rounded-lg animate-fade-in">
           <div className="flex items-center gap-4">
-            <Avatar>
-              <AvatarImage src={follow.followed.avatar_url || undefined} />
+            <Avatar className="h-12 w-12 ring-1 ring-border">
+              <AvatarImage 
+                src={follow.followed.avatar_url || undefined} 
+                alt={follow.followed.username || 'User avatar'}
+                className="object-cover w-full h-full"
+              />
               <AvatarFallback>
-                <User className="h-4 w-4" />
+                <User className="h-6 w-6" />
               </AvatarFallback>
             </Avatar>
-            <span>{follow.followed.full_name || follow.followed.username}</span>
+            <span className="font-medium">
+              {follow.followed.full_name || follow.followed.username}
+            </span>
           </div>
           <Button
             variant="ghost"
