@@ -8,7 +8,7 @@ import { User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface Message {
   id: string;
@@ -26,6 +26,7 @@ interface Message {
 export const MessageThread = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ["messages", id],
@@ -50,6 +51,13 @@ export const MessageThread = () => {
     },
     enabled: !!user && !!id,
   });
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // Subscribe to new messages
   useEffect(() => {
@@ -89,7 +97,7 @@ export const MessageThread = () => {
     };
 
     markMessagesAsRead();
-  }, [user, id]);
+  }, [user, id, messages]);
 
   if (!user) {
     return (
@@ -115,7 +123,7 @@ export const MessageThread = () => {
               </div>
             ) : (
               <>
-                <ScrollArea className="h-[400px] w-full rounded-md border mb-4">
+                <ScrollArea className="h-[400px] w-full rounded-md border mb-4" ref={scrollRef}>
                   <div className="space-y-4 p-4">
                     {messages?.map((message) => (
                       <div

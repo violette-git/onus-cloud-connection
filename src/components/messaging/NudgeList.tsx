@@ -66,7 +66,7 @@ export const NudgeList = () => {
       // Group messages by thread (conversation between two users)
       const threadMap = new Map<string, Thread>();
       
-      messages.forEach((message) => {
+      messages?.forEach((message) => {
         const otherUserId = message.sender_id === user.id ? message.recipient_id : message.sender_id;
         const threadId = [user.id, otherUserId].sort().join('-');
         
@@ -95,7 +95,7 @@ export const NudgeList = () => {
           event: "*",
           schema: "public",
           table: "nudges",
-          filter: `recipient_id=eq.${user.id}`,
+          filter: `or(recipient_id.eq.${user.id},sender_id.eq.${user.id})`,
         },
         () => {
           fetchThreads();
