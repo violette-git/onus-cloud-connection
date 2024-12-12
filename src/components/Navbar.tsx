@@ -11,9 +11,12 @@ import {
 import { useState } from "react";
 import { NavLinks } from "./navbar/NavLinks";
 import { AuthButtons } from "./navbar/AuthButtons";
+import { NudgeList } from "./messaging/NudgeList";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
 
   const handleSheetOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -44,13 +47,19 @@ export const Navbar = () => {
                 {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
+            <SheetContent side="right" className="w-[280px] flex flex-col">
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col space-y-4 mt-8">
                 <NavLinks onNavigate={() => setIsOpen(false)} />
               </div>
+              {user && (
+                <div className="mt-8">
+                  <h3 className="font-semibold mb-4">Messages</h3>
+                  <NudgeList />
+                </div>
+              )}
             </SheetContent>
           </Sheet>
         </div>

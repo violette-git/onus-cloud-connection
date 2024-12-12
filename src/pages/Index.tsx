@@ -1,6 +1,4 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { NudgeList } from "@/components/messaging/NudgeList";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Index = () => {
   const { user } = useAuth();
@@ -15,17 +13,6 @@ export const Index = () => {
           <p className="text-xl text-muted-foreground text-center">
             Connect with musicians, share your music, and grow your audience.
           </p>
-
-          {user && (
-            <Card className="mt-8">
-              <CardHeader>
-                <CardTitle>Messages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <NudgeList />
-              </CardContent>
-            </Card>
-          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <div className="p-6 rounded-lg border bg-card">
