@@ -16,8 +16,10 @@ import { Database } from "@/integrations/supabase/types";
 type Musician = Database['public']['Tables']['musicians']['Row'];
 type Genre = Database['public']['Tables']['genres']['Row'];
 
-interface MusicianWithGenre extends Musician {
-  genre: Pick<Genre, 'name'> | null;
+interface MusicianWithGenres extends Musician {
+  musician_genres: {
+    genre: Pick<Genre, 'name'>;
+  }[];
 }
 
 const Musicians = () => {
@@ -37,14 +39,18 @@ const Musicians = () => {
     },
   });
 
-  const { data: musicians, isLoading: isLoadingMusicians } = useQuery<MusicianWithGenre[]>({
+  const { data: musicians, isLoading: isLoadingMusicians } = useQuery<MusicianWithGenres[]>({
     queryKey: ['musicians', searchQuery, selectedGenre],
     queryFn: async () => {
       let query = supabase
         .from('musicians')
         .select(`
           *,
-          genre:genres(name)
+          musician_genres (
+            genre (
+              name
+            )
+          )
         `);
 
       if (searchQuery) {
@@ -52,17 +58,23 @@ const Musicians = () => {
       }
 
       if (selectedGenre && selectedGenre !== 'all') {
-        query = query.eq('genre_id', selectedGenre);
+        query = query.eq('musician_genres.genre_id', selectedGenre);
       }
 
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as MusicianWithGenre[];
+      return data as MusicianWithGenres[];
     },
   });
 
   const isLoading = isLoadingGenres || isLoadingMusicians;
+
+  const getGenreNames = (musician: MusicianWithGenres) => {
+    return musician.musician_genres
+      .map(mg => mg.genre.name)
+      .join(', ');
+  };
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
@@ -115,7 +127,7 @@ const Musicians = () => {
                 <CardHeader>
                   <CardTitle className="text-lg">{musician.name}</CardTitle>
                   <CardDescription>
-                    {musician.genre?.name} • {musician.location || 'Unknown location'}
+                    {getGenreNames(musician)} • {musician.location || 'Unknown location'}
                   </CardDescription>
                 </CardHeader>
               </Card>

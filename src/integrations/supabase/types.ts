@@ -41,12 +41,45 @@ export type Database = {
           },
         ]
       }
+      musician_genres: {
+        Row: {
+          created_at: string
+          genre_id: string
+          musician_id: string
+        }
+        Insert: {
+          created_at?: string
+          genre_id: string
+          musician_id: string
+        }
+        Update: {
+          created_at?: string
+          genre_id?: string
+          musician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musician_genres_genre_id_fkey"
+            columns: ["genre_id"]
+            isOneToOne: false
+            referencedRelation: "genres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "musician_genres_musician_id_fkey"
+            columns: ["musician_id"]
+            isOneToOne: false
+            referencedRelation: "musicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       musicians: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string
-          genre_id: string
+          genre_id: string | null
           id: string
           location: string | null
           name: string
@@ -57,7 +90,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          genre_id: string
+          genre_id?: string | null
           id?: string
           location?: string | null
           name: string
@@ -68,7 +101,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          genre_id?: string
+          genre_id?: string | null
           id?: string
           location?: string | null
           name?: string
