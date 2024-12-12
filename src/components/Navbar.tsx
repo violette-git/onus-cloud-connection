@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthForm } from "./auth/AuthForm";
 import {
@@ -27,10 +27,15 @@ export const Navbar = () => {
             Musicians
           </Link>
           {user ? (
-            <Button variant="outline" onClick={() => signOut()}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
+            <>
+              <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors">
+                <User className="h-5 w-5" />
+              </Link>
+              <Button variant="outline" onClick={() => signOut()}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </>
           ) : (
             <Dialog>
               <DialogTrigger asChild>
