@@ -12,6 +12,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Database } from "@/integrations/supabase/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 type Musician = Database['public']['Tables']['musicians']['Row'];
 type Genre = Database['public']['Tables']['genres']['Row'];
@@ -25,6 +28,24 @@ interface MusicianWithGenres extends Musician {
 const Musicians = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const { data: genres, isLoading: isLoadingGenres } = useQuery({
     queryKey: ['genres'],
@@ -68,7 +89,28 @@ const Musicians = () => {
     },
   });
 
-  const isLoading = isLoadingGenres || isLoadingMusicians;
+  const handleBecomeMusicianClick = async () => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: 'musician' })
+      .eq('id', user.id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not upgrade to musician account. Please try again.",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success!",
+      description: "Your account has been upgraded to a musician account.",
+    });
+  };
 
   const getGenreNames = (musician: MusicianWithGenres) => {
     return musician.musician_genres
@@ -76,9 +118,20 @@ const Musicians = () => {
       .join(', ');
   };
 
+  const isLoading = isLoadingGenres || isLoadingMusicians;
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
       <div className="max-w-4xl mx-auto space-y-8">
+        {user && userProfile?.role === 'observer' && (
+          <div className="bg-muted p-4 rounded-lg text-center space-y-2">
+            <p className="text-muted-foreground">Want to share your music with the world?</p>
+            <Button onClick={handleBecomeMusicianClick}>
+              Become a Musician
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
