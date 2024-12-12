@@ -26,7 +26,7 @@ interface MusicianWithGenres extends Musician {
   musician_genres: {
     genre: Pick<Genre, 'name'>;
   }[];
-  profile: {
+  profiles: {
     avatar_url: string | null;
     username: string | null;
     full_name: string | null;
@@ -76,7 +76,11 @@ const Musicians = () => {
         .from('musicians')
         .select(`
           *,
-          profile:profiles!musicians_user_id_fkey(avatar_url, username, full_name),
+          profiles (
+            avatar_url,
+            username,
+            full_name
+          ),
           musician_genres (
             genre:genres (
               name
@@ -188,7 +192,7 @@ const Musicians = () => {
                   <div className="aspect-square">
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage 
-                        src={musician.profile?.avatar_url || musician.avatar_url || undefined}
+                        src={musician.profiles?.avatar_url || musician.avatar_url || undefined}
                         alt={musician.name}
                         className="object-cover"
                       />
