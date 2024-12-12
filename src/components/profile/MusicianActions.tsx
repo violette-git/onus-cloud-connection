@@ -17,7 +17,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRequesting, setIsRequesting] = useState(false);
-  const { mutate: cancelCollaboration } = useCancelCollaboration();
+  const { mutate: cancelCollaboration, isPending: isCancelling } = useCancelCollaboration();
 
   // If this is the current user's profile, or no user is logged in, don't show any actions
   if (!user || user.id === musicianUserId) return null;
@@ -97,7 +97,14 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
 
   const handleCancelRequest = () => {
     if (!user?.id) return;
-    cancelCollaboration({ requesterId: user.id, musicianId });
+    cancelCollaboration(
+      { requesterId: user.id, musicianId },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['collaboration', musicianId, user?.id] });
+        }
+      }
+    );
   };
 
   return (
@@ -150,6 +157,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
             variant="ghost"
             size="sm"
             onClick={handleCancelRequest}
+            disabled={isCancelling}
             className="h-8 w-8 p-0"
           >
             <X className="h-4 w-4 text-red-500" />

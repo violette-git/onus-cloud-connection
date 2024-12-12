@@ -135,7 +135,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
               </div>
               <Button
                 variant="ghost"
-                onClick={() => navigate(`/musicians/${collab.musician.id}`)}
+                onClick={() => navigate(`/musician/${collab.musician.id}`)}
               >
                 View Profile
               </Button>
