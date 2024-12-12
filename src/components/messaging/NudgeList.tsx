@@ -6,7 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "lucide-react";
+import { User, Reply } from "lucide-react";
+import { NudgeForm } from "./NudgeForm";
 
 interface Nudge {
   id: string;
@@ -27,6 +28,7 @@ export const NudgeList = () => {
   const { toast } = useToast();
   const [nudges, setNudges] = useState<Nudge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -113,39 +115,55 @@ export const NudgeList = () => {
       ) : (
         <div className="space-y-4 p-4">
           {nudges.map((nudge) => (
-            <Card 
-              key={nudge.id}
-              className="transition-all duration-200 hover:bg-accent/50 animate-fade-in"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage 
-                      src={nudge.sender.avatar_url} 
-                      alt={nudge.sender.username || nudge.sender.full_name} 
-                    />
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">
-                        {nudge.sender.username || nudge.sender.full_name}
+            <div key={nudge.id} className="space-y-2">
+              <Card className="transition-all duration-200 hover:bg-accent/50 animate-fade-in">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage 
+                        src={nudge.sender.avatar_url} 
+                        alt={nudge.sender.username || nudge.sender.full_name} 
+                      />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">
+                          {nudge.sender.username || nudge.sender.full_name}
+                        </p>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(nudge.created_at), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {nudge.message}
                       </p>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(nudge.created_at), {
-                          addSuffix: true,
-                        })}
-                      </span>
+                      {user?.id !== nudge.sender_id && (
+                        <button
+                          onClick={() => setReplyTo(nudge.sender_id)}
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
+                        >
+                          <Reply className="h-3 w-3" />
+                          Reply
+                        </button>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {nudge.message}
-                    </p>
                   </div>
+                </CardContent>
+              </Card>
+              {replyTo === nudge.sender_id && (
+                <div className="pl-14">
+                  <NudgeForm 
+                    recipientId={nudge.sender_id}
+                    onSuccess={() => setReplyTo(null)}
+                  />
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           ))}
         </div>
       )}
