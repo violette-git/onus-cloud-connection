@@ -10,6 +10,7 @@ import { MusicianProfile } from "@/pages/MusicianProfile";
 import { Notifications } from "@/pages/Notifications";
 import { Settings } from "@/pages/Settings";
 import { Explore } from "@/pages/Explore";
+import { Connections } from "@/pages/Connections";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ function App() {
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/explore" element={<Explore />} />
+              <Route path="/connections" element={<Connections />} />
             </Routes>
             <Toaster />
           </AuthProvider>
