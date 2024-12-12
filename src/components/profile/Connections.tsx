@@ -65,6 +65,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
             name,
             user_id,
             profile:profiles!musicians_user_id_fkey (
+              id,
               username,
               full_name,
               avatar_url
