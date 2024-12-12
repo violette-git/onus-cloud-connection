@@ -26,11 +26,11 @@ interface MusicianWithGenres extends Musician {
   musician_genres: {
     genre: Pick<Genre, 'name'>;
   }[];
-  profiles: {
+  profile?: {
     avatar_url: string | null;
     username: string | null;
     full_name: string | null;
-  }[];
+  };
 }
 
 const Musicians = () => {
@@ -80,11 +80,6 @@ const Musicians = () => {
             genre:genres (
               name
             )
-          ),
-          profiles:profiles!inner(
-            avatar_url,
-            username,
-            full_name
           )
         `);
 
@@ -96,10 +91,30 @@ const Musicians = () => {
         query = query.eq('musician_genres.genre_id', selectedGenre);
       }
 
-      const { data, error } = await query;
+      const { data: musiciansData, error: musiciansError } = await query;
       
-      if (error) throw error;
-      return data as MusicianWithGenres[];
+      if (musiciansError) throw musiciansError;
+
+      // Fetch profiles for musicians with user_id
+      const musiciansWithProfiles = await Promise.all(
+        (musiciansData || []).map(async (musician) => {
+          if (musician.user_id) {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('avatar_url, username, full_name')
+              .eq('id', musician.user_id)
+              .single();
+
+            return {
+              ...musician,
+              profile: profileData || undefined
+            };
+          }
+          return musician;
+        })
+      );
+
+      return musiciansWithProfiles as MusicianWithGenres[];
     },
   });
 
@@ -192,7 +207,7 @@ const Musicians = () => {
                   <div className="aspect-square">
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage 
-                        src={musician.profiles?.[0]?.avatar_url || musician.avatar_url || undefined}
+                        src={musician.profile?.avatar_url || musician.avatar_url || undefined}
                         alt={musician.name}
                         className="object-cover"
                       />
