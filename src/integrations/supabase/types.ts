@@ -125,6 +125,7 @@ export type Database = {
           full_name: string | null
           id: string
           role: string
+          social_links: Json | null
           updated_at: string | null
           username: string | null
         }
@@ -134,6 +135,7 @@ export type Database = {
           full_name?: string | null
           id: string
           role?: string
+          social_links?: Json | null
           updated_at?: string | null
           username?: string | null
         }
@@ -143,6 +145,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           role?: string
+          social_links?: Json | null
           updated_at?: string | null
           username?: string | null
         }
