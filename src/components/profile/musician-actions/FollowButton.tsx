@@ -46,7 +46,7 @@ export const FollowButton = ({ userId, musicianUserId, isFollowing }: FollowButt
       onClick={() => followMutation.mutate()}
       disabled={followMutation.isPending}
       size="sm"
-      className="w-full max-w-[120px] flex items-center gap-1 text-xs"
+      className="w-[120px] flex items-center gap-1 text-xs"
     >
       {isFollowing ? (
         <>

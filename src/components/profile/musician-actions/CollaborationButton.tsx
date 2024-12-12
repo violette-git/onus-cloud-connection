@@ -75,7 +75,7 @@ export const CollaborationButton = ({ userId, musicianId, collaborationStatus }:
         onClick={() => collaborateMutation.mutate()}
         disabled={collaborateMutation.isPending || isRequesting}
         size="sm"
-        className="w-full max-w-[120px] flex items-center gap-1 text-xs"
+        className="w-[120px] flex items-center gap-1 text-xs"
       >
         <HandshakeIcon className="h-3 w-3" />
         <span>Request Collab</span>
@@ -90,7 +90,7 @@ export const CollaborationButton = ({ userId, musicianId, collaborationStatus }:
           variant="outline" 
           disabled 
           size="sm"
-          className="w-full max-w-[120px] flex items-center gap-1 text-xs"
+          className="w-[120px] flex items-center gap-1 text-xs"
         >
           <HandshakeIcon className="h-3 w-3" />
           <span>Request Pending</span>
@@ -114,7 +114,7 @@ export const CollaborationButton = ({ userId, musicianId, collaborationStatus }:
         variant="outline" 
         disabled 
         size="sm"
-        className="w-full max-w-[120px] flex items-center gap-1 text-xs"
+        className="w-[120px] flex items-center gap-1 text-xs"
       >
         <HandshakeIcon className="h-3 w-3" />
         <span>Collaborator</span>
