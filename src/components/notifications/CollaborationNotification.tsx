@@ -16,6 +16,11 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
   const cancelCollaborationMutation = useMutation({
     mutationFn: async () => {
       if (!notification.reference_id) throw new Error("No reference ID");
+      console.log('Cancelling collaboration request:', {
+        actorId: notification.actor_id,
+        musicianId: notification.reference_id
+      });
+      
       const { error } = await supabase
         .from('collaborators')
         .delete()
@@ -23,17 +28,33 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
         .eq('musician_id', notification.reference_id);
       
       if (error) throw error;
+      return true;
     },
     onSuccess: () => {
+      // Invalidate both the collaboration status and notifications queries
       queryClient.invalidateQueries({ 
         queryKey: ['collaboration-status', notification.reference_id, notification.actor_id] 
       });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      
+      // Also invalidate the specific musician's collaborators
+      queryClient.invalidateQueries({ 
+        queryKey: ['collaboration-requests', notification.reference_id] 
+      });
+      
       toast({
         title: "Request Cancelled",
         description: "Your collaboration request has been cancelled",
       });
     },
+    onError: (error) => {
+      console.error('Error cancelling collaboration:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to cancel collaboration request. Please try again.",
+      });
+    }
   });
 
   return {
@@ -43,7 +64,10 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => cancelCollaborationMutation.mutate()}
+        onClick={() => {
+          console.log('Cancel button clicked');
+          cancelCollaborationMutation.mutate();
+        }}
         disabled={cancelCollaborationMutation.isPending}
       >
         <X className="h-4 w-4 mr-1" />
