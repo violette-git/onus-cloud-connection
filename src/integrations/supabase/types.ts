@@ -190,6 +190,51 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string
+          created_at: string
+          id: string
+          read: boolean
+          recipient_id: string
+          reference_id: string | null
+          type: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id: string
+          reference_id?: string | null
+          type: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id?: string
+          reference_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -222,6 +267,45 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      song_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction_type: string
+          song_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction_type: string
+          song_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          song_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "song_reactions_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "song_reactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       songs: {
         Row: {

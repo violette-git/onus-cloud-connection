@@ -2,32 +2,99 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BellDot } from "lucide-react";
+import { BellDot, UserPlus, Heart, ThumbsDown, Users } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Notifications = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      // Fetch collaboration requests
-      const { data: collaborations } = await supabase
-        .from('collaborators')
+      const { data, error } = await supabase
+        .from('notifications')
         .select(`
           *,
-          musicians:musicians(name, avatar_url),
-          requester:profiles(username, full_name, avatar_url)
+          actor:profiles!notifications_actor_id_fkey (
+            username,
+            full_name,
+            avatar_url
+          )
         `)
-        .eq('musician_id', user.id)
-        .eq('status', 'pending')
+        .eq('recipient_id', user.id)
         .order('created_at', { ascending: false });
 
-      return collaborations || [];
+      if (error) throw error;
+      return data;
     },
     enabled: !!user,
   });
+
+  const getNotificationContent = (notification: any) => {
+    const actorName = notification.actor?.full_name || notification.actor?.username;
+    
+    switch (notification.type) {
+      case 'follow':
+        return {
+          icon: <Users className="h-5 w-5 text-blue-500" />,
+          message: `${actorName} started following you`,
+          action: (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/profile/${notification.actor_id}`)}
+            >
+              View Profile
+            </Button>
+          ),
+        };
+      
+      case 'collaboration_request':
+        return {
+          icon: <UserPlus className="h-5 w-5 text-green-500" />,
+          message: `${actorName} wants to collaborate with you`,
+          action: (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/profile/${notification.actor_id}`)}
+            >
+              View Request
+            </Button>
+          ),
+        };
+      
+      case 'song_reaction':
+        const isLike = notification.reaction_type === 'like';
+        return {
+          icon: isLike ? 
+            <Heart className="h-5 w-5 text-red-500" /> : 
+            <ThumbsDown className="h-5 w-5 text-gray-500" />,
+          message: `${actorName} ${isLike ? 'liked' : 'disliked'} your song`,
+          action: (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/songs/${notification.reference_id}`)}
+            >
+              View Song
+            </Button>
+          ),
+        };
+      
+      default:
+        return {
+          icon: <BellDot className="h-5 w-5" />,
+          message: "New notification",
+          action: null,
+        };
+    }
+  };
 
   if (!user) {
     return (
@@ -61,26 +128,32 @@ export const Notifications = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {notifications?.map((notification: any) => (
-                <Card key={notification.id} className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm">
-                        <span className="font-semibold">
-                          {notification.requester?.full_name || notification.requester?.username}
-                        </span>{' '}
-                        wants to collaborate with{' '}
-                        <span className="font-semibold">
-                          {notification.musicians?.name}
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(notification.created_at).toLocaleDateString()}
-                      </p>
+              {notifications?.map((notification: any) => {
+                const { icon, message, action } = getNotificationContent(notification);
+                
+                return (
+                  <Card key={notification.id} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={notification.actor?.avatar_url} />
+                        <AvatarFallback>
+                          {(notification.actor?.username || 'U')[0].toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          {icon}
+                          <p className="text-sm">{message}</p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(notification.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {action}
                     </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </CardContent>
