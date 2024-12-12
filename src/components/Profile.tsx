@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
 import { MusicianContent } from "./profile/MusicianContent";
@@ -51,13 +51,13 @@ export const Profile = () => {
             )
           `)
           .eq('user_id', user.id)
-          .maybeSingle(); // Changed from single() to maybeSingle()
+          .maybeSingle();
         
         if (error) {
           console.error('Error fetching musician:', error);
           throw error;
         }
-        return data; // This will be null if no musician exists
+        return data;
       } catch (error) {
         console.error('Error fetching musician:', error);
         return null;
@@ -130,59 +130,9 @@ export const Profile = () => {
     }
   };
 
-  const handleBecomeMusicianClick = async () => {
-    if (!user) return;
-
-    try {
-      // First, create the musician profile
-      const { error: musicianError } = await supabase
-        .from('musicians')
-        .insert({
-          user_id: user.id,
-          name: profile?.username || 'New Musician',
-          avatar_url: profile?.avatar_url
-        });
-
-      if (musicianError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Could not create musician profile. Please try again.",
-        });
-        return;
-      }
-
-      // Then update the user's role to musician
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ role: 'musician' })
-        .eq('id', user.id);
-
-      if (profileError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Could not upgrade to musician account. Please try again.",
-        });
-        return;
-      }
-
-      toast({
-        title: "Success!",
-        description: "Your account has been upgraded to a musician account.",
-      });
-      
-      // Invalidate both queries to refresh the data
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      queryClient.invalidateQueries({ queryKey: ['musician'] });
-    } catch (error) {
-      console.error('Error becoming musician:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
-    }
+  const handleMusicianProfileCreated = () => {
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['musician'] });
   };
 
   if (!profile) return null;
@@ -198,12 +148,14 @@ export const Profile = () => {
       <ProfileActions 
         profile={profile}
         isOwner={user?.id === profile.id}
-        onBecomeMusicianClick={handleBecomeMusicianClick}
         onSocialLinksUpdate={handleSocialLinksUpdate}
       />
 
       {profile.role === 'musician' && (
-        <MusicianContent musician={musician} />
+        <MusicianContent 
+          musician={musician} 
+          onProfileCreated={handleMusicianProfileCreated}
+        />
       )}
     </div>
   );
