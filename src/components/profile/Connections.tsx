@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface ConnectionsProps {
   userId: string;
@@ -32,6 +34,8 @@ interface Collaborator {
 
 export const Connections = ({ userId }: ConnectionsProps) => {
   const navigate = useNavigate();
+  const [followingSearch, setFollowingSearch] = useState("");
+  const [collaboratorsSearch, setCollaboratorsSearch] = useState("");
 
   const { data: following } = useQuery({
     queryKey: ['following', userId],
@@ -86,16 +90,38 @@ export const Connections = ({ userId }: ConnectionsProps) => {
     enabled: !!userId,
   });
 
+  const filteredFollowing = following?.filter(follow => {
+    const searchTerm = followingSearch.toLowerCase();
+    const fullName = follow.followed.full_name?.toLowerCase() || '';
+    const username = follow.followed.username?.toLowerCase() || '';
+    return fullName.includes(searchTerm) || username.includes(searchTerm);
+  });
+
+  const filteredCollaborators = collaborators?.filter(collab => {
+    const searchTerm = collaboratorsSearch.toLowerCase();
+    const fullName = collab.musician.profile?.full_name?.toLowerCase() || '';
+    const username = collab.musician.profile?.username?.toLowerCase() || '';
+    const name = collab.musician.name.toLowerCase();
+    return fullName.includes(searchTerm) || username.includes(searchTerm) || name.includes(searchTerm);
+  });
+
   return (
     <Tabs defaultValue="following" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="following">Following</TabsTrigger>
         <TabsTrigger value="collaborators">Collaborators</TabsTrigger>
       </TabsList>
+      
       <TabsContent value="following">
         <div className="space-y-4">
-          {following?.map((follow) => (
-            <div key={follow.followed.id} className="flex items-center justify-between p-4 bg-card rounded-lg">
+          <Input
+            placeholder="Search following..."
+            value={followingSearch}
+            onChange={(e) => setFollowingSearch(e.target.value)}
+            className="mb-4"
+          />
+          {filteredFollowing?.map((follow) => (
+            <div key={follow.followed.id} className="flex items-center justify-between p-4 bg-card rounded-lg animate-fade-in">
               <div className="flex items-center gap-4">
                 <Avatar>
                   <AvatarImage src={follow.followed.avatar_url || undefined} />
@@ -113,15 +139,24 @@ export const Connections = ({ userId }: ConnectionsProps) => {
               </Button>
             </div>
           ))}
-          {!following?.length && (
-            <p className="text-center text-muted-foreground">Not following anyone yet</p>
+          {!filteredFollowing?.length && (
+            <p className="text-center text-muted-foreground">
+              {followingSearch ? "No matching results" : "Not following anyone yet"}
+            </p>
           )}
         </div>
       </TabsContent>
+
       <TabsContent value="collaborators">
         <div className="space-y-4">
-          {collaborators?.map((collab) => (
-            <div key={collab.musician.id} className="flex items-center justify-between p-4 bg-card rounded-lg">
+          <Input
+            placeholder="Search collaborators..."
+            value={collaboratorsSearch}
+            onChange={(e) => setCollaboratorsSearch(e.target.value)}
+            className="mb-4"
+          />
+          {filteredCollaborators?.map((collab) => (
+            <div key={collab.musician.id} className="flex items-center justify-between p-4 bg-card rounded-lg animate-fade-in">
               <div className="flex items-center gap-4">
                 <Avatar>
                   <AvatarImage src={collab.musician.profile?.avatar_url || undefined} />
@@ -129,7 +164,11 @@ export const Connections = ({ userId }: ConnectionsProps) => {
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <span>{collab.musician.profile?.full_name || collab.musician.profile?.username || collab.musician.name}</span>
+                <span>
+                  {collab.musician.profile?.full_name || 
+                   collab.musician.profile?.username || 
+                   collab.musician.name}
+                </span>
               </div>
               <Button
                 variant="ghost"
@@ -139,8 +178,10 @@ export const Connections = ({ userId }: ConnectionsProps) => {
               </Button>
             </div>
           ))}
-          {!collaborators?.length && (
-            <p className="text-center text-muted-foreground">No collaborators yet</p>
+          {!filteredCollaborators?.length && (
+            <p className="text-center text-muted-foreground">
+              {collaboratorsSearch ? "No matching results" : "No collaborators yet"}
+            </p>
           )}
         </div>
       </TabsContent>
