@@ -11,6 +11,13 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Database } from "@/integrations/supabase/types";
+
+type MusicianWithGenre = Database['public']['Tables']['musicians']['Row'] & {
+  genres: {
+    name: string;
+  } | null;
+};
 
 const Musicians = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,7 +36,7 @@ const Musicians = () => {
     },
   });
 
-  const { data: musicians, isLoading: isLoadingMusicians } = useQuery({
+  const { data: musicians, isLoading: isLoadingMusicians } = useQuery<MusicianWithGenre[]>({
     queryKey: ['musicians', searchQuery, selectedGenre],
     queryFn: async () => {
       let query = supabase
