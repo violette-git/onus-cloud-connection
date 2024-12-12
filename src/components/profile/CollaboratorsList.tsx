@@ -27,6 +27,14 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
   const { data: collaborations } = useQuery({
     queryKey: ['collaborators', userId],
     queryFn: async () => {
+      // First, get the musician ID if the user is a musician
+      const { data: musician } = await supabase
+        .from('musicians')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      // Then fetch collaborations where user is either requester or the musician
       const { data, error } = await supabase
         .from('collaborators')
         .select(`
@@ -41,7 +49,9 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
           requester:profiles!collaborators_requester_id_fkey (*)
         `)
         .eq('status', 'accepted')
-        .or(`requester_id.eq.${userId},musician:musicians!collaborators_musician_id_fkey(user_id).eq.${userId}`);
+        .or(
+          `requester_id.eq.${userId},musician_id.eq.${musician?.id || 'null'}`
+        );
 
       if (error) {
         console.error('Error fetching collaborations:', error);
