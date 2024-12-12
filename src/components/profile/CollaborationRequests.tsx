@@ -35,8 +35,12 @@ export const CollaborationRequests = ({ musicianId }: CollaborationRequestsProps
       const { data, error } = await supabase
         .from('collaborators')
         .select(`
-          *,
-          requester:requester_id (
+          requester_id,
+          musician_id,
+          status,
+          created_at,
+          updated_at,
+          requester:profiles!collaborators_requester_id_fkey (
             username,
             full_name,
             avatar_url
