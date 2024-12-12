@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BellDot } from "lucide-react";
 import { NotificationCard } from "@/components/notifications/NotificationCard";
 import type { Notification } from "@/components/notifications/types";
+import { Navbar } from "@/components/Navbar";
 
 export const Notifications = () => {
   const { user } = useAuth();
@@ -35,47 +36,53 @@ export const Notifications = () => {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 pt-24">
-        <Card>
-          <CardContent className="flex items-center justify-center h-32">
-            Please sign in to view notifications
-          </CardContent>
-        </Card>
+      <div className="min-h-screen">
+        <Navbar />
+        <main className="container mx-auto px-4 pt-24">
+          <Card>
+            <CardContent className="flex items-center justify-center h-32">
+              Please sign in to view notifications
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 pt-24">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BellDot className="h-5 w-5" />
-            Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center h-32">
-              Loading notifications...
-            </div>
-          ) : notifications?.length === 0 ? (
-            <div className="flex items-center justify-center h-32">
-              No new notifications
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {notifications?.map((notification) => (
-                <NotificationCard 
-                  key={notification.id} 
-                  notification={notification}
-                  currentUserId={user.id}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="container mx-auto px-4 pt-24">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BellDot className="h-5 w-5" />
+              Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                Loading notifications...
+              </div>
+            ) : notifications?.length === 0 ? (
+              <div className="flex items-center justify-center h-32">
+                No new notifications
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {notifications?.map((notification) => (
+                  <NotificationCard 
+                    key={notification.id} 
+                    notification={notification}
+                    currentUserId={user.id}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </main>
     </div>
   );
 };
