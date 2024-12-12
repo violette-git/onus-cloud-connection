@@ -26,6 +26,15 @@ export interface Song {
   updated_at: string;
 }
 
+export interface Video {
+  id: string;
+  title: string;
+  url: string;
+  platform: 'youtube' | 'tiktok';
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Musician {
   id: string;
   user_id: string | null;
@@ -41,4 +50,5 @@ export interface Musician {
     };
   }[];
   songs?: Song[];
+  videos?: Video[];
 }

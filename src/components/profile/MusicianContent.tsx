@@ -1,7 +1,8 @@
-import { Music2 } from "lucide-react";
+import { Music2, Video } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CreateMusicianForm } from "./CreateMusicianForm";
 import { SongManager } from "./SongManager";
+import { VideoManager } from "./VideoManager";
 import type { Musician } from "@/types/profile";
 
 interface MusicianContentProps {
@@ -25,16 +26,25 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
           
           <div className="grid grid-cols-1 gap-6">
             {user?.id === musician.user_id && (
-              <SongManager 
-                musicianId={musician.id} 
-                songs={musician.songs || []}
-              />
+              <>
+                <SongManager 
+                  musicianId={musician.id} 
+                  songs={musician.songs || []}
+                />
+                <VideoManager 
+                  musicianId={musician.id} 
+                  videos={musician.videos || []}
+                />
+              </>
             )}
 
-            {(!musician.songs || musician.songs.length === 0) && (
+            {(!musician.songs?.length && !musician.videos?.length) && (
               <div className="col-span-full text-center py-12">
-                <Music2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No songs added yet</p>
+                <div className="flex justify-center space-x-4">
+                  <Music2 className="h-12 w-12 text-muted-foreground" />
+                  <Video className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground mt-4">No content added yet</p>
               </div>
             )}
           </div>

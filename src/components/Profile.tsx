@@ -55,6 +55,14 @@ export const Profile = () => {
               url,
               created_at,
               updated_at
+            ),
+            videos (
+              id,
+              title,
+              url,
+              platform,
+              created_at,
+              updated_at
             )
           `)
           .eq('user_id', user.id)
