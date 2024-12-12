@@ -1,5 +1,5 @@
 import { Settings, User, LogOut } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +25,7 @@ interface AuthButtonsProps {
 
 export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -42,6 +43,11 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
     enabled: !!user,
   });
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onAction?.();
+  };
+
   return (
     <>
       {user ? (
@@ -57,18 +63,14 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <Link to="/profile" onClick={onAction}>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </DropdownMenuItem>
-            </Link>
-            <Link to="/settings" onClick={onAction}>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem onClick={() => handleNavigation('/profile')}>
+              <User className="mr-2 h-4 w-4" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
               signOut();
