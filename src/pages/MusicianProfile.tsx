@@ -13,10 +13,15 @@ const MusicianProfile = () => {
   const { data: musician, isLoading } = useQuery({
     queryKey: ['musician', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: musicianData, error: musicianError } = await supabase
         .from('musicians')
         .select(`
           *,
+          profile:user_id (
+            avatar_url,
+            username,
+            full_name
+          ),
           musician_genres (
             genre: genres (name)
           ),
@@ -39,8 +44,8 @@ const MusicianProfile = () => {
         .eq('id', id)
         .single();
 
-      if (error) throw error;
-      return data as Musician;
+      if (musicianError) throw musicianError;
+      return musicianData as Musician & { profile: { avatar_url: string | null, username: string | null, full_name: string | null } };
     },
     enabled: !!id,
   });
@@ -76,17 +81,16 @@ const MusicianProfile = () => {
               </CardHeader>
               <CardContent>
                 <div className="aspect-square relative rounded-lg overflow-hidden">
-                  {musician.avatar_url ? (
-                    <img
-                      src={musician.avatar_url}
+                  <Avatar className="h-full w-full">
+                    <AvatarImage
+                      src={musician.profile?.avatar_url || undefined}
                       alt={musician.name}
-                      className="w-full h-full object-cover"
+                      className="object-cover"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <AvatarFallback>
                       <User className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                  )}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 {musician.bio && (
                   <p className="mt-4 text-muted-foreground">{musician.bio}</p>
