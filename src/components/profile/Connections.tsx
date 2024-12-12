@@ -76,7 +76,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('status', 'accepted');
       
       if (error) throw error;
-      return data as unknown as Collaborator[];
+      return data as Collaborator[];
     },
     enabled: !!userId,
   });
