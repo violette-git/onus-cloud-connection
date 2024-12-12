@@ -6,18 +6,16 @@ import { NudgeForm } from "@/components/messaging/NudgeForm";
 
 interface MessageDialogProps {
   recipientId: string;
+  children: React.ReactNode; // Added this line to accept children
 }
 
-export const MessageDialog = ({ recipientId }: MessageDialogProps) => {
+export const MessageDialog = ({ recipientId, children }: MessageDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
-          <MessageCircle className="mr-2 h-4 w-4" />
-          Send Message
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
