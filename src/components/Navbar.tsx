@@ -29,8 +29,10 @@ export const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           <NavLinks />
-          <AuthButtons />
         </div>
+
+        {/* Auth Buttons - Always Visible */}
+        <AuthButtons />
 
         {/* Mobile Navigation */}
         <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
@@ -45,9 +47,6 @@ export const Navbar = () => {
             </SheetHeader>
             <div className="flex flex-col space-y-4 mt-8">
               <NavLinks onNavigate={() => setIsOpen(false)} />
-              <div className="pt-4">
-                <AuthButtons onAction={() => setIsOpen(false)} />
-              </div>
             </div>
           </SheetContent>
         </Sheet>

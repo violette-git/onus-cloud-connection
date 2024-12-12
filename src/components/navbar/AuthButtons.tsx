@@ -48,7 +48,7 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
     if (onAction) {
       setTimeout(() => {
         onAction();
-      }, 0);
+      }, 100);
     }
   };
 
@@ -57,7 +57,6 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
     if (onAction) {
       onAction();
     }
-    navigate('/');
   };
 
   return (
