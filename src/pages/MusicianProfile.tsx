@@ -88,6 +88,7 @@ const MusicianProfile = () => {
   }
 
   const isOwner = user?.id === musician.user_id;
+  const displayName = musician.profile?.username || musician.profile?.full_name || musician.name;
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
@@ -97,7 +98,7 @@ const MusicianProfile = () => {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-start">
-                  <CardTitle>{musician.name}</CardTitle>
+                  <CardTitle>{displayName}</CardTitle>
                   <MusicianActions 
                     musicianUserId={musician.user_id} 
                     musicianId={musician.id} 
@@ -109,7 +110,7 @@ const MusicianProfile = () => {
                   <Avatar className="h-full w-full">
                     <AvatarImage
                       src={musician.profile?.avatar_url || undefined}
-                      alt={musician.name}
+                      alt={displayName}
                       className="object-cover"
                     />
                     <AvatarFallback>
