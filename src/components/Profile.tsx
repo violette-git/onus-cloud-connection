@@ -51,16 +51,13 @@ export const Profile = () => {
             )
           `)
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle(); // Changed from single() to maybeSingle()
         
         if (error) {
-          // If the error is PGRST116 (no rows returned), return null instead of throwing
-          if (error.code === 'PGRST116') {
-            return null;
-          }
+          console.error('Error fetching musician:', error);
           throw error;
         }
-        return data;
+        return data; // This will be null if no musician exists
       } catch (error) {
         console.error('Error fetching musician:', error);
         return null;
