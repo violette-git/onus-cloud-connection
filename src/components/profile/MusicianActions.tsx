@@ -116,11 +116,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       {
         onSuccess: () => {
           // Invalidate all relevant queries
-          queryClient.invalidateQueries({ queryKey: ['collaboration', musicianId, user?.id] });
-          queryClient.invalidateQueries({ queryKey: ['collaboration-requests', musicianId] });
+          queryClient.invalidateQueries({ queryKey: ['collaboration'] });
+          queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
-          // Force a refetch of the collaboration status
-          queryClient.refetchQueries({ queryKey: ['collaboration', musicianId, user?.id] });
         }
       }
     );
