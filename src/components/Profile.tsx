@@ -41,19 +41,30 @@ export const Profile = () => {
     queryKey: ['musician', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('musicians')
-        .select(`
-          *,
-          musician_genres (
-            genre: genres (name)
-          )
-        `)
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('musicians')
+          .select(`
+            *,
+            musician_genres (
+              genre: genres (name)
+            )
+          `)
+          .eq('user_id', user.id)
+          .single();
+        
+        if (error) {
+          // If the error is PGRST116 (no rows returned), return null instead of throwing
+          if (error.code === 'PGRST116') {
+            return null;
+          }
+          throw error;
+        }
+        return data;
+      } catch (error) {
+        console.error('Error fetching musician:', error);
+        return null;
+      }
     },
     enabled: !!user && profile?.role === 'musician',
   });
@@ -143,6 +154,9 @@ export const Profile = () => {
       title: "Success!",
       description: "Your account has been upgraded to a musician account.",
     });
+    
+    // Invalidate the profile query to refresh the data
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
   };
 
   if (!profile) return null;
