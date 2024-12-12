@@ -99,7 +99,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         onClick={() => followMutation.mutate()}
         disabled={followMutation.isPending}
         size="sm"
-        className="min-w-[100px]"
+        className="min-w-[100px] flex items-center gap-2"
       >
         {isFollowing ? (
           <>
@@ -120,7 +120,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           onClick={() => collaborateMutation.mutate()}
           disabled={collaborateMutation.isPending || isRequesting}
           size="sm"
-          className="min-w-[160px]"
+          className="min-w-[160px] flex items-center gap-2"
         >
           <HandshakeIcon className="h-4 w-4" />
           <span>Request Collab</span>
@@ -132,7 +132,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           variant="outline" 
           disabled 
           size="sm"
-          className="min-w-[160px]"
+          className="min-w-[160px] flex items-center gap-2"
         >
           <HandshakeIcon className="h-4 w-4" />
           <span>Request Pending</span>
@@ -144,7 +144,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           variant="outline" 
           disabled 
           size="sm"
-          className="min-w-[160px]"
+          className="min-w-[160px] flex items-center gap-2"
         >
           <HandshakeIcon className="h-4 w-4" />
           <span>Collaborator</span>

@@ -5,11 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MusicianActions } from "@/components/profile/MusicianActions";
+import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
 import type { Musician } from "@/types/profile";
 import { User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MusicianProfile = () => {
   const { id } = useParams();
+  const { user } = useAuth();
 
   const { data: musician, isLoading } = useQuery({
     queryKey: ['musician', id],
@@ -84,6 +87,8 @@ const MusicianProfile = () => {
     );
   }
 
+  const isOwner = user?.id === musician.user_id;
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -135,6 +140,7 @@ const MusicianProfile = () => {
                     </div>
                   </div>
                 )}
+                {isOwner && <CollaborationRequests musicianId={musician.id} />}
               </CardContent>
             </Card>
           </div>
