@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Musician } from "@/types/profile";
+import { User } from "lucide-react";
 
 const MusicianProfile = () => {
   const { id } = useParams();
@@ -75,17 +77,16 @@ const MusicianProfile = () => {
               </CardHeader>
               <CardContent>
                 <div className="aspect-square relative">
-                  {musician.avatar_url ? (
-                    <img
-                      src={musician.avatar_url}
+                  <Avatar className="h-full w-full">
+                    <AvatarImage
+                      src={musician.avatar_url || undefined}
                       alt={musician.name}
-                      className="w-full h-full object-cover rounded-md"
+                      className="object-cover"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-muted rounded-md flex items-center justify-center">
-                      No image available
-                    </div>
-                  )}
+                    <AvatarFallback>
+                      <User className="h-12 w-12 text-muted-foreground" />
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 {musician.bio && (
                   <p className="mt-4 text-muted-foreground">{musician.bio}</p>
@@ -149,9 +150,7 @@ const MusicianProfile = () => {
                     {musician.videos.map((video) => (
                       <div key={video.id} className="space-y-2">
                         <h3 className="font-medium">{video.title}</h3>
-                        <AspectRatio ratio={16 / 9}>
-                          <VideoEmbed video={video} />
-                        </AspectRatio>
+                        <VideoEmbed video={video} />
                       </div>
                     ))}
                   </div>

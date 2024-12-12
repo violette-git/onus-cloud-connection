@@ -16,6 +16,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User } from "lucide-react";
 
 type Musician = Database['public']['Tables']['musicians']['Row'];
 type Genre = Database['public']['Tables']['genres']['Row'];
@@ -177,14 +179,17 @@ const Musicians = () => {
                 onClick={() => handleMusicianClick(musician.id)}
               >
                 <CardContent className="p-0">
-                  <div className="aspect-square bg-muted">
-                    {musician.avatar_url && (
-                      <img 
-                        src={musician.avatar_url} 
+                  <div className="aspect-square">
+                    <Avatar className="h-full w-full rounded-none">
+                      <AvatarImage 
+                        src={musician.avatar_url || undefined}
                         alt={musician.name}
-                        className="w-full h-full object-cover"
+                        className="object-cover"
                       />
-                    )}
+                      <AvatarFallback className="rounded-none">
+                        <User className="h-12 w-12 text-muted-foreground" />
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                 </CardContent>
                 <CardHeader>
