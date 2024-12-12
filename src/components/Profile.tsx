@@ -78,11 +78,6 @@ export const Profile = () => {
     enabled: !!targetUserId && profile?.role === 'musician',
   });
 
-  // If this is a musician's profile and not the current user, redirect to the musician view
-  if (profile?.role === 'musician' && musician && profileId && profileId !== user?.id) {
-    return <Navigate to={`/musicians/${musician.id}`} replace />;
-  }
-
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<ProfileType>) => {
       if (!user?.id) throw new Error("No user");
@@ -153,6 +148,11 @@ export const Profile = () => {
   };
 
   if (!profile) return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
+
+  // Handle redirect to musician profile if needed
+  if (profile.role === 'musician' && musician && profileId && profileId !== user?.id) {
+    return <Navigate to={`/musicians/${musician.id}`} replace />;
+  }
 
   const isOwner = user?.id === profile.id;
 
