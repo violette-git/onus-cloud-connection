@@ -61,14 +61,25 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
     if (!searchTerm.trim()) return true;
     
     const searchLower = searchTerm.toLowerCase().trim();
+    console.log('Searching for:', searchLower);
+    console.log('Current collaborator data:', {
+      fullName: collab.musician.profile?.full_name,
+      username: collab.musician.profile?.username,
+      name: collab.musician.name
+    });
+    
     const fullName = (collab.musician.profile?.full_name || '').toLowerCase();
     const username = (collab.musician.profile?.username || '').toLowerCase();
     const name = collab.musician.name.toLowerCase();
     
-    return fullName.includes(searchLower) || 
+    const matches = fullName.includes(searchLower) || 
            username.includes(searchLower) || 
            name.includes(searchLower);
+    console.log('Matches:', matches);
+    return matches;
   });
+
+  console.log('Filtered collaborators count:', filteredCollaborators?.length);
 
   return (
     <div className="space-y-4">

@@ -50,11 +50,21 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
     if (!searchTerm.trim()) return true;
     
     const searchLower = searchTerm.toLowerCase().trim();
+    console.log('Searching for:', searchLower);
+    console.log('Current follow data:', {
+      fullName: follow.followed.full_name,
+      username: follow.followed.username
+    });
+    
     const fullName = (follow.followed.full_name || '').toLowerCase();
     const username = (follow.followed.username || '').toLowerCase();
     
-    return fullName.includes(searchLower) || username.includes(searchLower);
+    const matches = fullName.includes(searchLower) || username.includes(searchLower);
+    console.log('Matches:', matches);
+    return matches;
   });
+
+  console.log('Filtered following count:', filteredFollowing?.length);
 
   return (
     <div className="space-y-4">
