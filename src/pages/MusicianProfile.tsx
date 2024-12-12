@@ -6,6 +6,7 @@ import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MusicianActions } from "@/components/profile/MusicianActions";
 import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
+import { Connections } from "@/components/profile/Connections";
 import type { Musician } from "@/types/profile";
 import { User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -130,6 +131,13 @@ export const MusicianProfile = () => {
           {musician.bio && (
             <div className="max-w-2xl mx-auto">
               <p className="text-muted-foreground text-center">{musician.bio}</p>
+            </div>
+          )}
+
+          {isOwner && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">My Connections</h2>
+              <Connections userId={user?.id || ''} />
             </div>
           )}
 

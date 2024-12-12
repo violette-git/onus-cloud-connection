@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserPlus2, UserMinus2, HandshakeIcon } from "lucide-react";
+import { UserPlus2, UserMinus2, HandshakeIcon, X } from "lucide-react";
+import { useCancelCollaboration } from "@/hooks/useCancelCollaboration";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -16,6 +17,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRequesting, setIsRequesting] = useState(false);
+  const { mutate: cancelCollaboration } = useCancelCollaboration();
 
   // If this is the current user's profile, or no user is logged in, don't show any actions
   if (!user || user.id === musicianUserId) return null;
@@ -93,6 +95,11 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     },
   });
 
+  const handleCancelRequest = () => {
+    if (!user?.id) return;
+    cancelCollaboration({ requesterId: user.id, musicianId });
+  };
+
   return (
     <div className="flex flex-col items-center gap-2 mt-2">
       <Button
@@ -129,15 +136,25 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       )}
 
       {collaborationStatus === 'pending' && (
-        <Button 
-          variant="outline" 
-          disabled 
-          size="sm"
-          className="w-full max-w-[120px] flex items-center gap-1 text-xs"
-        >
-          <HandshakeIcon className="h-3 w-3" />
-          <span>Request Pending</span>
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            disabled 
+            size="sm"
+            className="w-full max-w-[120px] flex items-center gap-1 text-xs"
+          >
+            <HandshakeIcon className="h-3 w-3" />
+            <span>Request Pending</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCancelRequest}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4 text-red-500" />
+          </Button>
+        </div>
       )}
 
       {collaborationStatus === 'accepted' && (
