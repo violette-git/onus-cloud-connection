@@ -59,6 +59,8 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
     }
   };
 
+  const displayName = profile?.full_name || profile?.username || "User";
+
   return (
     <>
       {user ? (
@@ -66,7 +68,11 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || "User"} />
+                <AvatarImage 
+                  src={profile?.avatar_url} 
+                  alt={displayName}
+                  className="object-cover"
+                />
                 <AvatarFallback>
                   <User className="h-4 w-4" />
                 </AvatarFallback>

@@ -9,6 +9,8 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ profile, isOwner, onImageUpload }: ProfileHeaderProps) => {
+  const displayName = profile?.full_name || profile?.username || "User";
+  
   return (
     <div className="relative">
       <div className="h-48 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
@@ -17,7 +19,7 @@ export const ProfileHeader = ({ profile, isOwner, onImageUpload }: ProfileHeader
           <div className="gradient-border relative group">
             <img
               src={profile?.avatar_url || "https://source.unsplash.com/300x300/?musician"}
-              alt="Profile"
+              alt={displayName}
               className="w-32 h-32 rounded-lg object-cover bg-background"
             />
             {isOwner && (
@@ -33,7 +35,7 @@ export const ProfileHeader = ({ profile, isOwner, onImageUpload }: ProfileHeader
             )}
           </div>
           <div className="text-center">
-            <h1 className="text-3xl font-bold">{profile?.username || profile?.full_name || "Anonymous User"}</h1>
+            <h1 className="text-3xl font-bold">{displayName}</h1>
             <p className="text-muted-foreground">
               {profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast'}
             </p>
