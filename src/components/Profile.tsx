@@ -93,6 +93,32 @@ export const Profile = () => {
     },
   });
 
+  const handleBecomeMusicianClick = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ role: 'musician' })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast({
+        title: "Success!",
+        description: "You are now registered as a musician.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not update your role. Please try again.",
+      });
+      console.error('Error becoming musician:', error);
+    }
+  };
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
@@ -149,6 +175,7 @@ export const Profile = () => {
         profile={profile}
         isOwner={user?.id === profile.id}
         onSocialLinksUpdate={handleSocialLinksUpdate}
+        onBecomeMusicianClick={handleBecomeMusicianClick}
       />
 
       {profile.role === 'musician' && (
