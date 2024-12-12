@@ -2,12 +2,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MusicianActions } from "@/components/profile/MusicianActions";
 import { User } from "lucide-react";
 import type { Musician } from "@/types/profile";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MusicianHeaderProps {
   musician: Musician;
 }
 
 export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
+  const { user } = useAuth();
+  const isOwner = user?.id === musician.user_id;
+  
   // Get the most appropriate avatar URL from the profile
   const avatarUrl = musician.profile?.avatar_url || musician.avatar_url;
 
@@ -25,15 +29,26 @@ export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
               <User className="h-12 w-12 text-muted-foreground" />
             </AvatarFallback>
           </Avatar>
-          <h1 className="text-3xl font-bold mt-4">{musician.name}</h1>
-          <p className="text-muted-foreground">Musician</p>
           
-          <div className="mt-4 w-full max-w-md">
-            <MusicianActions 
-              musicianUserId={musician.user_id} 
-              musicianId={musician.id}
-            />
+          <div className="text-center mt-4">
+            <h1 className="text-3xl font-bold">{musician.name}</h1>
+            <p className="text-muted-foreground">Musician</p>
+            
+            {musician.location && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {musician.location}
+              </p>
+            )}
           </div>
+          
+          {!isOwner && (
+            <div className="mt-4">
+              <MusicianActions 
+                musicianUserId={musician.user_id || ''} 
+                musicianId={musician.id}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
