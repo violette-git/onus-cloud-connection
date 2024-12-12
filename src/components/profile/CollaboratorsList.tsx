@@ -72,13 +72,15 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
       return {
         id: collab.musician.id,
         name: collab.musician.name,
-        profile: collab.musician.profile
+        profile: collab.musician.profile,
+        userId: collab.musician.user_id // Add this for correct navigation
       };
     } else {
       return {
-        id: collab.musician.id, // Still use musician ID for navigation
+        id: collab.musician.id,
         name: collab.requester.username || '',
-        profile: collab.requester
+        profile: collab.requester,
+        userId: collab.requester.id // Add this for correct navigation
       };
     }
   }).filter(collab => {
@@ -104,7 +106,7 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
       {filteredCollaborators?.map((collab) => (
         <CollaboratorCard
           key={`${collab.id}-${collab.profile?.id}`}
-          id={collab.id}
+          id={collab.userId} // Use userId instead of musician id for navigation
           name={collab.name}
           profile={collab.profile}
         />
