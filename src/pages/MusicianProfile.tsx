@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MusicianActions } from "@/components/profile/MusicianActions";
 import type { Musician } from "@/types/profile";
 import { User } from "lucide-react";
 
@@ -90,7 +91,13 @@ const MusicianProfile = () => {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>{musician.name}</CardTitle>
+                <div className="flex justify-between items-start">
+                  <CardTitle>{musician.name}</CardTitle>
+                  <MusicianActions 
+                    musicianUserId={musician.user_id} 
+                    musicianId={musician.id} 
+                  />
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="aspect-square relative rounded-lg overflow-hidden">
