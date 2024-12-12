@@ -23,10 +23,11 @@ export const Profile = () => {
   // If no profileId is provided in URL, use the current user's ID
   const targetUserId = profileId || user?.id;
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return null;
+      console.log('Fetching profile for targetUserId:', targetUserId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -34,6 +35,7 @@ export const Profile = () => {
         .single();
       
       if (error) throw error;
+      console.log('Profile data:', data);
       return {
         ...data,
         social_links: data.social_links || defaultSocialLinks
@@ -42,10 +44,11 @@ export const Profile = () => {
     enabled: !!targetUserId,
   });
 
-  const { data: musician } = useQuery({
+  const { data: musician, isLoading: isMusicianLoading } = useQuery({
     queryKey: ['musician', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return null;
+      console.log('Fetching musician data for targetUserId:', targetUserId);
       const { data, error } = await supabase
         .from('musicians')
         .select(`
@@ -73,9 +76,10 @@ export const Profile = () => {
         .maybeSingle();
       
       if (error) throw error;
+      console.log('Musician data:', data);
       return data;
     },
-    enabled: !!targetUserId && profile?.role === 'musician',
+    enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
   });
 
   const updateProfileMutation = useMutation({
@@ -148,7 +152,14 @@ export const Profile = () => {
   };
 
   // Show loading state while profile is being fetched
-  if (!profile) return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
+  if (isProfileLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
+  }
+
+  // Show error state if no profile is found
+  if (!profile) {
+    return <div className="flex items-center justify-center h-screen">Profile not found</div>;
+  }
 
   // Only redirect if:
   // 1. We're viewing someone else's profile (profileId exists and isn't the current user)
