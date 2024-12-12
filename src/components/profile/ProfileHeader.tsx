@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Upload, User } from "lucide-react";
+import { User } from "lucide-react";
 import type { Profile, Musician } from "@/types/profile";
 
 interface ProfileHeaderProps {
@@ -11,11 +11,12 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: ProfileHeaderProps) => {
   const displayName = musician?.name || profile?.full_name || profile?.username || "User";
+  const role = profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast';
   
   return (
     <div className="relative">
       <div className="h-48 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-16">
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-24 text-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
             {profile?.avatar_url ? (
@@ -37,14 +38,14 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
                   className="hidden"
                   onChange={onImageUpload}
                 />
-                <Upload className="h-6 w-6 text-white" />
+                <User className="h-6 w-6 text-white" />
               </label>
             )}
           </div>
           <div className="text-center">
             <h1 className="text-3xl font-bold">{displayName}</h1>
-            <p className="text-muted-foreground">
-              {profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast'}
+            <p className="text-muted-foreground mt-1">
+              {role}
             </p>
           </div>
         </div>

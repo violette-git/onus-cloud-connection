@@ -2,10 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { ProfileHeader } from "./profile/ProfileHeader";
-import { ProfileActions } from "./profile/ProfileActions";
-import { ProfileContent } from "./profile/ProfileContent";
 import { useParams, Navigate } from "react-router-dom";
+import { ProfileView } from "./profile/ProfileView";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
@@ -20,14 +18,12 @@ export const Profile = () => {
   const queryClient = useQueryClient();
   const { id: profileId } = useParams();
   
-  // If no profileId is provided in URL, use the current user's ID
   const targetUserId = profileId || user?.id;
 
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return null;
-      console.log('Fetching profile for targetUserId:', targetUserId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -35,7 +31,6 @@ export const Profile = () => {
         .single();
       
       if (error) throw error;
-      console.log('Profile data:', data);
       return {
         ...data,
         social_links: data.social_links || defaultSocialLinks
@@ -48,7 +43,6 @@ export const Profile = () => {
     queryKey: ['musician', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return null;
-      console.log('Fetching musician data for targetUserId:', targetUserId);
       const { data, error } = await supabase
         .from('musicians')
         .select(`
@@ -76,7 +70,6 @@ export const Profile = () => {
         .maybeSingle();
       
       if (error) throw error;
-      console.log('Musician data:', data);
       return data;
     },
     enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
@@ -138,38 +131,19 @@ export const Profile = () => {
     }
   };
 
-  const handleSocialLinksUpdate = async (newLinks: SocialLinks) => {
-    try {
-      await updateProfileMutation.mutateAsync({ social_links: newLinks });
-    } catch (error) {
-      console.error('Error updating social links:', error);
-    }
-  };
-
-  const handleMusicianProfileCreated = () => {
-    queryClient.invalidateQueries({ queryKey: ['profile'] });
-    queryClient.invalidateQueries({ queryKey: ['musician'] });
-  };
-
-  // Show loading state while profile is being fetched
   if (isProfileLoading) {
     return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
   }
 
-  // Show error state if no profile is found
   if (!profile) {
     return <div className="flex items-center justify-center h-screen">Profile not found</div>;
   }
 
-  // Only redirect if:
-  // 1. We're viewing someone else's profile (profileId exists and isn't the current user)
-  // 2. That person is a musician
-  // 3. We have their musician data
   const shouldRedirectToMusicianProfile = 
-    profileId && // We're viewing a specific profile
-    profileId !== user?.id && // It's not our own profile
-    profile.role === 'musician' && // The profile is a musician
-    musician; // We have the musician data
+    profileId && 
+    profileId !== user?.id && 
+    profile.role === 'musician' && 
+    musician;
 
   if (shouldRedirectToMusicianProfile) {
     return <Navigate to={`/musicians/${musician.id}`} replace />;
@@ -178,35 +152,29 @@ export const Profile = () => {
   const isOwner = user?.id === profile.id;
 
   return (
-    <div className="animate-fade-in pb-12">
-      <ProfileHeader 
-        profile={profile}
-        musician={musician}
-        isOwner={isOwner}
-        onImageUpload={handleImageUpload}
-      />
-
-      <div className="mt-24">
-        <ProfileActions 
-          profile={profile}
-          isOwner={isOwner}
-          onSocialLinksUpdate={handleSocialLinksUpdate}
-          onBecomeMusicianClick={async () => {
-            try {
-              await updateProfileMutation.mutateAsync({ role: 'musician' });
-            } catch (error) {
-              console.error('Error becoming musician:', error);
-            }
-          }}
-        />
-
-        {profile.role === 'musician' && (
-          <ProfileContent 
-            musician={musician} 
-            onProfileCreated={handleMusicianProfileCreated}
-          />
-        )}
-      </div>
-    </div>
+    <ProfileView
+      profile={profile}
+      musician={musician}
+      isOwner={isOwner}
+      onImageUpload={handleImageUpload}
+      onSocialLinksUpdate={async (newLinks) => {
+        try {
+          await updateProfileMutation.mutateAsync({ social_links: newLinks });
+        } catch (error) {
+          console.error('Error updating social links:', error);
+        }
+      }}
+      onBecomeMusicianClick={async () => {
+        try {
+          await updateProfileMutation.mutateAsync({ role: 'musician' });
+        } catch (error) {
+          console.error('Error becoming musician:', error);
+        }
+      }}
+      onMusicianProfileCreated={() => {
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
+        queryClient.invalidateQueries({ queryKey: ['musician'] });
+      }}
+    />
   );
 };
