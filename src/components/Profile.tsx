@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
 import { MusicianContent } from "./profile/MusicianContent";
-import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
+import type { Profile as ProfileType, SocialLinks, VideoPlatform } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
   instagram: "",
@@ -72,6 +72,15 @@ export const Profile = () => {
           console.error('Error fetching musician:', error);
           throw error;
         }
+
+        // Type cast the platform field to ensure it matches the VideoPlatform type
+        if (data?.videos) {
+          data.videos = data.videos.map(video => ({
+            ...video,
+            platform: video.platform as VideoPlatform
+          }));
+        }
+
         return data;
       } catch (error) {
         console.error('Error fetching musician:', error);

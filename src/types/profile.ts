@@ -26,11 +26,13 @@ export interface Song {
   updated_at: string;
 }
 
+export type VideoPlatform = 'youtube' | 'tiktok';
+
 export interface Video {
   id: string;
   title: string;
   url: string;
-  platform: 'youtube' | 'tiktok';
+  platform: VideoPlatform;
   created_at: string;
   updated_at: string;
 }
