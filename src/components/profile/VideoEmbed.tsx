@@ -29,12 +29,6 @@ export const VideoEmbed = ({ video }: VideoEmbedProps) => {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const getTiktokVideoId = (url: string) => {
-    const regExp = /\/video\/(\d+)/;
-    const match = url.match(regExp);
-    return match ? match[1] : null;
-  };
-
   if (video.platform === 'youtube') {
     const videoId = getYoutubeVideoId(video.url);
     if (!videoId) return null;
@@ -52,15 +46,12 @@ export const VideoEmbed = ({ video }: VideoEmbedProps) => {
   }
 
   if (video.platform === 'tiktok') {
-    const videoId = getTiktokVideoId(video.url);
-    if (!videoId) return null;
-
     return (
-      <div ref={tiktokContainerRef} className="tiktok-embed my-4">
+      <div ref={tiktokContainerRef} className="tiktok-embed">
         <blockquote 
           className="tiktok-embed" 
           cite={video.url}
-          data-video-id={videoId}
+          data-video-id={video.url.split('/video/')[1]?.split('?')[0]}
         >
           <section>
             <a href={video.url}>Loading TikTok video...</a>

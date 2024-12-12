@@ -119,12 +119,12 @@ export const MusicianProfile = () => {
           <CollaborationRequests musicianId={musician.id} />
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+          <div className="lg:col-span-4 space-y-8">
             <MusicianBio musician={musician} />
 
             {isOwner && (
-              <div className="mt-8">
+              <div>
                 <h2 className="text-2xl font-semibold mb-4">My Connections</h2>
                 <Connections userId={user?.id || ''} />
               </div>
