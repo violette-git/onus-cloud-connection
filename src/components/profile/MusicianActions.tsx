@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { HandshakeIcon, UserPlus2, UserMinus2 } from "lucide-react";
+import { UserPlus2, UserMinus2, HandshakeIcon } from "lucide-react";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -93,18 +93,25 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   if (!user || user.id === musicianUserId) return null;
 
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-3">
       <Button
         variant={isFollowing ? "outline" : "default"}
         onClick={() => followMutation.mutate()}
         disabled={followMutation.isPending}
+        size="sm"
+        className="min-w-[100px]"
       >
         {isFollowing ? (
-          <UserMinus2 className="mr-2 h-4 w-4" />
+          <>
+            <UserMinus2 className="h-4 w-4" />
+            <span>Unfollow</span>
+          </>
         ) : (
-          <UserPlus2 className="mr-2 h-4 w-4" />
+          <>
+            <UserPlus2 className="h-4 w-4" />
+            <span>Follow</span>
+          </>
         )}
-        {isFollowing ? "Unfollow" : "Follow"}
       </Button>
 
       {!collaborationStatus && (
@@ -112,23 +119,35 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           variant="outline"
           onClick={() => collaborateMutation.mutate()}
           disabled={collaborateMutation.isPending || isRequesting}
+          size="sm"
+          className="min-w-[160px]"
         >
-          <HandshakeIcon className="mr-2 h-4 w-4" />
-          Request Collaboration
+          <HandshakeIcon className="h-4 w-4" />
+          <span>Request Collab</span>
         </Button>
       )}
 
       {collaborationStatus === 'pending' && (
-        <Button variant="outline" disabled>
-          <HandshakeIcon className="mr-2 h-4 w-4" />
-          Request Pending
+        <Button 
+          variant="outline" 
+          disabled 
+          size="sm"
+          className="min-w-[160px]"
+        >
+          <HandshakeIcon className="h-4 w-4" />
+          <span>Request Pending</span>
         </Button>
       )}
 
       {collaborationStatus === 'accepted' && (
-        <Button variant="outline" disabled>
-          <HandshakeIcon className="mr-2 h-4 w-4" />
-          Collaborator
+        <Button 
+          variant="outline" 
+          disabled 
+          size="sm"
+          className="min-w-[160px]"
+        >
+          <HandshakeIcon className="h-4 w-4" />
+          <span>Collaborator</span>
         </Button>
       )}
     </div>
