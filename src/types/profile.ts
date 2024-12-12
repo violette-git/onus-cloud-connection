@@ -18,6 +18,14 @@ export interface Profile {
   updated_at: string | null;
 }
 
+export interface Song {
+  id: string;
+  title: string;
+  url: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Musician {
   id: string;
   user_id: string | null;
@@ -32,4 +40,5 @@ export interface Musician {
       name: string;
     };
   }[];
+  songs?: Song[];
 }

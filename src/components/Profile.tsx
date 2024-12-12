@@ -48,6 +48,13 @@ export const Profile = () => {
             *,
             musician_genres (
               genre: genres (name)
+            ),
+            songs (
+              id,
+              title,
+              url,
+              created_at,
+              updated_at
             )
           `)
           .eq('user_id', user.id)

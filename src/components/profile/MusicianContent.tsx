@@ -1,7 +1,7 @@
 import { Music2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CreateMusicianForm } from "./CreateMusicianForm";
-import { SunoPlayer } from "./SunoPlayer";
+import { SongManager } from "./SongManager";
 import type { Musician } from "@/types/profile";
 
 interface MusicianContentProps {
@@ -11,9 +11,6 @@ interface MusicianContentProps {
 
 export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentProps) => {
   const { user } = useAuth();
-
-  // Example audio URL - replace with actual audio file URL from your data
-  const exampleSongUrl = "https://example.com/path/to/audio.mp3";
 
   return (
     <div className="mt-12 px-8">
@@ -26,24 +23,20 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
             </div>
           )}
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Audio player will only show up if there's a valid audio URL */}
-            {exampleSongUrl && (
-              <div className="col-span-full md:col-span-2 lg:col-span-3">
-                <SunoPlayer songUrl={exampleSongUrl} />
-              </div>
+          <div className="grid grid-cols-1 gap-6">
+            {user?.id === musician.user_id && (
+              <SongManager 
+                musicianId={musician.id} 
+                songs={musician.songs || []}
+              />
             )}
 
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="aspect-square rounded-lg bg-card p-6 border hover:border-primary/50 transition-colors cursor-pointer"
-              >
-                <div className="w-full h-full flex items-center justify-center">
-                  <Music2 className="h-12 w-12 text-muted-foreground" />
-                </div>
+            {(!musician.songs || musician.songs.length === 0) && (
+              <div className="col-span-full text-center py-12">
+                <Music2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No songs added yet</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       ) : user && (
