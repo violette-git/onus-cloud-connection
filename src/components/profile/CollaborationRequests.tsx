@@ -67,6 +67,7 @@ export const CollaborationRequests = ({ musicianId }: CollaborationRequestsProps
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['collaboration-requests', musicianId] });
+      queryClient.invalidateQueries({ queryKey: ['collaboration', musicianId] });
       toast({
         title: variables.status === 'accepted' ? "Request Accepted" : "Request Rejected",
         description: variables.status === 'accepted' 
