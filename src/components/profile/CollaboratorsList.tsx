@@ -29,7 +29,9 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
     queryKey: ['collaborators', userId],
     queryFn: async () => {
       console.log('Fetching collaborators data for userId:', userId);
-      const { data, error } = await supabase
+      
+      // First, get collaborations where user is the requester
+      const { data: requesterCollabs, error: requesterError } = await supabase
         .from('collaborators')
         .select(`
           musician:musicians!collaborators_musician_id_fkey (
@@ -46,13 +48,57 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
         `)
         .eq('requester_id', userId)
         .eq('status', 'accepted');
-      
-      if (error) {
-        console.error('Error fetching collaborators:', error);
-        throw error;
+
+      if (requesterError) {
+        console.error('Error fetching requester collaborations:', requesterError);
+        throw requesterError;
       }
-      console.log('Collaborators data:', data);
-      return data as Collaborator[];
+
+      // Then, get collaborations where user is the musician
+      const { data: musicianCollabs, error: musicianError } = await supabase
+        .from('musicians')
+        .select(`
+          id,
+          name,
+          user_id,
+          profile:profiles!musicians_user_id_fkey (
+            id,
+            username,
+            full_name,
+            avatar_url
+          ),
+          collaborations:collaborators!collaborators_musician_id_fkey (
+            requester:profiles!collaborators_requester_id_fkey (
+              id,
+              username,
+              full_name,
+              avatar_url
+            )
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('collaborations.status', 'accepted');
+
+      if (musicianError) {
+        console.error('Error fetching musician collaborations:', musicianError);
+        throw musicianError;
+      }
+
+      // Combine and format both sets of collaborations
+      const allCollaborations = [
+        ...(requesterCollabs || []),
+        ...(musicianCollabs || []).map(musician => ({
+          musician: {
+            id: musician.id,
+            name: musician.name,
+            user_id: musician.user_id,
+            profile: musician.profile
+          }
+        }))
+      ];
+
+      console.log('All collaborations:', allCollaborations);
+      return allCollaborations as Collaborator[];
     },
     enabled: !!userId,
   });
@@ -61,25 +107,14 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
     if (!searchTerm.trim()) return true;
     
     const searchLower = searchTerm.toLowerCase().trim();
-    console.log('Searching for:', searchLower);
-    console.log('Current collaborator data:', {
-      fullName: collab.musician.profile?.full_name,
-      username: collab.musician.profile?.username,
-      name: collab.musician.name
-    });
-    
     const fullName = (collab.musician.profile?.full_name || '').toLowerCase();
     const username = (collab.musician.profile?.username || '').toLowerCase();
     const name = collab.musician.name.toLowerCase();
     
-    const matches = fullName.includes(searchLower) || 
+    return fullName.includes(searchLower) || 
            username.includes(searchLower) || 
            name.includes(searchLower);
-    console.log('Matches:', matches);
-    return matches;
   });
-
-  console.log('Filtered collaborators count:', filteredCollaborators?.length);
 
   return (
     <div className="space-y-4">
