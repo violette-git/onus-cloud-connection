@@ -19,7 +19,7 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
             <img
-              src={profile?.avatar_url || "https://source.unsplash.com/300x300/?musician"}
+              src={profile?.avatar_url || "/placeholder.svg"}
               alt={displayName}
               className="w-32 h-32 rounded-lg object-cover bg-background"
             />
