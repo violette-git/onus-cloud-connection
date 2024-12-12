@@ -9,10 +9,10 @@ export const Index = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <main className="w-full max-w-[1400px] mx-auto px-4 pt-24">
-        <div className="space-y-16">
+      <main className="w-full mx-auto px-4">
+        <div className="max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-8rem)] mx-auto space-y-16">
           {/* Hero Content */}
-          <div className="max-w-4xl mx-auto space-y-8 text-center animate-fade-in">
+          <div className="max-w-4xl mx-auto space-y-8 text-center animate-fade-in pt-24">
             <h1 className="text-4xl md:text-6xl font-bold gradient-text">
               Connect, Create, and Grow Your Music Career
             </h1>
