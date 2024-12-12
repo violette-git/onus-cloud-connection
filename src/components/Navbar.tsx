@@ -21,7 +21,7 @@ export const Navbar = () => {
 
   return (
     <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-sm border-b z-50">
-      <div className="container mx-auto h-14 flex items-center justify-between">
+      <div className="container mx-auto h-16 flex items-center justify-between px-4">
         <Link to="/" className="flex items-center">
           <span className="text-2xl font-bold gradient-text">Onus</span>
         </Link>
@@ -33,12 +33,14 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-4">
           {/* Auth Buttons */}
-          <AuthButtons />
+          <div className="flex items-center">
+            <AuthButtons />
+          </div>
 
           {/* Mobile Navigation */}
           <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+              <Button variant="ghost" size="icon" className="h-9 w-9 p-0">
                 {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </SheetTrigger>
