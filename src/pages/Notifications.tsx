@@ -1,15 +1,18 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BellDot, UserPlus, Heart, ThumbsDown, Users } from "lucide-react";
+import { BellDot, UserPlus, Heart, ThumbsDown, Users, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export const Notifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications', user?.id],
@@ -35,6 +38,32 @@ export const Notifications = () => {
     enabled: !!user,
   });
 
+  const cancelCollaborationMutation = useMutation({
+    mutationFn: async (collaborationData: { requesterId: string; musicianId: string }) => {
+      const { error } = await supabase
+        .from('collaborators')
+        .delete()
+        .eq('requester_id', collaborationData.requesterId)
+        .eq('musician_id', collaborationData.musicianId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast({
+        title: "Collaboration request cancelled",
+        description: "Your collaboration request has been cancelled successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to cancel collaboration request. Please try again.",
+      });
+    },
+  });
+
   const getNotificationContent = (notification: any) => {
     const actorName = notification.actor?.full_name || notification.actor?.username;
     
@@ -58,11 +87,28 @@ export const Notifications = () => {
         return {
           icon: <UserPlus className="h-5 w-5 text-green-500" />,
           message: `${actorName} wants to collaborate with you`,
-          action: (
+          action: notification.actor_id === user?.id ? (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate(`/profile/${notification.actor_id}`)}
+              onClick={() => {
+                if (notification.reference_id) {
+                  cancelCollaborationMutation.mutate({
+                    requesterId: notification.actor_id,
+                    musicianId: notification.reference_id,
+                  });
+                }
+              }}
+              disabled={cancelCollaborationMutation.isPending}
+            >
+              <X className="h-4 w-4 mr-1" />
+              Cancel Request
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/musician/${notification.reference_id}`)}
             >
               View Request
             </Button>
