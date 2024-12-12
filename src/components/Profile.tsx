@@ -38,6 +38,27 @@ export const Profile = () => {
     enabled: !!user,
   });
 
+  const { data: musician } = useQuery({
+    queryKey: ['musician', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('musicians')
+        .select(`
+          *,
+          musician_genres (
+            genre: genres (name)
+          )
+        `)
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+    enabled: !!user && profile?.role === 'musician',
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<ProfileType>) => {
       if (!user?.id) throw new Error("No user");
