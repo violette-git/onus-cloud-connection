@@ -78,8 +78,8 @@ export const Profile = () => {
     enabled: !!targetUserId && profile?.role === 'musician',
   });
 
-  // If this is a musician's profile, redirect to the musician view
-  if (profile?.role === 'musician' && musician) {
+  // If this is a musician's profile and not the current user, redirect to the musician view
+  if (profile?.role === 'musician' && musician && profileId && profileId !== user?.id) {
     return <Navigate to={`/musicians/${musician.id}`} replace />;
   }
 
