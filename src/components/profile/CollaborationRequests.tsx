@@ -9,6 +9,21 @@ interface CollaborationRequestsProps {
   musicianId: string;
 }
 
+interface Requester {
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
+interface CollaborationRequest {
+  requester_id: string;
+  musician_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  requester: Requester;
+}
+
 export const CollaborationRequests = ({ musicianId }: CollaborationRequestsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -31,7 +46,7 @@ export const CollaborationRequests = ({ musicianId }: CollaborationRequestsProps
         .eq('status', 'pending');
       
       if (error) throw error;
-      return data;
+      return data as CollaborationRequest[];
     },
     enabled: !!musicianId,
   });
