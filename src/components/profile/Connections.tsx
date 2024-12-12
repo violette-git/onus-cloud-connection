@@ -76,14 +76,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('status', 'accepted');
       
       if (error) throw error;
-      
-      // Transform the data to match the Collaborator interface
-      return (data || []).map(item => ({
-        musician: {
-          ...item.musician,
-          profile: item.musician.profile[0] // Take the first profile from the array
-        }
-      })) as Collaborator[];
+      return data as unknown as Collaborator[];
     },
     enabled: !!userId,
   });
@@ -135,7 +128,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
               </div>
               <Button
                 variant="ghost"
-                onClick={() => navigate(`/musician/${collab.musician.id}`)}
+                onClick={() => navigate(`/musicians/${collab.musician.id}`)}
               >
                 View Profile
               </Button>
