@@ -2,8 +2,10 @@ import { UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationProps } from "./types";
 import { useCancelCollaboration } from "@/hooks/useCancelCollaboration";
+import { useNavigate } from "react-router-dom";
 
 export const CollaborationNotification = ({ notification, currentUserId }: NotificationProps) => {
+  const navigate = useNavigate();
   const { mutate: cancelCollaboration, isPending } = useCancelCollaboration();
   const actorName = notification.actor?.full_name || notification.actor?.username;
   const isOwnRequest = notification.actor_id === currentUserId;
