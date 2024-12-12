@@ -26,11 +26,11 @@ interface MusicianWithGenres extends Musician {
   musician_genres: {
     genre: Pick<Genre, 'name'>;
   }[];
-  profile?: {
+  profile: {
     avatar_url: string | null;
     username: string | null;
     full_name: string | null;
-  };
+  } | null;
 }
 
 const Musicians = () => {
@@ -76,15 +76,15 @@ const Musicians = () => {
         .from('musicians')
         .select(`
           *,
-          profile:profiles!inner(
-            avatar_url,
-            username,
-            full_name
-          ),
           musician_genres (
             genre:genres (
               name
             )
+          ),
+          profile:profiles(
+            avatar_url,
+            username,
+            full_name
           )
         `);
 
