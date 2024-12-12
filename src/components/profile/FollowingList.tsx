@@ -47,9 +47,12 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
   });
 
   const filteredFollowing = following?.filter(follow => {
-    const searchLower = searchTerm.toLowerCase();
-    const fullName = follow.followed.full_name?.toLowerCase() || '';
-    const username = follow.followed.username?.toLowerCase() || '';
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    const fullName = (follow.followed.full_name || '').toLowerCase();
+    const username = (follow.followed.username || '').toLowerCase();
+    
     return fullName.includes(searchLower) || username.includes(searchLower);
   });
 

@@ -58,11 +58,16 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
   });
 
   const filteredCollaborators = collaborators?.filter(collab => {
-    const searchLower = searchTerm.toLowerCase();
-    const fullName = collab.musician.profile?.full_name?.toLowerCase() || '';
-    const username = collab.musician.profile?.username?.toLowerCase() || '';
+    if (!searchTerm.trim()) return true;
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    const fullName = (collab.musician.profile?.full_name || '').toLowerCase();
+    const username = (collab.musician.profile?.username || '').toLowerCase();
     const name = collab.musician.name.toLowerCase();
-    return fullName.includes(searchLower) || username.includes(searchLower) || name.includes(searchLower);
+    
+    return fullName.includes(searchLower) || 
+           username.includes(searchLower) || 
+           name.includes(searchLower);
   });
 
   return (
