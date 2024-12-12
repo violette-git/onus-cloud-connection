@@ -75,7 +75,7 @@ export const Profile = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
+    enabled: !!targetUserId && profile?.role === 'musician',
   });
 
   const updateProfileMutation = useMutation({
