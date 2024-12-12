@@ -10,6 +10,26 @@ interface ConnectionsProps {
   userId: string;
 }
 
+interface Profile {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
+interface Following {
+  followed: Profile;
+}
+
+interface Collaborator {
+  musician: {
+    id: string;
+    name: string;
+    user_id: string;
+    profile: Profile;
+  };
+}
+
 export const Connections = ({ userId }: ConnectionsProps) => {
   const navigate = useNavigate();
 
@@ -29,7 +49,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('follower_id', userId);
       
       if (error) throw error;
-      return data;
+      return data as Following[];
     },
     enabled: !!userId,
   });
@@ -55,7 +75,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('status', 'accepted');
       
       if (error) throw error;
-      return data;
+      return data as Collaborator[];
     },
     enabled: !!userId,
   });
