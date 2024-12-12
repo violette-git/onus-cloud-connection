@@ -2,7 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 
-const Settings = () => {
+export const Settings = () => {
   const { user } = useAuth();
 
   if (!user) {
@@ -28,5 +28,3 @@ const Settings = () => {
     </div>
   );
 };
-
-export default Settings;

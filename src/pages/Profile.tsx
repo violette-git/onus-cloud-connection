@@ -3,7 +3,7 @@ import { Profile as ProfileComponent } from "@/components/Profile";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 
-const Profile = () => {
+export const Profile = () => {
   const { user } = useAuth();
 
   if (!user) {
@@ -19,5 +19,3 @@ const Profile = () => {
     </div>
   );
 };
-
-export default Profile;

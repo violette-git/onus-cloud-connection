@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
-const Explore = () => {
+export const Explore = () => {
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -47,5 +47,3 @@ const Explore = () => {
     </div>
   );
 };
-
-export default Explore;

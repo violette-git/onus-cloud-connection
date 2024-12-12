@@ -33,7 +33,7 @@ interface MusicianWithGenres extends Musician {
   };
 }
 
-const Musicians = () => {
+export const Musicians = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const { user } = useAuth();
@@ -237,5 +237,3 @@ const Musicians = () => {
     </div>
   );
 };
-
-export default Musicians;

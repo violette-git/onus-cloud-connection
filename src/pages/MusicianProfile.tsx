@@ -10,7 +10,7 @@ import type { Musician } from "@/types/profile";
 import { User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const MusicianProfile = () => {
+export const MusicianProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
 
@@ -191,5 +191,3 @@ const MusicianProfile = () => {
     </div>
   );
 };
-
-export default MusicianProfile;

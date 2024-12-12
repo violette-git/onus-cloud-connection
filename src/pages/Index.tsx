@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 
-const Index = () => {
+export const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -37,5 +37,3 @@ const Index = () => {
     </div>
   );
 };
-
-export default Index;
