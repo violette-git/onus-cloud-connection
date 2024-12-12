@@ -10,14 +10,14 @@ export const Index = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <main className="w-full mx-auto px-4">
-        <div className="max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-8rem)] mx-auto space-y-16">
+        <div className="max-w-[calc(100vw-32rem)] mx-auto space-y-16">
           {/* Hero Content */}
           <div className="max-w-4xl mx-auto space-y-8 text-center animate-fade-in pt-24">
             <h1 className="text-4xl md:text-6xl font-bold gradient-text">
-              Connect, Create, and Grow Your Music Career
+              Connect with AI Musicians and Create Together
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground">
-              Join the next generation of musicians building their careers through meaningful connections
+              Join the first social platform dedicated to AI musicians, collaborations, and creative growth
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to={user ? "/explore" : "/musicians"}>
@@ -28,7 +28,7 @@ export const Index = () => {
               </Link>
               <Link to="/musicians">
                 <Button size="lg" variant="secondary">
-                  Discover Musicians
+                  Discover AI Musicians
                 </Button>
               </Link>
             </div>
@@ -40,9 +40,9 @@ export const Index = () => {
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
                 <Music2 className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-3">Share Your Music</h3>
+              <h3 className="text-2xl font-semibold mb-3">Share AI-Generated Music</h3>
               <p className="text-muted-foreground">
-                Upload and showcase your songs and videos to a community of passionate musicians and fans
+                Showcase your AI-generated compositions and connect with other AI musicians pushing the boundaries of creativity
               </p>
             </div>
             
@@ -50,9 +50,9 @@ export const Index = () => {
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
                 <Users2 className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-3">Build Connections</h3>
+              <h3 className="text-2xl font-semibold mb-3">AI Collaborations</h3>
               <p className="text-muted-foreground">
-                Connect with like-minded musicians, collaborate on projects, and grow your network
+                Find and connect with other AI musicians, collaborate on innovative projects, and explore new creative possibilities
               </p>
             </div>
             
@@ -60,9 +60,9 @@ export const Index = () => {
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
                 <TrendingUp className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-semibold mb-3">Grow Your Audience</h3>
+              <h3 className="text-2xl font-semibold mb-3">Grow Your AI Music</h3>
               <p className="text-muted-foreground">
-                Reach new listeners and expand your fanbase through our engaged community
+                Build your audience within the AI music community and get discovered by other innovative creators
               </p>
             </div>
           </div>
@@ -78,10 +78,10 @@ export const Index = () => {
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-3">
                     <Zap className="h-6 w-6 text-primary" />
-                    <h3 className="text-2xl font-semibold">Modern Platform</h3>
+                    <h3 className="text-2xl font-semibold">AI-First Platform</h3>
                   </div>
                   <p className="text-muted-foreground">
-                    Built with the latest technology to provide a seamless experience for musicians to showcase their work and connect with others
+                    Built specifically for AI musicians to showcase their work, connect with others, and push the boundaries of AI-generated music
                   </p>
                 </div>
                 <div className="flex-1 h-64 bg-gradient-to-r from-onus-purple via-onus-blue to-onus-pink rounded-lg" />
@@ -91,10 +91,10 @@ export const Index = () => {
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-3">
                     <Users2 className="h-6 w-6 text-primary" />
-                    <h3 className="text-2xl font-semibold">Active Community</h3>
+                    <h3 className="text-2xl font-semibold">AI Music Community</h3>
                   </div>
                   <p className="text-muted-foreground">
-                    Join a thriving community of musicians, producers, and industry professionals all working together to push the boundaries of music
+                    Join a thriving community of AI musicians, creators, and innovators all working together to define the future of music
                   </p>
                 </div>
                 <div className="flex-1 h-64 bg-gradient-to-l from-onus-purple via-onus-blue to-onus-pink rounded-lg" />
@@ -107,10 +107,10 @@ export const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-onus-purple/10 via-onus-blue/10 to-onus-pink/10" />
             <div className="relative z-10 text-center space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold gradient-text">
-                Ready to Take Your Music Career to the Next Level?
+                Ready to Join the AI Music Revolution?
               </h2>
               <p className="text-xl text-muted-foreground">
-                Join Onus today and start connecting with other musicians
+                Connect with other AI musicians and start creating together
               </p>
               <Link to={user ? "/explore" : "/musicians"}>
                 <Button size="lg" className="mt-4">
