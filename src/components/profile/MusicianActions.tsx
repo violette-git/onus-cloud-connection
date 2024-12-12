@@ -5,7 +5,7 @@ import { FollowButton } from "./musician-actions/FollowButton";
 import { CollaborationButton } from "./musician-actions/CollaborationButton";
 import { MessageDialog } from "./musician-actions/MessageDialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, UserMinus2, Users } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -88,27 +88,29 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   });
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-sm mx-auto px-4">
-      <FollowButton
-        userId={user.id}
-        musicianUserId={musicianUserId || ''}
-        isFollowing={!!isFollowing}
-      />
-
-      {userProfile?.role === 'musician' && (
-        <CollaborationButton
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-center items-center gap-2">
+        <FollowButton
           userId={user.id}
-          musicianId={musicianId}
-          collaborationStatus={collaborationStatus}
+          musicianUserId={musicianUserId || ''}
+          isFollowing={!!isFollowing}
         />
-      )}
 
-      <MessageDialog recipientId={musicianUserId || ''}>
-        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
-          <MessageCircle className="h-4 w-4" />
-          Send Message
-        </Button>
-      </MessageDialog>
+        {userProfile?.role === 'musician' && (
+          <CollaborationButton
+            userId={user.id}
+            musicianId={musicianId}
+            collaborationStatus={collaborationStatus}
+          />
+        )}
+
+        <MessageDialog recipientId={musicianUserId || ''}>
+          <Button variant="outline" size="sm" className="w-[120px] flex items-center gap-1 text-xs">
+            <MessageCircle className="h-3 w-3" />
+            <span>Message</span>
+          </Button>
+        </MessageDialog>
+      </div>
     </div>
   );
 };

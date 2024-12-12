@@ -28,7 +28,7 @@ export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
           <h1 className="text-3xl font-bold mt-4">{musician.name}</h1>
           <p className="text-muted-foreground">Musician</p>
           
-          <div className="mt-4">
+          <div className="mt-4 w-full max-w-md">
             <MusicianActions 
               musicianUserId={musician.user_id} 
               musicianId={musician.id}
