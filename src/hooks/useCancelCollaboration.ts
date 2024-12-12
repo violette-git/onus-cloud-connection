@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -9,7 +9,6 @@ interface CollaborationData {
 
 export const useCancelCollaboration = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (collaborationData: CollaborationData) => {
@@ -22,7 +21,6 @@ export const useCancelCollaboration = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
       toast({
         title: "Collaboration request cancelled",
         description: "Your collaboration request has been cancelled successfully.",
