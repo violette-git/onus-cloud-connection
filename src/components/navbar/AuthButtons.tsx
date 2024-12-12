@@ -44,8 +44,10 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
   });
 
   const handleNavigation = (path: string) => {
-    if (onAction) onAction();
     navigate(path);
+    if (onAction) {
+      onAction();
+    }
   };
 
   return (
