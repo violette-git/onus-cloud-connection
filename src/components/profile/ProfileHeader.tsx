@@ -10,13 +10,13 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: ProfileHeaderProps) => {
-  const displayName = musician?.name || profile?.full_name || profile?.username || "User";
+  const displayName = musician?.name || profile?.username || "User";
   const role = profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast';
   
   return (
     <div className="relative">
       <div className="h-48 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-24 text-center">
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-24">
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
             {profile?.avatar_url ? (

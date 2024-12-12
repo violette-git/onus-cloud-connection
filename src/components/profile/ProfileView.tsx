@@ -31,21 +31,21 @@ export const ProfileView = ({
         onImageUpload={onImageUpload}
       />
 
-      <div className="mt-8 max-w-2xl mx-auto px-4">
-        <ProfileActions 
-          profile={profile}
-          isOwner={isOwner}
-          onSocialLinksUpdate={onSocialLinksUpdate}
-          onBecomeMusicianClick={onBecomeMusicianClick}
-        />
+      <ProfileActions 
+        profile={profile}
+        isOwner={isOwner}
+        onSocialLinksUpdate={onSocialLinksUpdate}
+        onBecomeMusicianClick={onBecomeMusicianClick}
+      />
 
-        {profile.role === 'musician' && (
+      {profile.role === 'musician' && (
+        <div className="mt-8 max-w-2xl mx-auto px-4 md:px-8">
           <ProfileContent 
             musician={musician} 
             onProfileCreated={onMusicianProfileCreated}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
