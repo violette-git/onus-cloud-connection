@@ -93,22 +93,22 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   if (!user || user.id === musicianUserId) return null;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col items-center gap-2 mt-2">
       <Button
         variant={isFollowing ? "outline" : "default"}
         onClick={() => followMutation.mutate()}
         disabled={followMutation.isPending}
         size="sm"
-        className="min-w-[100px] flex items-center gap-2"
+        className="w-full max-w-[120px] flex items-center gap-1 text-xs"
       >
         {isFollowing ? (
           <>
-            <UserMinus2 className="h-4 w-4" />
+            <UserMinus2 className="h-3 w-3" />
             <span>Unfollow</span>
           </>
         ) : (
           <>
-            <UserPlus2 className="h-4 w-4" />
+            <UserPlus2 className="h-3 w-3" />
             <span>Follow</span>
           </>
         )}
@@ -120,9 +120,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           onClick={() => collaborateMutation.mutate()}
           disabled={collaborateMutation.isPending || isRequesting}
           size="sm"
-          className="min-w-[160px] flex items-center gap-2"
+          className="w-full max-w-[120px] flex items-center gap-1 text-xs"
         >
-          <HandshakeIcon className="h-4 w-4" />
+          <HandshakeIcon className="h-3 w-3" />
           <span>Request Collab</span>
         </Button>
       )}
@@ -132,9 +132,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           variant="outline" 
           disabled 
           size="sm"
-          className="min-w-[160px] flex items-center gap-2"
+          className="w-full max-w-[120px] flex items-center gap-1 text-xs"
         >
-          <HandshakeIcon className="h-4 w-4" />
+          <HandshakeIcon className="h-3 w-3" />
           <span>Request Pending</span>
         </Button>
       )}
@@ -144,9 +144,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           variant="outline" 
           disabled 
           size="sm"
-          className="min-w-[160px] flex items-center gap-2"
+          className="w-full max-w-[120px] flex items-center gap-1 text-xs"
         >
-          <HandshakeIcon className="h-4 w-4" />
+          <HandshakeIcon className="h-3 w-3" />
           <span>Collaborator</span>
         </Button>
       )}
