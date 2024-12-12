@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus2, UserMinus2, HandshakeIcon, X } from "lucide-react";
-import { useCancelCollaboration } from "@/hooks/useCancelCollaboration";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -17,7 +16,6 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isRequesting, setIsRequesting] = useState(false);
-  const { mutate: cancelCollaboration, isPending: isCancelling } = useCancelCollaboration();
 
   // If this is the current user's profile, or no user is logged in, don't show any actions
   if (!user || user.id === musicianUserId) return null;
@@ -52,7 +50,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   });
 
   const { data: collaborationStatus } = useQuery({
-    queryKey: ['collaboration', musicianId, user?.id],
+    queryKey: ['collaboration-status', musicianId, user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       const { data } = await supabase
@@ -101,7 +99,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collaboration', musicianId, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['collaboration-status', musicianId, user?.id] });
       toast({
         title: "Request Sent",
         description: "Your collaboration request has been sent",
@@ -109,20 +107,25 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     },
   });
 
-  const handleCancelRequest = () => {
-    if (!user?.id) return;
-    cancelCollaboration(
-      { requesterId: user.id, musicianId },
-      {
-        onSuccess: () => {
-          // Invalidate all relevant queries
-          queryClient.invalidateQueries({ queryKey: ['collaboration'] });
-          queryClient.invalidateQueries({ queryKey: ['collaboration-requests'] });
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        }
-      }
-    );
-  };
+  const cancelCollaborationMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const { error } = await supabase
+        .from('collaborators')
+        .delete()
+        .eq('requester_id', user.id)
+        .eq('musician_id', musicianId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collaboration-status', musicianId, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast({
+        title: "Request Cancelled",
+        description: "Your collaboration request has been cancelled",
+      });
+    },
+  });
 
   return (
     <div className="flex flex-col items-center gap-2 mt-2">
@@ -173,8 +176,8 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleCancelRequest}
-            disabled={isCancelling}
+            onClick={() => cancelCollaborationMutation.mutate()}
+            disabled={cancelCollaborationMutation.isPending}
             className="h-8 w-8 p-0"
           >
             <X className="h-4 w-4 text-red-500" />
