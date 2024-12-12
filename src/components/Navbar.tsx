@@ -11,7 +11,6 @@ import {
 import { useState } from "react";
 import { NavLinks } from "./navbar/NavLinks";
 import { AuthButtons } from "./navbar/AuthButtons";
-import { NudgeList } from "./messaging/NudgeList";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Navbar = () => {
@@ -53,13 +52,16 @@ export const Navbar = () => {
               </SheetHeader>
               <div className="flex flex-col space-y-4 mt-8">
                 <NavLinks onNavigate={() => setIsOpen(false)} />
+                {user && (
+                  <Link 
+                    to="/messages" 
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Messages
+                  </Link>
+                )}
               </div>
-              {user && (
-                <div className="mt-8">
-                  <h3 className="font-semibold mb-4">Messages</h3>
-                  <NudgeList />
-                </div>
-              )}
             </SheetContent>
           </Sheet>
         </div>
