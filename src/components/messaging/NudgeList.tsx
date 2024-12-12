@@ -42,6 +42,11 @@ export const NudgeList = () => {
             username,
             full_name,
             avatar_url
+          ),
+          recipient:profiles!nudges_recipient_id_fkey (
+            username,
+            full_name,
+            avatar_url
           )
         `)
         .or(`recipient_id.eq.${user.id},sender_id.eq.${user.id}`)
