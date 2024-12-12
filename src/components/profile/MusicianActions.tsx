@@ -17,6 +17,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const queryClient = useQueryClient();
   const [isRequesting, setIsRequesting] = useState(false);
 
+  // If this is the current user's profile, or no user is logged in, don't show any actions
+  if (!user || user.id === musicianUserId) return null;
+
   const { data: isFollowing } = useQuery({
     queryKey: ['following', musicianUserId, user?.id],
     queryFn: async () => {
@@ -89,8 +92,6 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       });
     },
   });
-
-  if (!user || user.id === musicianUserId) return null;
 
   return (
     <div className="flex flex-col items-center gap-2 mt-2">
