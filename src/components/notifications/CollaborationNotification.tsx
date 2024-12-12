@@ -21,16 +21,20 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
         musicianId: notification.reference_id
       });
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('collaborators')
         .delete()
         .eq('requester_id', notification.actor_id)
-        .eq('musician_id', notification.reference_id);
+        .eq('musician_id', notification.reference_id)
+        .select();
+      
+      console.log('Delete response:', { data, error });
       
       if (error) throw error;
       return true;
     },
     onSuccess: () => {
+      console.log('Mutation successful, invalidating queries');
       // Invalidate both the collaboration status and notifications queries
       queryClient.invalidateQueries({ 
         queryKey: ['collaboration-status', notification.reference_id, notification.actor_id] 
@@ -65,7 +69,11 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
         variant="ghost"
         size="sm"
         onClick={() => {
-          console.log('Cancel button clicked');
+          console.log('Cancel button clicked', {
+            notificationId: notification.id,
+            actorId: notification.actor_id,
+            referenceId: notification.reference_id
+          });
           cancelCollaborationMutation.mutate();
         }}
         disabled={cancelCollaborationMutation.isPending}

@@ -23,6 +23,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { data: isFollowing } = useQuery({
     queryKey: ['following', musicianUserId, user?.id],
     queryFn: async () => {
+      console.log('Checking following status for:', { musicianUserId, userId: user?.id });
       if (!user?.id || !musicianUserId) return false;
       const { data } = await supabase
         .from('followers')
@@ -52,6 +53,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { data: collaborationStatus } = useQuery({
     queryKey: ['collaboration-status', musicianId, user?.id],
     queryFn: async () => {
+      console.log('Checking collaboration status for:', { musicianId, userId: user?.id });
       if (!user?.id) return null;
       const { data } = await supabase
         .from('collaborators')
@@ -59,6 +61,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         .eq('requester_id', user.id)
         .eq('musician_id', musicianId)
         .maybeSingle();
+      console.log('Collaboration status:', data);
       return data?.status;
     },
     enabled: !!user && !!musicianId && userProfile?.role === 'musician',
@@ -93,6 +96,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const collaborateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
+      console.log('Sending collaboration request:', { userId: user.id, musicianId });
       const { error } = await supabase
         .from('collaborators')
         .insert({ requester_id: user.id, musician_id: musicianId });
@@ -110,14 +114,20 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const cancelCollaborationMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      const { error } = await supabase
+      console.log('Cancelling collaboration request:', { userId: user.id, musicianId });
+      const { data, error } = await supabase
         .from('collaborators')
         .delete()
         .eq('requester_id', user.id)
-        .eq('musician_id', musicianId);
+        .eq('musician_id', musicianId)
+        .select();
+      
+      console.log('Delete response:', { data, error });
+      
       if (error) throw error;
     },
     onSuccess: () => {
+      console.log('Successfully cancelled collaboration request');
       queryClient.invalidateQueries({ queryKey: ['collaboration-status', musicianId, user?.id] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       toast({
@@ -125,6 +135,14 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         description: "Your collaboration request has been cancelled",
       });
     },
+    onError: (error) => {
+      console.error('Error cancelling collaboration:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to cancel collaboration request. Please try again.",
+      });
+    }
   });
 
   return (
