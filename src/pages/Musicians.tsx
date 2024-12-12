@@ -47,7 +47,7 @@ const Musicians = () => {
         .select(`
           *,
           musician_genres (
-            genre (
+            genre:genres (
               name
             )
           )
