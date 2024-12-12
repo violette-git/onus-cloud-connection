@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import Explore from "./pages/Explore";
 import Musicians from "./pages/Musicians";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/musicians" element={<Musicians />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </TooltipProvider>
       </AuthProvider>
