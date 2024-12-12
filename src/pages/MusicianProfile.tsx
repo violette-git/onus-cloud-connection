@@ -108,30 +108,34 @@ export const MusicianProfile = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto px-4 pt-16">
+      <div className="container mx-auto px-4 pt-16 max-w-7xl">
         <BackButton />
       </div>
       
       <MusicianHeader musician={musician} />
       
-      <div className="container mx-auto px-4 mt-40">
+      <div className="container mx-auto px-4 mt-40 max-w-7xl">
         {isOwner && (
           <CollaborationRequests musicianId={musician.id} />
         )}
 
-        <div className="space-y-8">
-          <MusicianBio musician={musician} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4">
+            <MusicianBio musician={musician} />
 
-          {isOwner && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">My Connections</h2>
-              <Connections userId={user?.id || ''} />
-            </div>
-          )}
+            {isOwner && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">My Connections</h2>
+                <Connections userId={user?.id || ''} />
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-8">
+            <MusicianMedia musician={musician} isOwner={isOwner} />
+          </div>
         </div>
       </div>
-
-      <MusicianMedia musician={musician} isOwner={isOwner} />
     </div>
   );
 };
