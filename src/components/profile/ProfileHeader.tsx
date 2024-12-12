@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { Upload } from "lucide-react";
+import { Upload, User } from "lucide-react";
 import type { Profile, Musician } from "@/types/profile";
 
 interface ProfileHeaderProps {
@@ -18,11 +18,17 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
       <div className="absolute left-1/2 -translate-x-1/2 -bottom-16">
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
-            <img
-              src={profile?.avatar_url || "/placeholder.svg"}
-              alt={displayName}
-              className="w-32 h-32 rounded-lg object-cover bg-background"
-            />
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt={displayName}
+                className="w-32 h-32 rounded-lg object-cover bg-background"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-lg bg-muted flex items-center justify-center">
+                <User className="h-12 w-12 text-muted-foreground" />
+              </div>
+            )}
             {isOwner && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-lg">
                 <Input
