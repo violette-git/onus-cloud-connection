@@ -46,8 +46,18 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
   const handleNavigation = (path: string) => {
     navigate(path);
     if (onAction) {
+      setTimeout(() => {
+        onAction();
+      }, 0);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    if (onAction) {
       onAction();
     }
+    navigate('/');
   };
 
   return (
@@ -65,29 +75,16 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <button 
-                className="w-full flex items-center" 
-                onClick={() => handleNavigation('/profile')}
-              >
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </button>
+            <DropdownMenuItem onClick={() => handleNavigation('/profile')}>
+              <User className="mr-2 h-4 w-4" />
+              Profile
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <button 
-                className="w-full flex items-center" 
-                onClick={() => handleNavigation('/settings')}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </button>
+            <DropdownMenuItem onClick={() => handleNavigation('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
-              signOut();
-              onAction?.();
-            }}>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>

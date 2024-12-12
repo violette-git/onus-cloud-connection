@@ -15,6 +15,10 @@ import { AuthButtons } from "./navbar/AuthButtons";
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSheetOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-sm border-b z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -29,7 +33,7 @@ export const Navbar = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
