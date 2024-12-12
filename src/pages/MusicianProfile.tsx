@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MusicianActions } from "@/components/profile/MusicianActions";
-import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
 import type { Musician } from "@/types/profile";
 import { User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,7 +16,6 @@ const MusicianProfile = () => {
   const { data: musician, isLoading } = useQuery({
     queryKey: ['musician', id],
     queryFn: async () => {
-      // First get the musician data
       const { data: musicianData, error: musicianError } = await supabase
         .from('musicians')
         .select(`
@@ -46,7 +44,6 @@ const MusicianProfile = () => {
 
       if (musicianError) throw musicianError;
 
-      // Then get the profile data if there's a user_id
       if (musicianData?.user_id) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -100,40 +97,42 @@ const MusicianProfile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <Card>
-              <CardHeader>
-                <div className="flex justify-between items-start">
+              <CardHeader className="text-center">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-32 h-32 relative">
+                    <Avatar className="w-full h-full">
+                      <AvatarImage
+                        src={musician.profile?.avatar_url || undefined}
+                        alt={displayName}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>
+                        <User className="h-12 w-12 text-muted-foreground" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
                   <CardTitle>{displayName}</CardTitle>
-                  <MusicianActions 
-                    musicianUserId={musician.user_id} 
-                    musicianId={musician.id} 
-                  />
+                  {!isOwner && (
+                    <MusicianActions 
+                      musicianUserId={musician.user_id} 
+                      musicianId={musician.id} 
+                    />
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="aspect-square relative rounded-lg overflow-hidden">
-                  <Avatar className="h-full w-full">
-                    <AvatarImage
-                      src={musician.profile?.avatar_url || undefined}
-                      alt={displayName}
-                      className="object-cover"
-                    />
-                    <AvatarFallback>
-                      <User className="h-12 w-12 text-muted-foreground" />
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
                 {musician.bio && (
-                  <p className="mt-4 text-muted-foreground">{musician.bio}</p>
+                  <p className="mt-4 text-muted-foreground text-center">{musician.bio}</p>
                 )}
                 {musician.location && (
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-muted-foreground text-center">
                     📍 {musician.location}
                   </p>
                 )}
                 {musician.musician_genres && musician.musician_genres.length > 0 && (
                   <div className="mt-4">
-                    <h3 className="font-medium mb-2">Genres</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="font-medium mb-2 text-center">Genres</h3>
+                    <div className="flex flex-wrap gap-2 justify-center">
                       {musician.musician_genres.map((mg) => (
                         <span
                           key={mg.genre.name}
@@ -145,7 +144,6 @@ const MusicianProfile = () => {
                     </div>
                   </div>
                 )}
-                {isOwner && <CollaborationRequests musicianId={musician.id} />}
               </CardContent>
             </Card>
           </div>
