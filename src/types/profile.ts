@@ -30,7 +30,7 @@ export interface Video {
   id: string;
   title: string;
   url: string;
-  platform: VideoPlatform;
+  platform: string; // Changed from VideoPlatform to string to match database
   created_at: string;
   updated_at: string;
 }
