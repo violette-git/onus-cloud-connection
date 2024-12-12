@@ -34,11 +34,11 @@ export const NotificationCard = ({ notification, currentUserId }: NotificationCa
     <Card className="p-4">
       <div className="flex items-center gap-4">
         <div className="flex-shrink-0">
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-12 w-12 ring-1 ring-border">
             <AvatarImage 
               src={notification.actor?.avatar_url} 
               alt={notification.actor?.username || 'User avatar'}
-              className="object-cover"
+              className="object-cover w-full h-full"
             />
             <AvatarFallback className="text-base">
               {(notification.actor?.username || 'U')[0].toUpperCase()}
