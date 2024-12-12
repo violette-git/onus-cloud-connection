@@ -149,8 +149,17 @@ export const Profile = () => {
 
   if (!profile) return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
 
-  // Handle redirect to musician profile if needed
-  if (profile.role === 'musician' && musician && profileId && profileId !== user?.id) {
+  // Only redirect if:
+  // 1. We're viewing someone else's profile (profileId exists and isn't the current user)
+  // 2. That person is a musician
+  // 3. We have their musician data
+  const shouldRedirectToMusicianProfile = 
+    profileId && // We're viewing a specific profile
+    profileId !== user?.id && // It's not our own profile
+    profile.role === 'musician' && // The profile is a musician
+    musician; // We have the musician data
+
+  if (shouldRedirectToMusicianProfile) {
     return <Navigate to={`/musicians/${musician.id}`} replace />;
   }
 
