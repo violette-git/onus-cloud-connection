@@ -73,12 +73,20 @@ export const Profile = () => {
           throw error;
         }
 
-        // Type cast the platform field to ensure it matches the VideoPlatform type
+        // Ensure video platforms match the VideoPlatform type
         if (data?.videos) {
-          data.videos = data.videos.map(video => ({
-            ...video,
-            platform: video.platform as VideoPlatform
-          }));
+          data.videos = data.videos.map(video => {
+            // Validate that platform is either 'youtube' or 'tiktok'
+            const platform = video.platform.toLowerCase();
+            if (platform !== 'youtube' && platform !== 'tiktok') {
+              console.warn(`Invalid platform "${platform}" for video ${video.id}`);
+              return null;
+            }
+            return {
+              ...video,
+              platform: platform as VideoPlatform
+            };
+          }).filter(Boolean); // Remove any null entries
         }
 
         return data;
