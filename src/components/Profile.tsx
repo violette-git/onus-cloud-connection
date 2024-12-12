@@ -148,6 +148,7 @@ export const Profile = () => {
     <div className="animate-fade-in pb-12">
       <ProfileHeader 
         profile={profile}
+        musician={musician}
         isOwner={user?.id === profile.id}
         onImageUpload={handleImageUpload}
       />

@@ -1,15 +1,16 @@
 import { Input } from "@/components/ui/input";
 import { Upload } from "lucide-react";
-import type { Profile } from "@/types/profile";
+import type { Profile, Musician } from "@/types/profile";
 
 interface ProfileHeaderProps {
   profile: Profile;
+  musician?: Musician | null;
   isOwner: boolean;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const ProfileHeader = ({ profile, isOwner, onImageUpload }: ProfileHeaderProps) => {
-  const displayName = profile?.full_name || profile?.username || "User";
+export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: ProfileHeaderProps) => {
+  const displayName = musician?.name || profile?.full_name || profile?.username || "User";
   
   return (
     <div className="relative">
