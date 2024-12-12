@@ -188,6 +188,13 @@ export type Database = {
             referencedRelation: "genres"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "musicians_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
