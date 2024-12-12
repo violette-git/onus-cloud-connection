@@ -1,5 +1,5 @@
 import { Settings, User, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,8 +44,8 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
   });
 
   const handleNavigation = (path: string) => {
+    if (onAction) onAction();
     navigate(path);
-    onAction?.();
   };
 
   return (
@@ -63,13 +63,23 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => handleNavigation('/profile')}>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <button 
+                className="w-full flex items-center" 
+                onClick={() => handleNavigation('/profile')}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </button>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleNavigation('/settings')}>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <DropdownMenuItem asChild>
+              <button 
+                className="w-full flex items-center" 
+                onClick={() => handleNavigation('/settings')}
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </button>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
