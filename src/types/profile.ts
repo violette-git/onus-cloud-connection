@@ -1,5 +1,3 @@
-import type { Json } from "@/integrations/supabase/types";
-
 export interface SocialLinks {
   [key: string]: string;
   instagram: string;

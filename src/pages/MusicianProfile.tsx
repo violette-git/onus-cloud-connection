@@ -13,15 +13,11 @@ const MusicianProfile = () => {
   const { data: musician, isLoading } = useQuery({
     queryKey: ['musician', id],
     queryFn: async () => {
+      // First get the musician data
       const { data: musicianData, error: musicianError } = await supabase
         .from('musicians')
         .select(`
           *,
-          profile:profiles!musicians_user_id_fkey (
-            avatar_url,
-            username,
-            full_name
-          ),
           musician_genres (
             genre: genres (name)
           ),
@@ -45,6 +41,23 @@ const MusicianProfile = () => {
         .single();
 
       if (musicianError) throw musicianError;
+
+      // Then get the profile data if there's a user_id
+      if (musicianData?.user_id) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('avatar_url, username, full_name')
+          .eq('id', musicianData.user_id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        return {
+          ...musicianData,
+          profile: profileData
+        } as Musician;
+      }
+
       return musicianData as Musician;
     },
     enabled: !!id,
