@@ -136,27 +136,56 @@ export const Profile = () => {
   const handleBecomeMusicianClick = async () => {
     if (!user) return;
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: 'musician' })
-      .eq('id', user.id);
+    try {
+      // First, create the musician profile
+      const { error: musicianError } = await supabase
+        .from('musicians')
+        .insert({
+          user_id: user.id,
+          name: profile?.username || 'New Musician',
+          avatar_url: profile?.avatar_url
+        });
 
-    if (error) {
+      if (musicianError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not create musician profile. Please try again.",
+        });
+        return;
+      }
+
+      // Then update the user's role to musician
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ role: 'musician' })
+        .eq('id', user.id);
+
+      if (profileError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not upgrade to musician account. Please try again.",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success!",
+        description: "Your account has been upgraded to a musician account.",
+      });
+      
+      // Invalidate both queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['musician'] });
+    } catch (error) {
+      console.error('Error becoming musician:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Could not upgrade to musician account. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
       });
-      return;
     }
-
-    toast({
-      title: "Success!",
-      description: "Your account has been upgraded to a musician account.",
-    });
-    
-    // Invalidate the profile query to refresh the data
-    queryClient.invalidateQueries({ queryKey: ['profile'] });
   };
 
   if (!profile) return null;
