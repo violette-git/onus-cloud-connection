@@ -26,11 +26,11 @@ interface MusicianWithGenres extends Musician {
   musician_genres: {
     genre: Pick<Genre, 'name'>;
   }[];
-  profile: {
+  profiles: {
     avatar_url: string | null;
     username: string | null;
     full_name: string | null;
-  } | null;
+  }[];
 }
 
 const Musicians = () => {
@@ -81,7 +81,7 @@ const Musicians = () => {
               name
             )
           ),
-          profile:profiles(
+          profiles:profiles!inner(
             avatar_url,
             username,
             full_name
@@ -192,7 +192,7 @@ const Musicians = () => {
                   <div className="aspect-square">
                     <Avatar className="h-full w-full rounded-none">
                       <AvatarImage 
-                        src={musician.profile?.avatar_url || musician.avatar_url || undefined}
+                        src={musician.profiles?.[0]?.avatar_url || musician.avatar_url || undefined}
                         alt={musician.name}
                         className="object-cover"
                       />
