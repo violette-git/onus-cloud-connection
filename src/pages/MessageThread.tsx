@@ -8,6 +8,7 @@ import { User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect } from "react";
 
 interface Message {
   id: string;
@@ -26,7 +27,7 @@ export const MessageThread = () => {
   const { id } = useParams();
   const { user } = useAuth();
 
-  const { data: messages, isLoading } = useQuery({
+  const { data: messages, isLoading, refetch } = useQuery({
     queryKey: ["messages", id],
     queryFn: async () => {
       if (!user || !id) return [];
@@ -49,6 +50,46 @@ export const MessageThread = () => {
     },
     enabled: !!user && !!id,
   });
+
+  // Subscribe to new messages
+  useEffect(() => {
+    if (!user || !id) return;
+
+    const channel = supabase
+      .channel("message_thread")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "nudges",
+          filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id}))`,
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, id, refetch]);
+
+  // Mark messages as read
+  useEffect(() => {
+    const markMessagesAsRead = async () => {
+      if (!user || !id) return;
+
+      await supabase
+        .from("nudges")
+        .update({ is_read: true })
+        .eq("recipient_id", user.id)
+        .eq("sender_id", id);
+    };
+
+    markMessagesAsRead();
+  }, [user, id]);
 
   if (!user) {
     return (
