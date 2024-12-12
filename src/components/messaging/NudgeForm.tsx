@@ -9,9 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface NudgeFormProps {
   recipientId: string;
+  onSuccess?: () => void;
 }
 
-export const NudgeForm = ({ recipientId }: NudgeFormProps) => {
+export const NudgeForm = ({ recipientId, onSuccess }: NudgeFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [message, setMessage] = useState("");
@@ -44,6 +45,7 @@ export const NudgeForm = ({ recipientId }: NudgeFormProps) => {
       title: "Message sent",
       description: "Your message has been sent successfully.",
     });
+    onSuccess?.();
   };
 
   const characterCount = message.length;

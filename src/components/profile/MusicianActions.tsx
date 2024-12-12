@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FollowButton } from "./musician-actions/FollowButton";
 import { CollaborationButton } from "./musician-actions/CollaborationButton";
+import { MessageDialog } from "./musician-actions/MessageDialog";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -104,6 +105,8 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           collaborationStatus={collaborationStatus}
         />
       )}
+
+      <MessageDialog recipientId={musicianUserId || ''} />
     </div>
   );
 };
