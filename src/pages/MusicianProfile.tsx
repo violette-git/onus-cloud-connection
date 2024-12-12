@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
