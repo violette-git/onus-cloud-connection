@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { FollowButton } from "./musician-actions/FollowButton";
 import { CollaborationButton } from "./musician-actions/CollaborationButton";
 import { MessageDialog } from "./musician-actions/MessageDialog";
+import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -106,7 +108,12 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         />
       )}
 
-      <MessageDialog recipientId={musicianUserId || ''} />
+      <MessageDialog recipientId={musicianUserId || ''}>
+        <Button variant="outline" className="w-full">
+          <MessageCircle className="mr-2 h-4 w-4" />
+          Send Message
+        </Button>
+      </MessageDialog>
     </div>
   );
 };
