@@ -73,10 +73,11 @@ export const Connections = ({ userId }: ConnectionsProps) => {
           )
         `)
         .eq('requester_id', userId)
-        .eq('status', 'accepted');
+        .eq('status', 'accepted')
+        .single();
       
       if (error) throw error;
-      return data as Collaborator[];
+      return data ? [data] as Collaborator[] : [];
     },
     enabled: !!userId,
   });
