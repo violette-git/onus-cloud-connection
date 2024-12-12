@@ -13,6 +13,7 @@ import { Settings } from "@/pages/Settings";
 import { Notifications } from "@/pages/Notifications";
 import { Connections } from "@/pages/Connections";
 import { Messages } from "@/pages/Messages";
+import { MessageThread } from "@/pages/MessageThread";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/connections" element={<Connections />} />
                 <Route path="/messages" element={<Messages />} />
+                <Route path="/messages/:id" element={<MessageThread />} />
               </Routes>
               <Toaster />
             </div>
