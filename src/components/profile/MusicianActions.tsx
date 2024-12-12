@@ -37,6 +37,20 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     enabled: !!user && !!musicianUserId,
   });
 
+  const { data: userProfile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: collaborationStatus } = useQuery({
     queryKey: ['collaboration', musicianId, user?.id],
     queryFn: async () => {
@@ -49,7 +63,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         .maybeSingle();
       return data?.status;
     },
-    enabled: !!user && !!musicianId,
+    enabled: !!user && !!musicianId && userProfile?.role === 'musician',
   });
 
   const followMutation = useMutation({
@@ -129,7 +143,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         )}
       </Button>
 
-      {!collaborationStatus && (
+      {userProfile?.role === 'musician' && !collaborationStatus && (
         <Button
           variant="outline"
           onClick={() => collaborateMutation.mutate()}
