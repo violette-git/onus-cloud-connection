@@ -23,7 +23,6 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { data: isFollowing } = useQuery({
     queryKey: ['following', musicianUserId, user?.id],
     queryFn: async () => {
-      console.log('Checking following status for:', { musicianUserId, userId: user?.id });
       if (!user?.id || !musicianUserId) return false;
       const { data } = await supabase
         .from('followers')
@@ -53,16 +52,25 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
   const { data: collaborationStatus } = useQuery({
     queryKey: ['collaboration-status', musicianId, user?.id],
     queryFn: async () => {
-      console.log('Checking collaboration status for:', { musicianId, userId: user?.id });
       if (!user?.id) return null;
-      const { data } = await supabase
+      const { data: requestorStatus } = await supabase
         .from('collaborators')
         .select('status')
         .eq('requester_id', user.id)
         .eq('musician_id', musicianId)
         .maybeSingle();
-      console.log('Collaboration status:', data);
-      return data?.status;
+
+      if (requestorStatus) return requestorStatus.status;
+
+      // Check if the current user is a musician and has received a request
+      const { data: musicianStatus } = await supabase
+        .from('collaborators')
+        .select('status')
+        .eq('musician_id', musicianId)
+        .eq('requester_id', user.id)
+        .maybeSingle();
+
+      return musicianStatus?.status || null;
     },
     enabled: !!user && !!musicianId && userProfile?.role === 'musician',
   });

@@ -8,7 +8,7 @@ interface MusicianHeaderProps {
 }
 
 export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
-  // Get the most appropriate avatar URL
+  // Get the most appropriate avatar URL from the profile
   const avatarUrl = musician.profile?.avatar_url || musician.avatar_url;
 
   return (
@@ -17,7 +17,7 @@ export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
         <div className="flex flex-col items-center relative -bottom-32">
           <Avatar className="w-32 h-32 border-4 border-background">
             <AvatarImage
-              src={avatarUrl}
+              src={avatarUrl || ''}
               alt={musician.name}
               className="object-cover"
             />
