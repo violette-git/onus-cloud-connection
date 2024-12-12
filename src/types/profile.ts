@@ -17,3 +17,19 @@ export interface Profile {
   created_at: string;
   updated_at: string | null;
 }
+
+export interface Musician {
+  id: string;
+  user_id: string | null;
+  name: string;
+  location: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+  musician_genres?: {
+    genre: {
+      name: string;
+    };
+  }[];
+}

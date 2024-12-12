@@ -1,11 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Music2, Share2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
-import { SocialLinksSection } from "./profile/SocialLinks";
+import { ProfileActions } from "./profile/ProfileActions";
+import { MusicianContent } from "./profile/MusicianContent";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
@@ -156,60 +155,15 @@ export const Profile = () => {
         onImageUpload={handleImageUpload}
       />
 
-      <div className="mt-20 px-8 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          {profile.role === 'observer' ? (
-            <Button onClick={handleBecomeMusicianClick}>
-              <Music2 className="mr-2 h-4 w-4" />
-              Become a Musician
-            </Button>
-          ) : (
-            <>
-              <Button className="gradient-border">
-                <Music2 className="mr-2 h-4 w-4" />
-                Follow
-              </Button>
-              <Button variant="outline">
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
-              </Button>
-            </>
-          )}
-        </div>
-        <SocialLinksSection
-          initialLinks={profile.social_links || defaultSocialLinks}
-          isOwner={user?.id === profile.id}
-          onSave={handleSocialLinksUpdate}
-        />
-      </div>
+      <ProfileActions 
+        profile={profile}
+        isOwner={user?.id === profile.id}
+        onBecomeMusicianClick={handleBecomeMusicianClick}
+        onSocialLinksUpdate={handleSocialLinksUpdate}
+      />
 
       {profile.role === 'musician' && (
-        <div className="mt-12 px-8">
-          {musician ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-lg bg-card p-6 border hover:border-primary/50 transition-colors cursor-pointer"
-                >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Music2 className="h-12 w-12 text-muted-foreground" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold mb-2">Complete Your Musician Profile</h2>
-              <p className="text-muted-foreground mb-4">
-                Set up your musician profile to start sharing your music
-              </p>
-              <Button>
-                Create Musician Profile
-              </Button>
-            </div>
-          )}
-        </div>
+        <MusicianContent musician={musician} />
       )}
     </div>
   );
