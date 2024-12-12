@@ -76,7 +76,12 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('status', 'accepted');
       
       if (error) throw error;
-      return data as Collaborator[];
+      return (data as any[]).map(item => ({
+        musician: {
+          ...item.musician,
+          profile: item.musician.profile[0] // Convert array to single object
+        }
+      })) as Collaborator[];
     },
     enabled: !!userId,
   });
