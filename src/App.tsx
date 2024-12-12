@@ -15,9 +15,9 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <div className="min-h-screen bg-background">
             <Navbar />
             <Routes>
@@ -31,9 +31,9 @@ function App() {
             </Routes>
             <Toaster />
           </div>
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </Router>
   );
 }
 
