@@ -1,39 +1,40 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Navbar } from "@/components/Navbar";
-import Index from "./pages/Index";
-import Profile from "./pages/Profile";
-import Explore from "./pages/Explore";
-import Musicians from "./pages/Musicians";
-import MusicianProfile from "./pages/MusicianProfile";
-import Settings from "./pages/Settings";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Navbar } from "./components/Navbar";
+import { Index } from "./pages/Index";
+import { Profile } from "./pages/Profile";
+import { Settings } from "./pages/Settings";
+import { Musicians } from "./pages/Musicians";
+import { MusicianProfile } from "./pages/MusicianProfile";
+import { Explore } from "./pages/Explore";
+import { Notifications } from "./pages/Notifications";
+import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Navbar />
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/musicians" element={<Musicians />} />
-            <Route path="/musicians/:id" element={<MusicianProfile />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </TooltipProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/musicians" element={<Musicians />} />
+              <Route path="/musicians/:id" element={<MusicianProfile />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/notifications" element={<Notifications />} />
+            </Routes>
+            <Toaster />
+          </div>
+        </Router>
       </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+}
 
 export default App;
