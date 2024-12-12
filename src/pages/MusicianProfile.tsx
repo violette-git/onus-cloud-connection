@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MusicianHeader } from "@/components/profile/musician/MusicianHeader";
 import { MusicianBio } from "@/components/profile/musician/MusicianBio";
-import { MusicianContent } from "@/components/profile/musician/MusicianContent";
+import { MusicianMedia } from "@/components/profile/musician/MusicianMedia";
 import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
 import { Connections } from "@/components/profile/Connections";
 import { useAuth } from "@/contexts/AuthContext";
+import { BackButton } from "@/components/ui/back-button";
 
 export const MusicianProfile = () => {
   const { id } = useParams();
@@ -107,6 +108,10 @@ export const MusicianProfile = () => {
 
   return (
     <div className="min-h-screen">
+      <div className="container mx-auto px-4 pt-16">
+        <BackButton />
+      </div>
+      
       <MusicianHeader musician={musician} />
       
       <div className="container mx-auto px-4 mt-40">
@@ -123,10 +128,10 @@ export const MusicianProfile = () => {
               <Connections userId={user?.id || ''} />
             </div>
           )}
-
-          <MusicianContent musician={musician} isOwner={isOwner} />
         </div>
       </div>
+
+      <MusicianMedia musician={musician} isOwner={isOwner} />
     </div>
   );
 };
