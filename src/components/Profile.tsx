@@ -75,7 +75,7 @@ export const Profile = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!targetUserId && profile?.role === 'musician',
+    enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
   });
 
   const updateProfileMutation = useMutation({
@@ -147,6 +147,7 @@ export const Profile = () => {
     queryClient.invalidateQueries({ queryKey: ['musician'] });
   };
 
+  // Show loading state while profile is being fetched
   if (!profile) return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
 
   // Only redirect if:
