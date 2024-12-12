@@ -9,12 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      genres: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          parent_genre_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          parent_genre_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          parent_genre_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "genres_parent_genre_id_fkey"
+            columns: ["parent_genre_id"]
+            isOneToOne: false
+            referencedRelation: "genres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       musicians: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string
-          genre: string
+          genre_id: string
           id: string
           location: string | null
           name: string
@@ -25,7 +57,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          genre: string
+          genre_id: string
           id?: string
           location?: string | null
           name: string
@@ -36,14 +68,22 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          genre?: string
+          genre_id?: string
           id?: string
           location?: string | null
           name?: string
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "musicians_genre_id_fkey"
+            columns: ["genre_id"]
+            isOneToOne: false
+            referencedRelation: "genres"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

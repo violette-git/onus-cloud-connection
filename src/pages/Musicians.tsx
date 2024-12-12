@@ -16,19 +16,37 @@ const Musicians = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
 
-  const { data: musicians, isLoading } = useQuery({
+  const { data: genres, isLoading: isLoadingGenres } = useQuery({
+    queryKey: ['genres'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('genres')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: musicians, isLoading: isLoadingMusicians } = useQuery({
     queryKey: ['musicians', searchQuery, selectedGenre],
     queryFn: async () => {
       let query = supabase
         .from('musicians')
-        .select('*');
+        .select(`
+          *,
+          genres:genre_id (
+            name
+          )
+        `);
 
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
       }
 
       if (selectedGenre && selectedGenre !== 'all') {
-        query = query.eq('genre', selectedGenre);
+        query = query.eq('genre_id', selectedGenre);
       }
 
       const { data, error } = await query;
@@ -37,6 +55,8 @@ const Musicians = () => {
       return data;
     },
   });
+
+  const isLoading = isLoadingGenres || isLoadingMusicians;
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
@@ -60,10 +80,11 @@ const Musicians = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Genres</SelectItem>
-              <SelectItem value="rock">Rock</SelectItem>
-              <SelectItem value="jazz">Jazz</SelectItem>
-              <SelectItem value="classical">Classical</SelectItem>
-              <SelectItem value="electronic">Electronic</SelectItem>
+              {genres?.map((genre) => (
+                <SelectItem key={genre.id} value={genre.id}>
+                  {genre.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -87,7 +108,9 @@ const Musicians = () => {
                 </CardContent>
                 <CardHeader>
                   <CardTitle className="text-lg">{musician.name}</CardTitle>
-                  <CardDescription>{musician.genre} • {musician.location || 'Unknown location'}</CardDescription>
+                  <CardDescription>
+                    {musician.genres?.name} • {musician.location || 'Unknown location'}
+                  </CardDescription>
                 </CardHeader>
               </Card>
             ))}
