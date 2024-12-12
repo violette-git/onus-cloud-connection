@@ -15,6 +15,7 @@ import { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 type Musician = Database['public']['Tables']['musicians']['Row'];
 type Genre = Database['public']['Tables']['genres']['Row'];
@@ -30,6 +31,7 @@ const Musicians = () => {
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: userProfile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -120,6 +122,10 @@ const Musicians = () => {
 
   const isLoading = isLoadingGenres || isLoadingMusicians;
 
+  const handleMusicianClick = (musicianId: string) => {
+    navigate(`/musicians/${musicianId}`);
+  };
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-12">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -165,7 +171,11 @@ const Musicians = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {musicians?.map((musician) => (
-              <Card key={musician.id} className="overflow-hidden">
+              <Card 
+                key={musician.id} 
+                className="overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
+                onClick={() => handleMusicianClick(musician.id)}
+              >
                 <CardContent className="p-0">
                   <div className="aspect-square bg-muted">
                     {musician.avatar_url && (
