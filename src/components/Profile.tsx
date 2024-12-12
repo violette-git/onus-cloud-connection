@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
 import { ProfileContent } from "./profile/ProfileContent";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
@@ -77,6 +77,11 @@ export const Profile = () => {
     },
     enabled: !!targetUserId && profile?.role === 'musician',
   });
+
+  // If this is a musician's profile, redirect to the musician view
+  if (profile?.role === 'musician' && musician) {
+    return <Navigate to={`/musicians/${musician.id}`} replace />;
+  }
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<ProfileType>) => {
