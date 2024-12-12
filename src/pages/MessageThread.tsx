@@ -1,14 +1,15 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { NudgeForm } from "@/components/messaging/NudgeForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   id: string;
@@ -26,9 +27,10 @@ interface Message {
 export const MessageThread = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: messages, isLoading, refetch } = useQuery({
+  const { data: messages, isLoading } = useQuery({
     queryKey: ["messages", id],
     queryFn: async () => {
       if (!user || !id) return [];
@@ -50,6 +52,7 @@ export const MessageThread = () => {
       return data as Message[];
     },
     enabled: !!user && !!id,
+    refetchInterval: 1000, // Poll every second as backup
   });
 
   // Auto-scroll to bottom when new messages arrive
@@ -68,13 +71,14 @@ export const MessageThread = () => {
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "nudges",
           filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id}))`,
         },
         () => {
-          refetch();
+          // Trigger a refetch when changes occur
+          window.location.reload();
         }
       )
       .subscribe();
@@ -82,12 +86,12 @@ export const MessageThread = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, id, refetch]);
+  }, [user, id]);
 
   // Mark messages as read
   useEffect(() => {
     const markMessagesAsRead = async () => {
-      if (!user || !id) return;
+      if (!user || !id || !messages?.length) return;
 
       await supabase
         .from("nudges")
@@ -98,6 +102,10 @@ export const MessageThread = () => {
 
     markMessagesAsRead();
   }, [user, id, messages]);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   if (!user) {
     return (
@@ -112,6 +120,15 @@ export const MessageThread = () => {
   return (
     <div className="container mx-auto px-4 pt-24">
       <div className="max-w-2xl mx-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mb-4"
+          onClick={handleBack}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
         <Card>
           <CardHeader>
             <CardTitle>Message Thread</CardTitle>

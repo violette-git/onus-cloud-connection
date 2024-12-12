@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { NudgeList } from "@/components/messaging/NudgeList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BackButton } from "@/components/ui/back-button";
 
 export const Messages = () => {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export const Messages = () => {
   return (
     <div className="container mx-auto px-4 pt-24">
       <div className="max-w-4xl mx-auto">
+        <BackButton />
         <h1 className="text-3xl font-bold mb-8">Messages</h1>
         <Card>
           <CardHeader>
