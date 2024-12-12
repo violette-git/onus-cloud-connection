@@ -1,29 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Instagram, 
-  Linkedin, 
-  Music2, 
-  Share2, 
-  Youtube,
-  Upload
-} from "lucide-react";
+import { Music2, Share2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { ProfileHeader } from "./profile/ProfileHeader";
+import { SocialLinksSection } from "./profile/SocialLinks";
+import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
+
+const defaultSocialLinks: SocialLinks = {
+  instagram: "",
+  youtube: "",
+  linkedin: ""
+};
 
 export const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isEditingLinks, setIsEditingLinks] = useState(false);
-  const [socialLinks, setSocialLinks] = useState({
-    instagram: "",
-    youtube: "",
-    linkedin: ""
-  });
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -36,10 +30,10 @@ export const Profile = () => {
         .single();
       
       if (error) throw error;
-      if (data.social_links) {
-        setSocialLinks(data.social_links);
-      }
-      return data;
+      return {
+        ...data,
+        social_links: data.social_links || defaultSocialLinks
+      } as ProfileType;
     },
     enabled: !!user,
   });
@@ -66,7 +60,7 @@ export const Profile = () => {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (updates: { avatar_url?: string, social_links?: any }) => {
+    mutationFn: async (updates: { avatar_url?: string, social_links?: SocialLinks }) => {
       if (!user?.id) throw new Error("No user");
       const { error } = await supabase
         .from('profiles')
@@ -121,10 +115,9 @@ export const Profile = () => {
     }
   };
 
-  const handleSocialLinksSubmit = async () => {
+  const handleSocialLinksUpdate = async (newLinks: SocialLinks) => {
     try {
-      await updateProfileMutation.mutateAsync({ social_links: socialLinks });
-      setIsEditingLinks(false);
+      await updateProfileMutation.mutateAsync({ social_links: newLinks });
     } catch (error) {
       console.error('Error updating social links:', error);
     }
@@ -153,42 +146,19 @@ export const Profile = () => {
     });
   };
 
+  if (!profile) return null;
+
   return (
     <div className="animate-fade-in">
-      {/* Hero Section */}
-      <div className="relative h-64 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20">
-        <div className="absolute -bottom-16 left-8 flex items-end space-x-6">
-          <div className="gradient-border relative group">
-            <img
-              src={profile?.avatar_url || "https://source.unsplash.com/300x300/?musician"}
-              alt="Profile"
-              className="w-32 h-32 rounded-lg object-cover"
-            />
-            {user?.id === profile?.id && (
-              <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-lg">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-                <Upload className="h-6 w-6 text-white" />
-              </label>
-            )}
-          </div>
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold">{profile?.username || "Anonymous User"}</h1>
-            <p className="text-muted-foreground">
-              {profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast'}
-            </p>
-          </div>
-        </div>
-      </div>
+      <ProfileHeader 
+        profile={profile}
+        isOwner={user?.id === profile.id}
+        onImageUpload={handleImageUpload}
+      />
 
-      {/* Profile Actions */}
       <div className="mt-20 px-8 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {profile?.role === 'observer' ? (
+          {profile.role === 'observer' ? (
             <Button onClick={handleBecomeMusicianClick}>
               <Music2 className="mr-2 h-4 w-4" />
               Become a Musician
@@ -206,59 +176,14 @@ export const Profile = () => {
             </>
           )}
         </div>
-        <div className="flex items-center space-x-4">
-          {isEditingLinks ? (
-            <div className="flex items-center gap-4">
-              <Input
-                placeholder="Instagram URL"
-                value={socialLinks.instagram}
-                onChange={(e) => setSocialLinks(prev => ({ ...prev, instagram: e.target.value }))}
-                className="w-48"
-              />
-              <Input
-                placeholder="YouTube URL"
-                value={socialLinks.youtube}
-                onChange={(e) => setSocialLinks(prev => ({ ...prev, youtube: e.target.value }))}
-                className="w-48"
-              />
-              <Input
-                placeholder="LinkedIn URL"
-                value={socialLinks.linkedin}
-                onChange={(e) => setSocialLinks(prev => ({ ...prev, linkedin: e.target.value }))}
-                className="w-48"
-              />
-              <Button onClick={handleSocialLinksSubmit}>Save</Button>
-              <Button variant="outline" onClick={() => setIsEditingLinks(false)}>Cancel</Button>
-            </div>
-          ) : (
-            <>
-              {user?.id === profile?.id && (
-                <Button variant="outline" onClick={() => setIsEditingLinks(true)}>
-                  Edit Links
-                </Button>
-              )}
-              {socialLinks.instagram && (
-                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-              )}
-              {socialLinks.youtube && (
-                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  <Youtube className="h-5 w-5" />
-                </a>
-              )}
-              {socialLinks.linkedin && (
-                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              )}
-            </>
-          )}
-        </div>
+        <SocialLinksSection
+          initialLinks={profile.social_links || defaultSocialLinks}
+          isOwner={user?.id === profile.id}
+          onSave={handleSocialLinksUpdate}
+        />
       </div>
 
-      {/* Content Grid */}
-      {profile?.role === 'musician' && (
+      {profile.role === 'musician' && (
         <div className="mt-12 px-8">
           {musician ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
