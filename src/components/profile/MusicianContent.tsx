@@ -12,8 +12,8 @@ interface MusicianContentProps {
 export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentProps) => {
   const { user } = useAuth();
 
-  // Example song URL - you'll need to replace this with actual song URLs from your data
-  const exampleSongUrl = "https://suno.com/song/cb5b62d7-7f79-45fc-927a-a30e9296a428";
+  // Example audio URL - replace with actual audio file URL from your data
+  const exampleSongUrl = "https://example.com/path/to/audio.mp3";
 
   return (
     <div className="mt-12 px-8">
@@ -27,10 +27,12 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Example of how to use the SunoPlayer */}
-            <div className="col-span-full md:col-span-2 lg:col-span-3">
-              <SunoPlayer songUrl={exampleSongUrl} />
-            </div>
+            {/* Audio player will only show up if there's a valid audio URL */}
+            {exampleSongUrl && (
+              <div className="col-span-full md:col-span-2 lg:col-span-3">
+                <SunoPlayer songUrl={exampleSongUrl} />
+              </div>
+            )}
 
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
