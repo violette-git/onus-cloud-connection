@@ -73,11 +73,17 @@ export const Connections = ({ userId }: ConnectionsProps) => {
           )
         `)
         .eq('requester_id', userId)
-        .eq('status', 'accepted')
-        .single();
+        .eq('status', 'accepted');
       
       if (error) throw error;
-      return data ? [data] as Collaborator[] : [];
+      
+      // Transform the data to match the Collaborator interface
+      return (data || []).map(item => ({
+        musician: {
+          ...item.musician,
+          profile: item.musician.profile[0] // Take the first profile from the array
+        }
+      })) as Collaborator[];
     },
     enabled: !!userId,
   });
