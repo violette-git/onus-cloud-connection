@@ -1,16 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { VideoEmbed } from "@/components/profile/VideoEmbed";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MusicianActions } from "@/components/profile/MusicianActions";
-import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
-import { Connections } from "@/components/profile/Connections";
 import { MusicianHeader } from "@/components/profile/musician/MusicianHeader";
 import { MusicianBio } from "@/components/profile/musician/MusicianBio";
 import { MusicianContent } from "@/components/profile/musician/MusicianContent";
-import { User } from "lucide-react";
+import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
+import { Connections } from "@/components/profile/Connections";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const MusicianProfile = () => {
@@ -25,6 +20,11 @@ export const MusicianProfile = () => {
         .from('musicians')
         .select(`
           *,
+          profile:profiles!musicians_user_id_fkey (
+            avatar_url,
+            username,
+            full_name
+          ),
           musician_genres (
             genre: genres (name)
           ),
@@ -54,6 +54,11 @@ export const MusicianProfile = () => {
         .from('musicians')
         .select(`
           *,
+          profile:profiles!musicians_user_id_fkey (
+            avatar_url,
+            username,
+            full_name
+          ),
           musician_genres (
             genre: genres (name)
           ),
