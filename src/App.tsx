@@ -28,7 +28,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/explore" element={<Explore />} />
                 <Route path="/musicians" element={<Musicians />} />
-                <Route path="/musician/:id" element={<MusicianProfile />} />
+                <Route path="/musicians/:id" element={<MusicianProfile />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/notifications" element={<Notifications />} />
