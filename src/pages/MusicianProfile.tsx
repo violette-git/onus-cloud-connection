@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Musician } from "@/types/profile";
@@ -76,17 +75,18 @@ const MusicianProfile = () => {
                 <CardTitle>{musician.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-square relative">
-                  <Avatar className="h-full w-full">
-                    <AvatarImage
-                      src={musician.avatar_url || undefined}
+                <div className="aspect-square relative rounded-lg overflow-hidden">
+                  {musician.avatar_url ? (
+                    <img
+                      src={musician.avatar_url}
                       alt={musician.name}
-                      className="object-cover"
+                      className="w-full h-full object-cover"
                     />
-                    <AvatarFallback>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted">
                       <User className="h-12 w-12 text-muted-foreground" />
-                    </AvatarFallback>
-                  </Avatar>
+                    </div>
+                  )}
                 </div>
                 {musician.bio && (
                   <p className="mt-4 text-muted-foreground">{musician.bio}</p>
