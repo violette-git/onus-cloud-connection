@@ -1,41 +1,38 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
 import { Navbar } from "./components/Navbar";
 import { Index } from "./pages/Index";
 import { Profile } from "./pages/Profile";
-import { Settings } from "./pages/Settings";
-import { Musicians } from "./pages/Musicians";
 import { MusicianProfile } from "./pages/MusicianProfile";
-import { Explore } from "./pages/Explore";
+import { Musicians } from "./pages/Musicians";
+import { Settings } from "./pages/Settings";
 import { Notifications } from "./pages/Notifications";
-import { Toaster } from "@/components/ui/sonner";
-
-const queryClient = new QueryClient();
+import { Explore } from "./pages/Explore";
+import { Connections } from "./components/profile/Connections";
+import { useAuth } from "./contexts/AuthContext";
 
 function App() {
+  const { user } = useAuth();
+
   return (
     <Router>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider>
-            <div className="min-h-screen bg-background">
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/musicians" element={<Musicians />} />
-                <Route path="/musicians/:id" element={<MusicianProfile />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/notifications" element={<Notifications />} />
-              </Routes>
-              <Toaster />
-            </div>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/musicians/:id" element={<MusicianProfile />} />
+            <Route path="/musicians" element={<Musicians />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route 
+              path="/connections" 
+              element={user ? <Connections userId={user.id} /> : null} 
+            />
+          </Routes>
+        </main>
+      </div>
     </Router>
   );
 }

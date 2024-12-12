@@ -40,6 +40,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
   const { data: following } = useQuery({
     queryKey: ['following', userId],
     queryFn: async () => {
+      console.log('Fetching following data for userId:', userId);
       const { data, error } = await supabase
         .from('followers')
         .select(`
@@ -52,7 +53,11 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         `)
         .eq('follower_id', userId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching following:', error);
+        throw error;
+      }
+      console.log('Following data:', data);
       return data as Following[];
     },
     enabled: !!userId,
@@ -61,6 +66,7 @@ export const Connections = ({ userId }: ConnectionsProps) => {
   const { data: collaborators } = useQuery({
     queryKey: ['collaborators', userId],
     queryFn: async () => {
+      console.log('Fetching collaborators data for userId:', userId);
       const { data, error } = await supabase
         .from('collaborators')
         .select(`
@@ -79,7 +85,11 @@ export const Connections = ({ userId }: ConnectionsProps) => {
         .eq('requester_id', userId)
         .eq('status', 'accepted');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching collaborators:', error);
+        throw error;
+      }
+      console.log('Collaborators data:', data);
       return (data as any[]).map(item => ({
         musician: {
           ...item.musician,
@@ -104,6 +114,8 @@ export const Connections = ({ userId }: ConnectionsProps) => {
     const name = collab.musician.name.toLowerCase();
     return fullName.includes(searchTerm) || username.includes(searchTerm) || name.includes(searchTerm);
   });
+
+  console.log('Rendered Connections with:', { following, collaborators, userId });
 
   return (
     <Tabs defaultValue="following" className="w-full">
