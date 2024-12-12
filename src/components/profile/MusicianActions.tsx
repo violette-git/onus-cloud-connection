@@ -49,7 +49,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     queryFn: async () => {
       if (!user?.id) return null;
 
-      // Check if the current user has sent a request
+      // First check if the current user has sent a request to this musician
       const { data: requestorStatus } = await supabase
         .from('collaborators')
         .select('status')
@@ -57,26 +57,33 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         .eq('musician_id', musicianId)
         .maybeSingle();
 
-      if (requestorStatus) return requestorStatus.status;
+      if (requestorStatus) {
+        console.log('Found status as requester:', requestorStatus.status);
+        return requestorStatus.status;
+      }
 
-      // Check if the current user has received a request (if they're a musician)
-      const { data: musicianData } = await supabase
+      // If no request found as requester, check if the current user (as a musician) has received a request
+      const { data: currentUserMusician } = await supabase
         .from('musicians')
         .select('id')
         .eq('user_id', user.id)
         .single();
 
-      if (musicianData) {
+      if (currentUserMusician) {
         const { data: musicianStatus } = await supabase
           .from('collaborators')
           .select('status')
-          .eq('musician_id', musicianData.id)
+          .eq('musician_id', currentUserMusician.id)
           .eq('requester_id', musicianUserId)
           .maybeSingle();
 
-        return musicianStatus?.status || null;
+        if (musicianStatus) {
+          console.log('Found status as musician:', musicianStatus.status);
+          return musicianStatus.status;
+        }
       }
 
+      console.log('No collaboration status found');
       return null;
     },
     enabled: !!user && !!musicianId && userProfile?.role === 'musician',
