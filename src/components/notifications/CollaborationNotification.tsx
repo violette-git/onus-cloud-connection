@@ -24,6 +24,9 @@ export const CollaborationNotification = ({ notification, currentUserId }: Notif
           queryClient.invalidateQueries({ 
             queryKey: ['collaboration-requests', notification.reference_id] 
           });
+          queryClient.invalidateQueries({ 
+            queryKey: ['collaboration', notification.reference_id, currentUserId] 
+          });
         }
       });
     }
