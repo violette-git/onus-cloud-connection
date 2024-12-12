@@ -36,7 +36,7 @@ export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
             id,
             name,
             user_id,
-            profile:profiles (
+            profile:profiles!musicians_user_id_fkey (
               id,
               username,
               full_name,
