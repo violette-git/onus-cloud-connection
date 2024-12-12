@@ -10,14 +10,15 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ profile, isOwner, onImageUpload }: ProfileHeaderProps) => {
   return (
-    <div className="relative h-64 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20">
-      <div className="absolute -bottom-16 left-8">
+    <div className="relative">
+      <div className="h-48 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-16">
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
             <img
               src={profile?.avatar_url || "https://source.unsplash.com/300x300/?musician"}
               alt="Profile"
-              className="w-32 h-32 rounded-lg object-cover"
+              className="w-32 h-32 rounded-lg object-cover bg-background"
             />
             {isOwner && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-lg">

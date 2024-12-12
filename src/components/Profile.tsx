@@ -4,8 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
-import { MusicianContent } from "./profile/MusicianContent";
-import type { Profile as ProfileType, SocialLinks, VideoPlatform, Musician } from "@/types/profile";
+import { ProfileContent } from "./profile/ProfileContent";
+import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
   instagram: "",
@@ -41,59 +41,34 @@ export const Profile = () => {
     queryKey: ['musician', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      try {
-        const { data, error } = await supabase
-          .from('musicians')
-          .select(`
-            *,
-            musician_genres (
-              genre: genres (name)
-            ),
-            songs (
-              id,
-              title,
-              url,
-              created_at,
-              updated_at
-            ),
-            videos (
-              id,
-              title,
-              url,
-              platform,
-              created_at,
-              updated_at
-            )
-          `)
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (error) {
-          console.error('Error fetching musician:', error);
-          throw error;
-        }
-
-        // Ensure video platforms match the VideoPlatform type
-        if (data?.videos) {
-          data.videos = data.videos.map(video => {
-            // Validate that platform is either 'youtube' or 'tiktok'
-            const platform = video.platform.toLowerCase();
-            if (platform !== 'youtube' && platform !== 'tiktok') {
-              console.warn(`Invalid platform "${platform}" for video ${video.id}`);
-              return null;
-            }
-            return {
-              ...video,
-              platform: platform as VideoPlatform
-            };
-          }).filter(Boolean); // Remove any null entries
-        }
-
-        return data as Musician | null;
-      } catch (error) {
-        console.error('Error fetching musician:', error);
-        return null;
-      }
+      const { data, error } = await supabase
+        .from('musicians')
+        .select(`
+          *,
+          musician_genres (
+            genre: genres (name)
+          ),
+          songs (
+            id,
+            title,
+            url,
+            created_at,
+            updated_at
+          ),
+          videos (
+            id,
+            title,
+            url,
+            platform,
+            created_at,
+            updated_at
+          )
+        `)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
     },
     enabled: !!user && profile?.role === 'musician',
   });
@@ -124,32 +99,6 @@ export const Profile = () => {
       console.error('Error updating profile:', error);
     },
   });
-
-  const handleBecomeMusicianClick = async () => {
-    if (!user?.id) return;
-    
-    try {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ role: 'musician' })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast({
-        title: "Success!",
-        description: "You are now registered as a musician.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not update your role. Please try again.",
-      });
-      console.error('Error becoming musician:', error);
-    }
-  };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -196,26 +145,34 @@ export const Profile = () => {
   if (!profile) return null;
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pb-12">
       <ProfileHeader 
         profile={profile}
         isOwner={user?.id === profile.id}
         onImageUpload={handleImageUpload}
       />
 
-      <ProfileActions 
-        profile={profile}
-        isOwner={user?.id === profile.id}
-        onSocialLinksUpdate={handleSocialLinksUpdate}
-        onBecomeMusicianClick={handleBecomeMusicianClick}
-      />
-
-      {profile.role === 'musician' && (
-        <MusicianContent 
-          musician={musician} 
-          onProfileCreated={handleMusicianProfileCreated}
+      <div className="mt-24">
+        <ProfileActions 
+          profile={profile}
+          isOwner={user?.id === profile.id}
+          onSocialLinksUpdate={handleSocialLinksUpdate}
+          onBecomeMusicianClick={async () => {
+            try {
+              await updateProfileMutation.mutateAsync({ role: 'musician' });
+            } catch (error) {
+              console.error('Error becoming musician:', error);
+            }
+          }}
         />
-      )}
+
+        {profile.role === 'musician' && (
+          <ProfileContent 
+            musician={musician} 
+            onProfileCreated={handleMusicianProfileCreated}
+          />
+        )}
+      </div>
     </div>
   );
 };
