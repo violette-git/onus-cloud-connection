@@ -31,7 +31,8 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
             id,
             username,
             full_name,
-            avatar_url
+            avatar_url,
+            role
           )
         `)
         .eq('follower_id', userId);
@@ -66,6 +67,28 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
 
   console.log('Filtered following count:', filteredFollowing?.length);
 
+  const handleProfileClick = (profile: Profile) => {
+    if (profile.role === 'musician') {
+      // For musicians, first get their musician profile ID
+      supabase
+        .from('musicians')
+        .select('id')
+        .eq('user_id', profile.id)
+        .single()
+        .then(({ data: musician, error }) => {
+          if (!error && musician) {
+            navigate(`/musicians/${musician.id}`);
+          } else {
+            // Fallback to regular profile if no musician profile found
+            navigate(`/profile/${profile.id}`);
+          }
+        });
+    } else {
+      // For non-musicians, go to regular profile
+      navigate(`/profile/${profile.id}`);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Input
@@ -93,7 +116,7 @@ export const FollowingList = ({ userId }: FollowingListProps) => {
           </div>
           <Button
             variant="ghost"
-            onClick={() => navigate(`/profile/${follow.followed.id}`)}
+            onClick={() => handleProfileClick(follow.followed)}
           >
             View Profile
           </Button>
