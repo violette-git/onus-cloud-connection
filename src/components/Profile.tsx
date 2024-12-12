@@ -142,6 +142,7 @@ export const Profile = () => {
     queryClient.invalidateQueries({ queryKey: ['musician'] });
   };
 
+  if (!user) return null;
   if (!profile) return null;
 
   return (
