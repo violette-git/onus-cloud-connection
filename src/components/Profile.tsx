@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
 import { MusicianContent } from "./profile/MusicianContent";
-import type { Profile as ProfileType, SocialLinks, VideoPlatform } from "@/types/profile";
+import type { Profile as ProfileType, SocialLinks, VideoPlatform, Musician } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
   instagram: "",
@@ -89,7 +89,7 @@ export const Profile = () => {
           }).filter(Boolean); // Remove any null entries
         }
 
-        return data;
+        return data as Musician | null;
       } catch (error) {
         console.error('Error fetching musician:', error);
         return null;
