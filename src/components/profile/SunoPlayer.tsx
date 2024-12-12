@@ -1,13 +1,13 @@
 interface SunoPlayerProps {
-  songId: string;
+  songUrl: string;
   className?: string;
 }
 
-export const SunoPlayer = ({ songId, className }: SunoPlayerProps) => {
+export const SunoPlayer = ({ songUrl, className }: SunoPlayerProps) => {
   return (
     <div className={className}>
       <iframe
-        src={`https://suno.com/embed/song/${songId}`}
+        src={songUrl}
         width="100%"
         height="166"
         frameBorder="0"
