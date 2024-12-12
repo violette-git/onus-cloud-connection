@@ -13,11 +13,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Database } from "@/integrations/supabase/types";
 
-type MusicianWithGenre = Database['public']['Tables']['musicians']['Row'] & {
-  genres: {
-    name: string;
-  } | null;
-};
+type Musician = Database['public']['Tables']['musicians']['Row'];
+type Genre = Database['public']['Tables']['genres']['Row'];
+
+interface MusicianWithGenre extends Musician {
+  genre: Pick<Genre, 'name'> | null;
+}
 
 const Musicians = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,9 +44,7 @@ const Musicians = () => {
         .from('musicians')
         .select(`
           *,
-          genres:genre_id (
-            name
-          )
+          genre:genres(name)
         `);
 
       if (searchQuery) {
@@ -59,7 +58,7 @@ const Musicians = () => {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data;
+      return data as MusicianWithGenre[];
     },
   });
 
@@ -116,7 +115,7 @@ const Musicians = () => {
                 <CardHeader>
                   <CardTitle className="text-lg">{musician.name}</CardTitle>
                   <CardDescription>
-                    {musician.genres?.name} • {musician.location || 'Unknown location'}
+                    {musician.genre?.name} • {musician.location || 'Unknown location'}
                   </CardDescription>
                 </CardHeader>
               </Card>
