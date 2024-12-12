@@ -51,7 +51,7 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     enabled: !!user,
   });
 
-  const { data: collaborationStatus, refetch: refetchCollaborationStatus } = useQuery({
+  const { data: collaborationStatus } = useQuery({
     queryKey: ['collaboration', musicianId, user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -115,9 +115,12 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       { requesterId: user.id, musicianId },
       {
         onSuccess: () => {
+          // Invalidate all relevant queries
           queryClient.invalidateQueries({ queryKey: ['collaboration', musicianId, user?.id] });
           queryClient.invalidateQueries({ queryKey: ['collaboration-requests', musicianId] });
-          refetchCollaborationStatus();
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          // Force a refetch of the collaboration status
+          queryClient.refetchQueries({ queryKey: ['collaboration', musicianId, user?.id] });
         }
       }
     );

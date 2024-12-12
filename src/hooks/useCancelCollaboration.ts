@@ -19,6 +19,7 @@ export const useCancelCollaboration = () => {
         .eq('musician_id', collaborationData.musicianId);
 
       if (error) throw error;
+      return true;
     },
     onSuccess: () => {
       toast({
