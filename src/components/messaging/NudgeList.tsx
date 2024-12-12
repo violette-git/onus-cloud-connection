@@ -8,6 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Reply } from "lucide-react";
 import { NudgeForm } from "./NudgeForm";
+import { useNavigate } from "react-router-dom";
 
 interface Nudge {
   id: string;
@@ -26,6 +27,7 @@ interface Nudge {
 export const NudgeList = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [nudges, setNudges] = useState<Nudge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -64,7 +66,6 @@ export const NudgeList = () => {
 
     fetchNudges();
 
-    // Subscribe to realtime updates
     const channel = supabase
       .channel("nudges")
       .on(
@@ -92,6 +93,10 @@ export const NudgeList = () => {
     };
   }, [user, toast]);
 
+  const handleNotificationClick = (senderId: string) => {
+    navigate(`/messages/${senderId}`);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[400px] animate-pulse">
@@ -116,7 +121,10 @@ export const NudgeList = () => {
         <div className="space-y-4 p-4">
           {nudges.map((nudge) => (
             <div key={nudge.id} className="space-y-2">
-              <Card className="transition-all duration-200 hover:bg-accent/50 animate-fade-in">
+              <Card 
+                className="transition-all duration-200 hover:bg-accent/50 animate-fade-in cursor-pointer"
+                onClick={() => handleNotificationClick(nudge.sender_id)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-10 w-10">
@@ -144,7 +152,10 @@ export const NudgeList = () => {
                       </p>
                       {user?.id !== nudge.sender_id && (
                         <button
-                          onClick={() => setReplyTo(nudge.sender_id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setReplyTo(nudge.sender_id);
+                          }}
                           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
                         >
                           <Reply className="h-3 w-3" />

@@ -5,7 +5,7 @@ import { FollowButton } from "./musician-actions/FollowButton";
 import { CollaborationButton } from "./musician-actions/CollaborationButton";
 import { MessageDialog } from "./musician-actions/MessageDialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, UserMinus2, Users } from "lucide-react";
 
 interface MusicianActionsProps {
   musicianUserId: string | null;
@@ -52,7 +52,6 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
     queryFn: async () => {
       if (!user?.id) return null;
 
-      // First check if the current user has sent a request to this musician
       const { data: requestorStatus } = await supabase
         .from('collaborators')
         .select('status')
@@ -61,11 +60,9 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
         .maybeSingle();
 
       if (requestorStatus) {
-        console.log('Found status as requester:', requestorStatus.status);
         return requestorStatus.status;
       }
 
-      // If no request found as requester, check if the current user (as a musician) has received a request
       const { data: currentUserMusician } = await supabase
         .from('musicians')
         .select('id')
@@ -81,19 +78,17 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
           .maybeSingle();
 
         if (musicianStatus) {
-          console.log('Found status as musician:', musicianStatus.status);
           return musicianStatus.status;
         }
       }
 
-      console.log('No collaboration status found');
       return null;
     },
     enabled: !!user && !!musicianId && userProfile?.role === 'musician',
   });
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-2">
+    <div className="flex flex-col gap-2 w-full max-w-sm mx-auto px-4">
       <FollowButton
         userId={user.id}
         musicianUserId={musicianUserId || ''}
@@ -109,8 +104,8 @@ export const MusicianActions = ({ musicianUserId, musicianId }: MusicianActionsP
       )}
 
       <MessageDialog recipientId={musicianUserId || ''}>
-        <Button variant="outline" className="w-full">
-          <MessageCircle className="mr-2 h-4 w-4" />
+        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+          <MessageCircle className="h-4 w-4" />
           Send Message
         </Button>
       </MessageDialog>
