@@ -45,7 +45,7 @@ const MusicianProfile = () => {
         .single();
 
       if (musicianError) throw musicianError;
-      return musicianData as Musician & { profile: { avatar_url: string | null, username: string | null, full_name: string | null } };
+      return musicianData as Musician;
     },
     enabled: !!id,
   });
