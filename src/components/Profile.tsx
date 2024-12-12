@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProfileHeader } from "./profile/ProfileHeader";
 import { ProfileActions } from "./profile/ProfileActions";
 import { ProfileContent } from "./profile/ProfileContent";
+import { useParams } from "react-router-dom";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
 
 const defaultSocialLinks: SocialLinks = {
@@ -17,15 +18,19 @@ export const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { id: profileId } = useParams();
+  
+  // If no profileId is provided in URL, use the current user's ID
+  const targetUserId = profileId || user?.id;
 
   const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ['profile', targetUserId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!targetUserId) return null;
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', targetUserId)
         .single();
       
       if (error) throw error;
@@ -34,13 +39,13 @@ export const Profile = () => {
         social_links: data.social_links || defaultSocialLinks
       } as ProfileType;
     },
-    enabled: !!user,
+    enabled: !!targetUserId,
   });
 
   const { data: musician } = useQuery({
-    queryKey: ['musician', user?.id],
+    queryKey: ['musician', targetUserId],
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!targetUserId) return null;
       const { data, error } = await supabase
         .from('musicians')
         .select(`
@@ -64,13 +69,13 @@ export const Profile = () => {
             updated_at
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .maybeSingle();
       
       if (error) throw error;
       return data;
     },
-    enabled: !!user && profile?.role === 'musician',
+    enabled: !!targetUserId && profile?.role === 'musician',
   });
 
   const updateProfileMutation = useMutation({
@@ -142,22 +147,23 @@ export const Profile = () => {
     queryClient.invalidateQueries({ queryKey: ['musician'] });
   };
 
-  if (!user) return null;
-  if (!profile) return null;
+  if (!profile) return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
+
+  const isOwner = user?.id === profile.id;
 
   return (
     <div className="animate-fade-in pb-12">
       <ProfileHeader 
         profile={profile}
         musician={musician}
-        isOwner={user?.id === profile.id}
+        isOwner={isOwner}
         onImageUpload={handleImageUpload}
       />
 
       <div className="mt-24">
         <ProfileActions 
           profile={profile}
-          isOwner={user?.id === profile.id}
+          isOwner={isOwner}
           onSocialLinksUpdate={handleSocialLinksUpdate}
           onBecomeMusicianClick={async () => {
             try {
