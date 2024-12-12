@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface NudgeFormProps {
   recipientId: string;
@@ -45,21 +46,47 @@ export const NudgeForm = ({ recipientId }: NudgeFormProps) => {
     });
   };
 
+  const characterCount = message.length;
+  const maxLength = 150;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Textarea
-        placeholder="Type your message..."
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        maxLength={150}
-        className="min-h-[100px]"
-      />
-      <div className="flex justify-end">
-        <Button type="submit" disabled={isSending || !message.trim()}>
-          <Send className="mr-2 h-4 w-4" />
-          Send Message
-        </Button>
-      </div>
-    </form>
+    <Card className="animate-fade-in">
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <Textarea
+              placeholder="Type your message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              maxLength={maxLength}
+              className="min-h-[100px] resize-none pr-16"
+              disabled={isSending}
+            />
+            <span className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+              {characterCount}/{maxLength}
+            </span>
+          </div>
+          <div className="flex justify-end">
+            <Button 
+              type="submit" 
+              disabled={isSending || !message.trim()}
+              className="transition-all duration-200 ease-in-out"
+            >
+              {isSending ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
+                  Sending...
+                </span>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Message
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
