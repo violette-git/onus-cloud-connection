@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { Index } from "@/pages/Index";
 import { Explore } from "@/pages/Explore";
 import { Musicians } from "@/pages/Musicians";
@@ -24,21 +25,24 @@ function App() {
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <div className="min-h-screen bg-background text-foreground">
+            <div className="min-h-screen bg-background text-foreground flex flex-col">
               <Navbar />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/musicians" element={<Musicians />} />
-                <Route path="/musicians/:id" element={<MusicianProfile />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/connections" element={<Connections />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/messages/:id" element={<MessageThread />} />
-                <Route path="/comments/:type/:id" element={<Comments />} />
-              </Routes>
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/musicians" element={<Musicians />} />
+                  <Route path="/musicians/:id" element={<MusicianProfile />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/connections" element={<Connections />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/messages/:id" element={<MessageThread />} />
+                  <Route path="/comments/:type/:id" element={<Comments />} />
+                </Routes>
+              </main>
+              <Footer />
               <Toaster />
             </div>
           </AuthProvider>
