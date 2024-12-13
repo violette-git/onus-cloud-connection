@@ -6,6 +6,7 @@ import { VideoManager } from "./VideoManager";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Connections } from "@/components/profile/Connections";
+import { FeaturedContent } from "./FeaturedContent";
 import type { Musician, Profile } from "@/types/profile";
 
 interface ProfileContentProps {
@@ -37,6 +38,17 @@ export const ProfileContent = ({ musician, onProfileCreated, profile, isOwner }:
 
   return (
     <div className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {musician && (
+        <div className="mb-8">
+          <FeaturedContent
+            musicianId={musician.id}
+            isOwner={isOwner}
+            songs={musician.songs || []}
+            videos={musician.videos || []}
+          />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-6">
