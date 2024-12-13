@@ -13,6 +13,7 @@ import { Music, Video } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SongManager } from "@/components/profile/SongManager";
 import { VideoManager } from "@/components/profile/VideoManager";
+import { FeaturedContent } from "@/components/profile/FeaturedContent";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -92,9 +93,7 @@ export const MusicianProfile = () => {
     );
   }
 
-  if (!musician) {
-    return null;
-  }
+  if (!musician) return null;
 
   const isOwner = user?.id === musician.user_id;
 
@@ -111,6 +110,16 @@ export const MusicianProfile = () => {
         {/* Profile Header Section */}
         <div className="-mt-24 mb-12">
           <MusicianHeader musician={musician} />
+        </div>
+
+        {/* Featured Content Section */}
+        <div className="mb-8">
+          <FeaturedContent
+            musicianId={musician.id}
+            isOwner={isOwner}
+            songs={musician.songs || []}
+            videos={musician.videos || []}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
