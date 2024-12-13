@@ -36,8 +36,36 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
   const maxDepth = 5;
   const canReply = depth < maxDepth;
 
+  // Calculate indentation and line styles
+  const indentationWidth = 28; // Fixed width for each level of indentation
+  const marginLeft = depth * indentationWidth;
+  
   return (
-    <div className={`ml-${depth * 4}`}>
+    <div 
+      className="relative"
+      style={{ marginLeft: `${marginLeft}px` }}
+    >
+      {/* Connection line */}
+      {depth > 0 && (
+        <div 
+          className="absolute left-0 top-0 bottom-0 w-[2px] bg-border opacity-30"
+          style={{ 
+            left: '-16px',
+            top: '20px', // Align with the middle of the avatar
+          }}
+        />
+      )}
+      {/* Horizontal connector line */}
+      {depth > 0 && (
+        <div 
+          className="absolute w-3 h-[2px] bg-border opacity-30"
+          style={{ 
+            left: '-16px',
+            top: '20px', // Align with the vertical line
+          }}
+        />
+      )}
+      
       <Card className="bg-secondary/50">
         <CardContent className="p-3">
           <div className="flex justify-between items-start gap-2">
