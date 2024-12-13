@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { VideoForm } from "./VideoForm";
 import { VideoEmbed } from "./VideoEmbed";
-import { MessageCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import type { Video, VideoPlatform } from "@/types/profile";
 
 interface VideoManagerProps {
@@ -16,7 +14,6 @@ interface VideoManagerProps {
 
 export const VideoManager = ({ musicianId, videos }: VideoManagerProps) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
   const [newVideo, setNewVideo] = useState({ 
@@ -119,27 +116,18 @@ export const VideoManager = ({ musicianId, videos }: VideoManagerProps) => {
             className="p-4 border rounded-lg space-y-2"
           >
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <h4 className="font-medium">{video.title}</h4>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate(`/comments/video/${video.id}`)}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-              </div>
               <div>
+                <h4 className="font-medium">{video.title}</h4>
                 <p className="text-sm text-muted-foreground capitalize">{video.platform}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(video.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  Delete
-                </Button>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDelete(video.id)}
+                className="text-destructive hover:text-destructive"
+              >
+                Delete
+              </Button>
             </div>
             <VideoEmbed video={video} />
           </div>

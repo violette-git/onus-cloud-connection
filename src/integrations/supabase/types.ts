@@ -48,54 +48,6 @@ export type Database = {
           },
         ]
       }
-      comments: {
-        Row: {
-          content: string
-          content_id: string
-          content_type: string
-          created_at: string
-          id: string
-          parent_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          content_id: string
-          content_type: string
-          created_at?: string
-          id?: string
-          parent_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          content_id?: string
-          content_type?: string
-          created_at?: string
-          id?: string
-          parent_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       featured_content: {
         Row: {
           content_id: string

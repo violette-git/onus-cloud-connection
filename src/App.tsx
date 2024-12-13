@@ -1,36 +1,49 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Home } from "./pages/Home";
-import { MusicianProfile } from "./pages/MusicianProfile";
-import { MessageThread } from "./pages/MessageThread";
-import { Comments } from "./pages/Comments";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster } from "@/components/ui/toaster";
+import { Navbar } from "@/components/Navbar";
+import { Index } from "@/pages/Index";
+import { Explore } from "@/pages/Explore";
+import { Musicians } from "@/pages/Musicians";
+import { MusicianProfile } from "@/pages/MusicianProfile";
+import { Profile } from "@/pages/Profile";
+import { Settings } from "@/pages/Settings";
+import { Notifications } from "@/pages/Notifications";
+import { Connections } from "@/pages/Connections";
+import { Messages } from "@/pages/Messages";
+import { MessageThread } from "@/pages/MessageThread";
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/musicians/:id" element={<MusicianProfile />} />
-            <Route path="/messages/:id" element={<MessageThread />} />
-            <Route path="/comments/:type/:id" element={<Comments />} />
-          </Routes>
-        </AuthProvider>
-      </Router>
-    </QueryClientProvider>
+    <Router>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <div className="min-h-screen bg-background text-foreground">
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/musicians" element={<Musicians />} />
+                <Route path="/musicians/:id" element={<MusicianProfile />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/connections" element={<Connections />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/messages/:id" element={<MessageThread />} />
+              </Routes>
+              <Toaster />
+            </div>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </Router>
   );
-};
+}
 
 export default App;
