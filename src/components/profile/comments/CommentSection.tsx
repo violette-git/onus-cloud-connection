@@ -22,20 +22,27 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     queryKey: ['content-owner', contentType, contentId],
     queryFn: async () => {
       const table = contentType === 'song' ? 'songs' : 'videos';
-      const { data: content, error: contentError } = await supabase
-        .from(table)
-        .select(`
-          musician:musicians!inner (
-            user:profiles!musicians_user_id_fkey (
-              comment_preferences
+      try {
+        const { data: content, error: contentError } = await supabase
+          .from(table)
+          .select(`
+            musician:musicians!inner (
+              user:profiles!musicians_user_id_fkey (
+                comment_preferences
+              )
             )
-          )
-        `)
-        .eq('id', contentId)
-        .single();
+          `)
+          .eq('id', contentId)
+          .maybeSingle();
 
-      if (contentError) throw contentError;
-      return content?.musician?.user;
+        if (contentError) throw contentError;
+        if (!content) return null;
+        
+        return content?.musician?.user;
+      } catch (error) {
+        console.error('Error fetching content owner:', error);
+        return null;
+      }
     },
   });
 
@@ -174,7 +181,9 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     );
   }
 
-  const commentsDisabled = (contentOwner?.comment_preferences as CommentPreferences)?.disable_comments;
+  const commentsDisabled = contentOwner?.comment_preferences ? 
+    (contentOwner.comment_preferences as CommentPreferences).disable_comments : 
+    false;
 
   if (commentsDisabled) {
     return (

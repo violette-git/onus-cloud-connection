@@ -27,7 +27,10 @@ export const Settings = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      return {
+        ...data,
+        comment_preferences: data.comment_preferences || { disable_comments: false }
+      };
     },
     enabled: !!user?.id,
   });
@@ -65,7 +68,9 @@ export const Settings = () => {
     return <Navigate to="/" replace />;
   }
 
-  const disableComments = (profile?.comment_preferences as CommentPreferences)?.disable_comments ?? false;
+  const disableComments = profile?.comment_preferences ? 
+    (profile.comment_preferences as CommentPreferences).disable_comments : 
+    false;
 
   return (
     <div className="min-h-screen">

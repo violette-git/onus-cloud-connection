@@ -23,7 +23,7 @@ export interface Profile extends BaseRecord {
   full_name: string | null;
   avatar_url: string | null;
   role: string;
-  social_links: SocialLinks | null;
+  social_links: SocialLinks;
   comment_preferences: CommentPreferences;
 }
 

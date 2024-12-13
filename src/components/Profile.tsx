@@ -31,10 +31,13 @@ export const Profile = () => {
         .single();
       
       if (error) throw error;
+      
+      // Ensure proper typing of JSON fields
       return {
         ...data,
-        social_links: data.social_links || defaultSocialLinks
-      } as ProfileType;
+        social_links: data.social_links || defaultSocialLinks,
+        comment_preferences: data.comment_preferences || { disable_comments: false }
+      } as Profile;
     },
     enabled: !!targetUserId,
   });
