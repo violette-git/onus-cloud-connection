@@ -9,7 +9,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Video, Users2 } from "lucide-react";
+import { Music, Video } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SongManager } from "@/components/profile/SongManager";
 import { VideoManager } from "@/components/profile/VideoManager";
@@ -97,100 +97,84 @@ export const MusicianProfile = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-3 space-y-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <MusicianBio musician={musician} />
-                  {musician.musician_genres && musician.musician_genres.length > 0 && (
-                    <>
-                      <Separator className="my-4" />
-                      <div>
-                        <h3 className="font-semibold mb-3">Genres</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {musician.musician_genres.map((mg, index) => (
-                            <span
-                              key={index}
-                              className="px-3 py-1 bg-secondary rounded-full text-sm"
-                            >
-                              {mg.genre.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-6">
             {isOwner && (
               <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Users2 className="h-5 w-5 text-muted-foreground" />
-                      <h3 className="font-semibold">My Network</h3>
-                    </div>
-                    <ScrollArea className="h-[300px]">
-                      <Connections userId={user?.id || ''} />
-                    </ScrollArea>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Main Content Area */}
-          <div className="lg:col-span-9">
-            {isOwner && (
-              <Card className="mb-8">
                 <CardContent className="p-6">
                   <CollaborationRequests musicianId={musician.id} />
                 </CardContent>
               </Card>
             )}
 
-            {/* Songs Section */}
-            <Card className="mb-8">
+            <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Music className="h-5 w-5 text-muted-foreground" />
-                  <h2 className="text-xl font-semibold">Songs</h2>
+                  <h2 className="text-xl font-semibold">My Songs</h2>
                 </div>
-                <ScrollArea className="h-[400px]">
-                  <div className="pr-4">
-                    {isOwner && (
-                      <SongManager 
-                        musicianId={musician.id} 
-                        songs={musician.songs || []}
-                      />
-                    )}
-                  </div>
-                </ScrollArea>
+                <div className="pr-4">
+                  <SongManager 
+                    musicianId={musician.id} 
+                    songs={musician.songs || []}
+                  />
+                </div>
               </CardContent>
             </Card>
 
-            {/* Videos Section */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Video className="h-5 w-5 text-muted-foreground" />
-                  <h2 className="text-xl font-semibold">Videos</h2>
+                  <h2 className="text-xl font-semibold">My Videos</h2>
                 </div>
-                <ScrollArea className="h-[400px]">
-                  <div className="pr-4">
-                    {isOwner && (
-                      <VideoManager 
-                        musicianId={musician.id} 
-                        videos={musician.videos || []}
-                      />
-                    )}
-                  </div>
-                </ScrollArea>
+                <div className="pr-4">
+                  <VideoManager 
+                    musicianId={musician.id} 
+                    videos={musician.videos || []}
+                  />
+                </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-4 space-y-6">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">About</h3>
+                <MusicianBio musician={musician} />
+                {musician.musician_genres && musician.musician_genres.length > 0 && (
+                  <>
+                    <Separator className="my-4" />
+                    <div>
+                      <h3 className="font-semibold mb-3">Genres</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {musician.musician_genres.map((mg, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-secondary rounded-full text-sm"
+                          >
+                            {mg.genre.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {isOwner && (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">My Network</h3>
+                  <ScrollArea className="h-[300px]">
+                    <Connections userId={user?.id || ''} />
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
