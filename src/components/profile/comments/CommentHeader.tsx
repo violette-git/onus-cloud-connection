@@ -29,14 +29,16 @@ export const CommentHeader = ({ user, created_at, canDelete, onDelete }: Comment
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">
-            {user.username || user.full_name}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(created_at), {
-              addSuffix: true,
-            })}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-sm truncate">
+              {user.username || user.full_name}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(created_at), {
+                addSuffix: true,
+              })}
+            </p>
+          </div>
         </div>
       </div>
       {canDelete && (

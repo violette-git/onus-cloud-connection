@@ -11,7 +11,7 @@ export const CommentReplyButton = ({ onReplyClick, isReplying }: CommentReplyBut
     <Button
       variant="ghost"
       size="sm"
-      className="text-muted-foreground h-7 text-xs px-2"
+      className="text-muted-foreground h-7 text-xs px-2 shrink-0"
       onClick={() => onReplyClick()}
     >
       <MessageSquare className="h-3 w-3 mr-1" />

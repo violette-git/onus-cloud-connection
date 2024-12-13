@@ -46,23 +46,25 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
       
       <Card className="bg-secondary/50">
         <CardContent className="p-3">
-          <CommentHeader
-            user={comment.user}
-            created_at={comment.created_at}
-            canDelete={user?.id === comment.user_id}
-            onDelete={() => onDelete(comment.id)}
-          />
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex-1">
+              <CommentHeader
+                user={comment.user}
+                created_at={comment.created_at}
+                canDelete={user?.id === comment.user_id}
+                onDelete={() => onDelete(comment.id)}
+              />
 
-          <p className="mt-2 text-sm break-words">{comment.content}</p>
+              <p className="mt-2 text-sm break-words">{comment.content}</p>
+            </div>
 
-          {canReply && user && (
-            <div className="mt-2">
+            {canReply && user && (
               <CommentReplyButton
                 onReplyClick={() => setIsReplying(!isReplying)}
                 isReplying={isReplying}
               />
-            </div>
-          )}
+            )}
+          </div>
 
           {isReplying && (
             <div className="mt-3">
