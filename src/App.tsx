@@ -5,7 +5,7 @@ import { MessageThread } from "./pages/MessageThread";
 import { Comments } from "./pages/Comments";
 import { AuthProvider } from "@/contexts/AuthContext";
 
-export const App = () => {
+const App = () => {
   return (
     <Router>
       <AuthProvider>
@@ -19,3 +19,5 @@ export const App = () => {
     </Router>
   );
 };
+
+export default App;
