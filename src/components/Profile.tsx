@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useParams, Navigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "
 export const Profile = () => {
   const { user } = useAuth();
   const { username: urlUsername } = useParams();
+  const queryClient = useQueryClient();
   
   // First, fetch profile by username if provided in URL
   const { data: profileByUsername, isLoading: isUsernameLoading } = useQuery({
@@ -125,6 +126,12 @@ export const Profile = () => {
 
   if (!profile) {
     return <div className="flex items-center justify-center h-screen">Profile not found</div>;
+  }
+
+  // Check if this is a private profile and the viewer is not the owner
+  const isPrivateProfile = profile.visibility === 'private' && user?.id !== profile.id;
+  if (isPrivateProfile) {
+    return <div className="flex items-center justify-center h-screen">This profile is private</div>;
   }
 
   const shouldRedirectToMusicianProfile = 

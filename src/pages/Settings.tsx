@@ -1,27 +1,22 @@
-import { Navbar } from "@/components/Navbar";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Moon, Sun, MessageSquareOff } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { CommentPreferences, ThemeColors } from "@/types/database";
-import { ensureCommentPreferences, ensureThemeColors } from "@/types/database";
-import { ThemeCustomization } from "@/components/profile/ThemeCustomization";
 import { useProfileMutation } from "@/hooks/useProfileMutation";
+import { ThemeCustomization } from "@/components/profile/ThemeCustomization";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
 import type { Profile } from "@/types/profile";
 
 export const Settings = () => {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const updateProfileMutation = useProfileMutation();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -35,6 +30,7 @@ export const Settings = () => {
       
       return {
         ...data,
+        social_links: ensureSocialLinks(data.social_links),
         comment_preferences: ensureCommentPreferences(data.comment_preferences),
         theme_colors: ensureThemeColors(data.theme_colors)
       } as Profile;
@@ -42,101 +38,104 @@ export const Settings = () => {
     enabled: !!user?.id,
   });
 
-  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user?.id) return;
+  if (isLoading || !profile) {
+    return <div>Loading settings...</div>;
+  }
 
+  const handleVisibilityChange = async (isPublic: boolean) => {
     try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}-banner-${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      await updateProfileMutation.mutateAsync({ 
-        id: user.id,
-        banner_url: publicUrl 
+      await updateProfileMutation.mutateAsync({
+        id: profile.id,
+        visibility: isPublic ? 'public' : 'private'
+      });
+      
+      toast({
+        title: "Success",
+        description: `Your profile is now ${isPublic ? 'public' : 'private'}`,
       });
     } catch (error) {
-      console.error('Error uploading banner:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile visibility",
+      });
     }
   };
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  const disableComments = profile?.comment_preferences?.disable_comments ?? false;
+  const handleCommentsChange = async (allowComments: boolean) => {
+    try {
+      await updateProfileMutation.mutateAsync({
+        id: profile.id,
+        comment_preferences: { disable_comments: !allowComments }
+      });
+      
+      toast({
+        title: "Success",
+        description: `Comments are now ${allowComments ? 'enabled' : 'disabled'}`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update comment preferences",
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main className="container mx-auto px-4 pt-24">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Settings</h1>
-          <div className="space-y-6">
-            <div className="p-6 rounded-lg border bg-card">
-              <h2 className="text-xl font-semibold mb-4">Appearance</h2>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Settings</h1>
+      
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Profile Settings</h2>
+            
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Dark Mode</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Toggle between light and dark themes
-                  </p>
+                  <Label>Profile Visibility</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Make your profile visible to everyone
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Sun className="h-5 w-5" />
-                  <Switch
-                    checked={theme === "dark"}
-                    onCheckedChange={toggleTheme}
-                  />
-                  <Moon className="h-5 w-5" />
+                <Switch
+                  checked={profile.visibility === 'public'}
+                  onCheckedChange={handleVisibilityChange}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Allow Comments</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Let others comment on your content
+                  </div>
                 </div>
+                <Switch
+                  checked={!profile.comment_preferences.disable_comments}
+                  onCheckedChange={handleCommentsChange}
+                />
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {profile && (
-              <ThemeCustomization
-                profile={profile}
-                onThemeUpdate={(colors: ThemeColors) => updateProfileMutation.mutateAsync({ 
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
+            <ThemeCustomization
+              initialColors={profile.theme_colors}
+              onUpdate={(colors) => 
+                updateProfileMutation.mutateAsync({
                   id: profile.id,
-                  theme_colors: colors 
-                })}
-                onBannerUpload={handleBannerUpload}
-              />
-            )}
-
-            <div className="p-6 rounded-lg border bg-card">
-              <h2 className="text-xl font-semibold mb-4">Comment Settings</h2>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base">Disable Comments</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Turn off comments on all your content
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    checked={disableComments}
-                    onCheckedChange={(checked) => updateProfileMutation.mutateAsync({
-                      id: profile!.id,
-                      comment_preferences: { disable_comments: checked }
-                    })}
-                  />
-                  <MessageSquareOff className="h-5 w-5" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+                  theme_colors: colors
+                })
+              }
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
