@@ -19,6 +19,7 @@ interface CommentHeaderProps {
 }
 
 export const CommentHeader = ({ user, created_at, canDelete, onDelete }: CommentHeaderProps) => {
+  // Prioritize musician name if available
   const displayName = user.musician?.name || user.username || user.full_name;
   
   return (
