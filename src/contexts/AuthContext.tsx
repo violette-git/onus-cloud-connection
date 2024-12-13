@@ -30,7 +30,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true
 
-    async function getInitialSession() {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession()
         
@@ -58,15 +59,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession()
 
+    // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        console.log('Auth state changed:', event, currentSession?.user?.id)
-
+      async (_event, currentSession) => {
         if (mounted) {
           if (currentSession) {
+            console.log('Auth state changed - Session found:', currentSession.user.id)
             setSession(currentSession)
             setUser(currentSession.user)
           } else {
+            console.log('Auth state changed - No session')
             setSession(null)
             setUser(null)
           }
@@ -79,12 +81,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       mounted = false
       subscription.unsubscribe()
     }
-  }, []) // Empty dependency array since we only want to run this once
+  }, [])
 
   const signOut = async () => {
     try {
       await supabase.auth.signOut()
-      navigate('/login')
+      navigate('/')
     } catch (error) {
       console.error('Error signing out:', error)
     }

@@ -111,7 +111,7 @@ export const MusicianProfile = () => {
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Music className="h-5 w-5 text-muted-foreground" />
-                  <h2 className="text-xl font-semibold">My Songs</h2>
+                  <h2 className="text-xl font-semibold">Songs</h2>
                 </div>
                 <div className="pr-4">
                   <SongManager 
@@ -126,7 +126,7 @@ export const MusicianProfile = () => {
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Video className="h-5 w-5 text-muted-foreground" />
-                  <h2 className="text-xl font-semibold">My Videos</h2>
+                  <h2 className="text-xl font-semibold">Videos</h2>
                 </div>
                 <div className="pr-4">
                   <VideoManager 
@@ -164,17 +164,6 @@ export const MusicianProfile = () => {
                 )}
               </CardContent>
             </Card>
-
-            {isOwner && (
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">My Network</h3>
-                  <ScrollArea className="h-[300px]">
-                    <Connections userId={user?.id || ''} />
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
