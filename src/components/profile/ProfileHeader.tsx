@@ -23,11 +23,11 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
               <img
                 src={profile.avatar_url}
                 alt={displayName}
-                className="w-32 h-32 rounded-lg object-cover bg-background"
+                className="w-40 h-40 rounded-lg object-cover bg-background"
               />
             ) : (
-              <div className="w-32 h-32 rounded-lg bg-muted flex items-center justify-center">
-                <User className="h-12 w-12 text-muted-foreground" />
+              <div className="w-40 h-40 rounded-lg bg-muted flex items-center justify-center">
+                <User className="h-16 w-16 text-muted-foreground" />
               </div>
             )}
             {isOwner && (
@@ -38,7 +38,7 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
                   className="hidden"
                   onChange={onImageUpload}
                 />
-                <User className="h-6 w-6 text-white" />
+                <User className="h-8 w-8 text-white" />
               </label>
             )}
           </div>

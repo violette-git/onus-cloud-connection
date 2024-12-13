@@ -36,7 +36,7 @@ export const ProfileContent = ({ musician, onProfileCreated, profile, isOwner }:
   }
 
   return (
-    <div className="mt-12 space-y-6">
+    <div className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-6">
@@ -110,16 +110,14 @@ export const ProfileContent = ({ musician, onProfileCreated, profile, isOwner }:
             </CardContent>
           </Card>
 
-          {isOwner && (
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">My Network</h3>
-                <ScrollArea className="h-[300px]">
-                  <Connections userId={profile.id} />
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-semibold mb-4">My Network</h3>
+              <ScrollArea className="h-[300px]">
+                <Connections userId={profile.id} />
+              </ScrollArea>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

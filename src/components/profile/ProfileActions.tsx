@@ -19,9 +19,9 @@ export const ProfileActions = ({
   onSocialLinksUpdate 
 }: ProfileActionsProps) => {
   return (
-    <div className="mt-32 px-4 md:px-8 max-w-2xl mx-auto w-full">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+    <div className="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {profile.role === 'observer' && isOwner && (
             <Button 
               onClick={onBecomeMusicianClick}
