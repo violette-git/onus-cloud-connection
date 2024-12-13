@@ -1,6 +1,24 @@
 import { Link } from "react-router-dom";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { Mail, Send } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "./ui/use-toast";
 
 export const Footer = () => {
+  const [email, setEmail] = useState("");
+  const { toast } = useToast();
+
+  const handleNewsletterSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically handle the newsletter signup
+    toast({
+      title: "Thanks for subscribing!",
+      description: "You'll receive our newsletter updates soon.",
+    });
+    setEmail("");
+  };
+
   return (
     <footer className="bg-background border-t border-border/40 mt-12">
       <div className="onus-container py-8">
@@ -32,43 +50,55 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* About & Contact */}
           <div>
-            <h3 className="font-semibold mb-4">Resources</h3>
+            <h3 className="font-semibold mb-4">About & Contact</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/settings" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Settings
+                <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link to="/profile" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Profile
+                <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Contact
                 </Link>
               </li>
               <li>
-                <Link to="/messages" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Messages
+                <a href="mailto:support@onus.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Support
+                </a>
+              </li>
+              <li>
+                <Link to="/feedback" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Feedback
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Newsletter Signup */}
           <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
+            <h3 className="font-semibold mb-4">Newsletter</h3>
+            <form onSubmit={handleNewsletterSignup} className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Stay updated with our latest features and updates.
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-sm"
+                  required
+                />
+                <Button type="submit" size="sm" className="shrink-0">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
 
