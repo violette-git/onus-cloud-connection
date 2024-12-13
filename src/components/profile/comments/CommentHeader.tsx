@@ -9,6 +9,9 @@ interface CommentHeaderProps {
     username: string;
     full_name: string;
     avatar_url: string;
+    musician?: {
+      name: string;
+    } | null;
   };
   created_at: string;
   canDelete: boolean;
@@ -16,13 +19,15 @@ interface CommentHeaderProps {
 }
 
 export const CommentHeader = ({ user, created_at, canDelete, onDelete }: CommentHeaderProps) => {
+  const displayName = user.musician?.name || user.username || user.full_name;
+  
   return (
     <div className="flex justify-between items-start gap-2">
-      <div className="flex gap-2 items-center flex-1 min-w-0">
+      <div className="flex gap-2 items-start flex-1 min-w-0">
         <Avatar className="h-8 w-8">
           <AvatarImage
             src={user.avatar_url}
-            alt={user.username || user.full_name}
+            alt={displayName}
           />
           <AvatarFallback>
             <User className="h-4 w-4" />
@@ -31,7 +36,7 @@ export const CommentHeader = ({ user, created_at, canDelete, onDelete }: Comment
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="font-medium text-sm truncate">
-              {user.username || user.full_name}
+              {displayName}
             </p>
             <p className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(created_at), {

@@ -16,6 +16,9 @@ interface CommentItemProps {
       username: string;
       full_name: string;
       avatar_url: string;
+      musician?: {
+        name: string;
+      } | null;
     };
   };
   onDelete: (id: string) => void;
@@ -55,7 +58,9 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
                 onDelete={() => onDelete(comment.id)}
               />
 
-              <p className="mt-2 text-sm break-words">{comment.content}</p>
+              <div className="pl-10">
+                <p className="text-sm break-words">{comment.content}</p>
+              </div>
             </div>
 
             {canReply && user && (
