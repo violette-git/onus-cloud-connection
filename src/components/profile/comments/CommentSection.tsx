@@ -31,7 +31,7 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
         `)
         .eq('content_type', contentType)
         .eq('content_id', contentId)
-        .order('created_at', { ascending: false });
+        .order('thread_path', { ascending: true });
 
       if (error) throw error;
       return data;
@@ -39,28 +39,22 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
   });
 
   const addCommentMutation = useMutation({
-    mutationFn: async (content: string) => {
+    mutationFn: async ({ content, parentId }: { content: string, parentId?: string }) => {
       if (!user?.id) throw new Error('User must be logged in to comment');
 
-      // First, create the comment without thread_path
-      const { data, error: insertError } = await supabase
+      const { data, error } = await supabase
         .from('comments')
         .insert({
           content,
           content_type: contentType,
           content_id: contentId,
           user_id: user.id,
-          parent_id: null, // Ensure this is explicitly set for top-level comments
-          depth: 0, // Set initial depth
+          parent_id: parentId || null,
         })
         .select()
         .single();
 
-      if (insertError) {
-        console.error('Error inserting comment:', insertError);
-        throw insertError;
-      }
-
+      if (error) throw error;
       return data;
     },
     onSuccess: () => {
@@ -105,6 +99,48 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     },
   });
 
+  const buildCommentTree = (comments: any[]) => {
+    const commentMap = new Map();
+    const roots: any[] = [];
+
+    comments.forEach(comment => {
+      commentMap.set(comment.id, { ...comment, replies: [] });
+    });
+
+    comments.forEach(comment => {
+      if (comment.parent_id) {
+        const parent = commentMap.get(comment.parent_id);
+        if (parent) {
+          parent.replies.push(commentMap.get(comment.id));
+        }
+      } else {
+        roots.push(commentMap.get(comment.id));
+      }
+    });
+
+    return roots;
+  };
+
+  const renderComments = (comments: any[], depth = 0) => {
+    return comments.map(comment => (
+      <div key={comment.id} className="space-y-4">
+        <CommentItem
+          comment={comment}
+          onDelete={(id) => deleteCommentMutation.mutate(id)}
+          onReply={(content, parentId) => 
+            addCommentMutation.mutate({ content, parentId })
+          }
+          depth={depth}
+        />
+        {comment.replies && comment.replies.length > 0 && (
+          <div className="ml-8 space-y-4">
+            {renderComments(comment.replies, depth + 1)}
+          </div>
+        )}
+      </div>
+    ));
+  };
+
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-4">
@@ -115,6 +151,8 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     );
   }
 
+  const commentTree = comments ? buildCommentTree(comments) : [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-6">
@@ -123,20 +161,14 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
       </div>
 
       <CommentForm
-        onSubmit={(content) => addCommentMutation.mutate(content)}
+        onSubmit={(content) => addCommentMutation.mutate({ content })}
         isSubmitting={addCommentMutation.isPending}
       />
 
       <div className="space-y-4">
-        {comments?.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            onDelete={(id) => deleteCommentMutation.mutate(id)}
-          />
-        ))}
+        {renderComments(commentTree)}
 
-        {comments?.length === 0 && (
+        {(!comments || comments.length === 0) && (
           <div className="text-center py-8 text-muted-foreground">
             No comments yet. Be the first to comment!
           </div>
