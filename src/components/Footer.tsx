@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
-    <footer className="bg-background border-t border-border/40 mt-20">
-      <div className="onus-container py-12">
+    <footer className="bg-background border-t border-border/40 mt-12">
+      <div className="onus-container py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
@@ -72,8 +72,8 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright - Reduced padding from pt-8 to pt-4 */}
-        <div className="border-t border-border/40 mt-8 pt-4 text-center">
+        {/* Copyright - Reduced spacing */}
+        <div className="border-t border-border/40 mt-6 pt-3 text-center">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} ONUS. All rights reserved.
           </p>
