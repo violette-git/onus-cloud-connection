@@ -28,32 +28,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Get initial session
+    // Set up the initial session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      setSession(initialSession)
-      setUser(initialSession?.user ?? null)
+      if (initialSession) {
+        setSession(initialSession)
+        setUser(initialSession.user)
+      }
       setLoading(false)
     })
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', _event, session?.user?.id)
-      setSession(session)
-      setUser(session?.user ?? null)
+    // Listen for auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+      console.log('Auth state changed:', _event, currentSession?.user?.id)
+      if (currentSession) {
+        setSession(currentSession)
+        setUser(currentSession.user)
+      } else {
+        setSession(null)
+        setUser(null)
+      }
       setLoading(false)
     })
 
-    // Cleanup subscription
+    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, []) // Empty dependency array since we only want to run this once
 
   const signOut = async () => {
     try {
       await supabase.auth.signOut()
-      setUser(null)
-      setSession(null)
       navigate('/login')
     } catch (error) {
       console.error('Error signing out:', error)
