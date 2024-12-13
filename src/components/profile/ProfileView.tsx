@@ -24,28 +24,30 @@ export const ProfileView = ({
 }: ProfileViewProps) => {
   return (
     <div className="animate-fade-in pb-12 min-h-screen bg-background">
-      <ProfileHeader 
-        profile={profile}
-        musician={musician}
-        isOwner={isOwner}
-        onImageUpload={onImageUpload}
-      />
+      <div className="onus-container">
+        <ProfileHeader 
+          profile={profile}
+          musician={musician}
+          isOwner={isOwner}
+          onImageUpload={onImageUpload}
+        />
 
-      <ProfileActions 
-        profile={profile}
-        isOwner={isOwner}
-        onSocialLinksUpdate={onSocialLinksUpdate}
-        onBecomeMusicianClick={onBecomeMusicianClick}
-      />
+        <ProfileActions 
+          profile={profile}
+          isOwner={isOwner}
+          onSocialLinksUpdate={onSocialLinksUpdate}
+          onBecomeMusicianClick={onBecomeMusicianClick}
+        />
 
-      {profile.role === 'musician' && (
-        <div className="mt-8 max-w-2xl mx-auto px-4 md:px-8">
+        <div className="mt-8">
           <ProfileContent 
             musician={musician} 
             onProfileCreated={onMusicianProfileCreated}
+            profile={profile}
+            isOwner={isOwner}
           />
         </div>
-      )}
+      </div>
     </div>
   );
 };

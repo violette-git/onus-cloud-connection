@@ -6,17 +6,19 @@ import { VideoManager } from "./VideoManager";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Connections } from "@/components/profile/Connections";
-import type { Musician } from "@/types/profile";
+import type { Musician, Profile } from "@/types/profile";
 
 interface ProfileContentProps {
   musician: Musician | null;
   onProfileCreated?: () => void;
+  profile: Profile;
+  isOwner: boolean;
 }
 
-export const ProfileContent = ({ musician, onProfileCreated }: ProfileContentProps) => {
+export const ProfileContent = ({ musician, onProfileCreated, profile, isOwner }: ProfileContentProps) => {
   const { user } = useAuth();
 
-  if (!musician && user) {
+  if (!musician && user && isOwner) {
     return (
       <div className="max-w-xl mx-auto mt-12">
         <div className="text-center mb-8">
@@ -33,46 +35,48 @@ export const ProfileContent = ({ musician, onProfileCreated }: ProfileContentPro
     );
   }
 
-  if (!musician || !user) return null;
-
   return (
-    <div className="mt-12 space-y-6 max-w-4xl mx-auto px-4">
+    <div className="mt-12 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Music2 className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-xl font-semibold">My Songs</h2>
-              </div>
-              <ScrollArea className="h-[400px]">
-                <div className="pr-4">
-                  <SongManager 
-                    musicianId={musician.id} 
-                    songs={musician.songs || []}
-                  />
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          {musician && (
+            <>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Music2 className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-xl font-semibold">My Songs</h2>
+                  </div>
+                  <ScrollArea className="h-[400px]">
+                    <div className="pr-4">
+                      <SongManager 
+                        musicianId={musician.id} 
+                        songs={musician.songs || []}
+                      />
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Video className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-xl font-semibold">My Videos</h2>
-              </div>
-              <ScrollArea className="h-[400px]">
-                <div className="pr-4">
-                  <VideoManager 
-                    musicianId={musician.id} 
-                    videos={musician.videos || []}
-                  />
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Video className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-xl font-semibold">My Videos</h2>
+                  </div>
+                  <ScrollArea className="h-[400px]">
+                    <div className="pr-4">
+                      <VideoManager 
+                        musicianId={musician.id} 
+                        videos={musician.videos || []}
+                      />
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -80,12 +84,12 @@ export const ProfileContent = ({ musician, onProfileCreated }: ProfileContentPro
           <Card>
             <CardContent className="p-6">
               <h3 className="font-semibold mb-4">About</h3>
-              {musician.bio ? (
+              {musician?.bio ? (
                 <p className="text-muted-foreground">{musician.bio}</p>
               ) : (
                 <p className="text-muted-foreground italic">No bio available</p>
               )}
-              {musician.musician_genres && musician.musician_genres.length > 0 && (
+              {musician?.musician_genres && musician.musician_genres.length > 0 && (
                 <>
                   <div className="my-4 border-t" />
                   <div>
@@ -106,18 +110,20 @@ export const ProfileContent = ({ musician, onProfileCreated }: ProfileContentPro
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">My Network</h3>
-              <ScrollArea className="h-[300px]">
-                <Connections userId={user.id} />
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          {isOwner && (
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">My Network</h3>
+                <ScrollArea className="h-[300px]">
+                  <Connections userId={profile.id} />
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
-      {(!musician.songs?.length && !musician.videos?.length) && (
+      {musician && (!musician.songs?.length && !musician.videos?.length) && (
         <div className="text-center py-12">
           <div className="flex justify-center space-x-4">
             <Music2 className="h-12 w-12 text-muted-foreground" />
