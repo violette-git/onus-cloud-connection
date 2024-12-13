@@ -47,7 +47,8 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
           content_type: contentType,
           content_id: contentId,
           user_id: user?.id,
-          thread_path: null, // Let the trigger handle this
+          parent_id: null,
+          thread_path: null, // Let the database trigger handle this
           depth: 0
         });
 

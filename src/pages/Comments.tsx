@@ -7,6 +7,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { SunoPlayer } from "@/components/profile/SunoPlayer";
 import { Card } from "@/components/ui/card";
+import type { Video } from "@/types/musician";
+
+interface SongContent {
+  id: string;
+  title: string;
+  url: string;
+  musician?: {
+    name: string;
+  };
+}
+
+interface VideoContent extends Video {
+  musician?: {
+    name: string;
+  };
+}
 
 export const Comments = () => {
   const { type, id } = useParams();
@@ -30,7 +46,7 @@ export const Comments = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as SongContent | VideoContent;
     },
     enabled: !!type && !!id,
   });
@@ -59,7 +75,7 @@ export const Comments = () => {
               By {content.musician?.name}
             </p>
             {type === 'video' ? (
-              <VideoEmbed video={content} />
+              <VideoEmbed video={content as VideoContent} />
             ) : (
               <SunoPlayer songId={content.url} />
             )}
