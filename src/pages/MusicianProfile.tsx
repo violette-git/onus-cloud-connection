@@ -6,12 +6,12 @@ import { MusicianBio } from "@/components/profile/musician/MusicianBio";
 import { MusicianMedia } from "@/components/profile/musician/MusicianMedia";
 import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
 import { Connections } from "@/components/profile/Connections";
-import { useAuth } from "@/contexts/AuthContext";
 import { BackButton } from "@/components/ui/back-button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Music, Video, Users2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const MusicianProfile = () => {
   const { id } = useParams();
