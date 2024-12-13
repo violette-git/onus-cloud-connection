@@ -56,7 +56,9 @@ export type Database = {
           created_at: string
           depth: number | null
           id: string
+          mentions: string[] | null
           parent_id: string | null
+          rich_content: Json | null
           thread_path: unknown | null
           updated_at: string
           user_id: string
@@ -68,7 +70,9 @@ export type Database = {
           created_at?: string
           depth?: number | null
           id?: string
+          mentions?: string[] | null
           parent_id?: string | null
+          rich_content?: Json | null
           thread_path?: unknown | null
           updated_at?: string
           user_id: string
@@ -80,7 +84,9 @@ export type Database = {
           created_at?: string
           depth?: number | null
           id?: string
+          mentions?: string[] | null
           parent_id?: string | null
+          rich_content?: Json | null
           thread_path?: unknown | null
           updated_at?: string
           user_id?: string
@@ -379,36 +385,51 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          banner_url: string | null
           comment_preferences: Json | null
           created_at: string
           full_name: string | null
+          handle: string | null
           id: string
+          rich_text_bio: string | null
           role: string
           social_links: Json | null
+          theme_colors: Json | null
           updated_at: string | null
           username: string | null
+          visibility: string | null
         }
         Insert: {
           avatar_url?: string | null
+          banner_url?: string | null
           comment_preferences?: Json | null
           created_at?: string
           full_name?: string | null
+          handle?: string | null
           id: string
+          rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
+          theme_colors?: Json | null
           updated_at?: string | null
           username?: string | null
+          visibility?: string | null
         }
         Update: {
           avatar_url?: string | null
+          banner_url?: string | null
           comment_preferences?: Json | null
           created_at?: string
           full_name?: string | null
+          handle?: string | null
           id?: string
+          rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
+          theme_colors?: Json | null
           updated_at?: string | null
           username?: string | null
+          visibility?: string | null
         }
         Relationships: []
       }
