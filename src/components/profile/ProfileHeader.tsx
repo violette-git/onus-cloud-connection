@@ -13,9 +13,17 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
   const displayName = musician?.name || profile?.full_name || profile?.username || "Anonymous User";
   const role = profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast';
   
+  const headerStyle = profile.banner_url ? {
+    backgroundImage: `url(${profile.banner_url})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  } : {
+    background: `linear-gradient(to right, ${profile.theme_colors?.primary || '#6B46C1'}33, ${profile.theme_colors?.secondary || '#4299E1'}33)`
+  };
+  
   return (
     <div className="relative">
-      <div className="h-48 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
+      <div className="h-48 transition-all duration-300" style={headerStyle} />
       <div className="absolute left-1/2 -translate-x-1/2 -bottom-24">
         <div className="flex flex-col items-center space-y-4">
           <div className="gradient-border relative group">
@@ -44,7 +52,7 @@ export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: Pro
           </div>
           <div className="text-center">
             <h1 className="text-3xl font-bold">{displayName}</h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1" style={{ color: profile.theme_colors?.accent }}>
               {role}
             </p>
           </div>

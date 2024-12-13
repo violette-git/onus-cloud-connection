@@ -1,6 +1,7 @@
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileActions } from "./ProfileActions";
 import { ProfileContent } from "./ProfileContent";
+import { ThemeCustomization } from "./ThemeCustomization";
 import type { Profile, Musician, SocialLinks } from "@/types/profile";
 
 interface ProfileViewProps {
@@ -8,6 +9,8 @@ interface ProfileViewProps {
   musician: Musician | null;
   isOwner: boolean;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onBannerUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onThemeUpdate: (colors: { primary: string; secondary: string; accent: string }) => void;
   onSocialLinksUpdate: (links: SocialLinks) => void;
   onBecomeMusicianClick: () => void;
   onMusicianProfileCreated: () => void;
@@ -18,6 +21,8 @@ export const ProfileView = ({
   musician,
   isOwner,
   onImageUpload,
+  onBannerUpload,
+  onThemeUpdate,
   onSocialLinksUpdate,
   onBecomeMusicianClick,
   onMusicianProfileCreated
@@ -38,6 +43,16 @@ export const ProfileView = ({
           onSocialLinksUpdate={onSocialLinksUpdate}
           onBecomeMusicianClick={onBecomeMusicianClick}
         />
+
+        {isOwner && (
+          <div className="mt-8">
+            <ThemeCustomization
+              profile={profile}
+              onThemeUpdate={onThemeUpdate}
+              onBannerUpload={onBannerUpload}
+            />
+          </div>
+        )}
 
         <div className="mt-8">
           <ProfileContent 

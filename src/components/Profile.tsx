@@ -145,6 +145,48 @@ export const Profile = () => {
     }
   };
 
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}-banner-${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      await updateProfileMutation.mutateAsync({ banner_url: publicUrl });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not upload banner image. Please try again.",
+      });
+      console.error('Error uploading banner:', error);
+    }
+  };
+
+  const handleThemeUpdate = async (colors: { primary: string; secondary: string; accent: string }) => {
+    try {
+      await updateProfileMutation.mutateAsync({ theme_colors: colors });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not update theme colors. Please try again.",
+      });
+      console.error('Error updating theme:', error);
+    }
+  };
+
   if (isProfileLoading) {
     return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
   }
@@ -171,6 +213,8 @@ export const Profile = () => {
       musician={musician}
       isOwner={isOwner}
       onImageUpload={handleImageUpload}
+      onBannerUpload={handleBannerUpload}
+      onThemeUpdate={handleThemeUpdate}
       onSocialLinksUpdate={async (newLinks) => {
         try {
           await updateProfileMutation.mutateAsync({ social_links: newLinks });
