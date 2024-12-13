@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useParams, Navigate } from "react-router-dom";
 import { ProfileView } from "./profile/ProfileView";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
-import { ensureCommentPreferences, ensureSocialLinks } from "@/types/database";
+import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
 
 const defaultSocialLinks: SocialLinks = {
   instagram: "",
@@ -37,7 +37,8 @@ export const Profile = () => {
       return {
         ...data,
         social_links: ensureSocialLinks(data.social_links),
-        comment_preferences: ensureCommentPreferences(data.comment_preferences)
+        comment_preferences: ensureCommentPreferences(data.comment_preferences),
+        theme_colors: ensureThemeColors(data.theme_colors)
       } as ProfileType;
     },
     enabled: !!targetUserId,
@@ -89,7 +90,12 @@ export const Profile = () => {
         comment_preferences: updates.comment_preferences ? 
           { disable_comments: updates.comment_preferences.disable_comments } : 
           { disable_comments: false },
-        social_links: updates.social_links || defaultSocialLinks
+        social_links: updates.social_links || defaultSocialLinks,
+        theme_colors: updates.theme_colors || {
+          primary: '#6B46C1',
+          secondary: '#4299E1',
+          accent: '#ED64A6'
+        }
       };
 
       const { error } = await supabase

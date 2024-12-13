@@ -16,15 +16,23 @@ export interface CommentPreferences {
   disable_comments: boolean;
 }
 
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+}
+
 // User and Profile related types
 export interface Profile extends BaseRecord {
   id: string;
   username: string | null;
   full_name: string | null;
   avatar_url: string | null;
+  banner_url: string | null;
   role: string;
   social_links: SocialLinks;
   comment_preferences: CommentPreferences;
+  theme_colors: ThemeColors;
 }
 
 export interface SocialLinks {
@@ -50,5 +58,21 @@ export const ensureSocialLinks = (data: Json | null): SocialLinks => {
     instagram: links.instagram || '',
     youtube: links.youtube || '',
     linkedin: links.linkedin || ''
+  };
+};
+
+export const ensureThemeColors = (data: Json | null): ThemeColors => {
+  if (!data || Array.isArray(data)) {
+    return {
+      primary: '#6B46C1',
+      secondary: '#4299E1',
+      accent: '#ED64A6'
+    };
+  }
+  const colors = data as Record<string, string>;
+  return {
+    primary: colors.primary || '#6B46C1',
+    secondary: colors.secondary || '#4299E1',
+    accent: colors.accent || '#ED64A6'
   };
 };
