@@ -48,11 +48,11 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
       {/* Connection line */}
       {depth > 0 && (
         <div 
-          className="absolute left-0 w-[2px] bg-border opacity-30"
+          className="absolute left-0 bottom-0 w-[2px] bg-border opacity-30"
           style={{ 
             left: '-16px',
-            height: 'calc(100% - 20px)', // Extend from avatar to bottom
-            top: '20px', // Start from the avatar
+            height: '100%',
+            bottom: '20px', // Start from the bottom and go up
           }}
         />
       )}
@@ -62,7 +62,7 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
           className="absolute w-3 h-[2px] bg-border opacity-30"
           style={{ 
             left: '-16px',
-            top: '20px', // Align with avatar
+            top: '20px', // Keep aligned with the avatar
           }}
         />
       )}
