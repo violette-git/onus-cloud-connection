@@ -28,20 +28,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Set up the initial session
+    // Initialize auth state from any existing session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       if (initialSession) {
+        console.log('Initial session found:', initialSession.user.id)
         setSession(initialSession)
         setUser(initialSession.user)
+      } else {
+        console.log('No initial session found')
       }
       setLoading(false)
     })
 
-    // Listen for auth state changes
+    // Subscribe to auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
-      console.log('Auth state changed:', _event, currentSession?.user?.id)
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      console.log('Auth state changed:', event, currentSession?.user?.id)
+      
       if (currentSession) {
         setSession(currentSession)
         setUser(currentSession.user)
@@ -49,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(null)
         setUser(null)
       }
+      
       setLoading(false)
     })
 
