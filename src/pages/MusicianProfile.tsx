@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MusicianHeader } from "@/components/profile/musician/MusicianHeader";
 import { MusicianBio } from "@/components/profile/musician/MusicianBio";
-import { MusicianMedia } from "@/components/profile/musician/MusicianMedia";
 import { CollaborationRequests } from "@/components/profile/CollaborationRequests";
 import { Connections } from "@/components/profile/Connections";
 import { BackButton } from "@/components/ui/back-button";
@@ -12,6 +11,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Music, Video, Users2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { SongManager } from "@/components/profile/SongManager";
+import { VideoManager } from "@/components/profile/VideoManager";
 
 export const MusicianProfile = () => {
   const { id } = useParams();
@@ -151,37 +152,45 @@ export const MusicianProfile = () => {
               </Card>
             )}
 
-            <div className="grid grid-cols-1 gap-8">
-              {/* Songs Section */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Music className="h-5 w-5 text-muted-foreground" />
-                    <h2 className="text-xl font-semibold">Songs</h2>
+            {/* Songs Section */}
+            <Card className="mb-8">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Music className="h-5 w-5 text-muted-foreground" />
+                  <h2 className="text-xl font-semibold">Songs</h2>
+                </div>
+                <ScrollArea className="h-[400px]">
+                  <div className="pr-4">
+                    {isOwner && (
+                      <SongManager 
+                        musicianId={musician.id} 
+                        songs={musician.songs || []}
+                      />
+                    )}
                   </div>
-                  <ScrollArea className="h-[400px]">
-                    <div className="pr-4">
-                      <MusicianMedia musician={musician} isOwner={isOwner} />
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
+                </ScrollArea>
+              </CardContent>
+            </Card>
 
-              {/* Videos Section */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Video className="h-5 w-5 text-muted-foreground" />
-                    <h2 className="text-xl font-semibold">Videos</h2>
+            {/* Videos Section */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Video className="h-5 w-5 text-muted-foreground" />
+                  <h2 className="text-xl font-semibold">Videos</h2>
+                </div>
+                <ScrollArea className="h-[400px]">
+                  <div className="pr-4">
+                    {isOwner && (
+                      <VideoManager 
+                        musicianId={musician.id} 
+                        videos={musician.videos || []}
+                      />
+                    )}
                   </div>
-                  <ScrollArea className="h-[400px]">
-                    <div className="pr-4">
-                      <MusicianMedia musician={musician} isOwner={isOwner} />
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
