@@ -7,9 +7,10 @@ import type { Musician } from "@/types/musician";
 
 interface MusicianContentProps {
   musician: Musician;
+  isOwner?: boolean;
 }
 
-export const MusicianContent = ({ musician }: MusicianContentProps) => {
+export const MusicianContent = ({ musician, isOwner }: MusicianContentProps) => {
   return (
     <div className="mt-12 space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
