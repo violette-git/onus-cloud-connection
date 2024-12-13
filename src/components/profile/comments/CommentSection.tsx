@@ -42,20 +42,26 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     mutationFn: async (content: string) => {
       if (!user?.id) throw new Error('User must be logged in to comment');
 
-      const { error } = await supabase
+      // First, create the comment without thread_path
+      const { data, error: insertError } = await supabase
         .from('comments')
         .insert({
           content,
           content_type: contentType,
           content_id: contentId,
           user_id: user.id,
+          parent_id: null, // Ensure this is explicitly set for top-level comments
+          depth: 0, // Set initial depth
         })
+        .select()
         .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (insertError) {
+        console.error('Error inserting comment:', insertError);
+        throw insertError;
       }
+
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', contentType, contentId] });
