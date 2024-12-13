@@ -5,6 +5,7 @@ import { SongManager } from "./SongManager";
 import { VideoManager } from "./VideoManager";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Connections } from "./Connections";
 import type { Musician } from "@/types/profile";
 
 interface MusicianContentProps {
@@ -56,7 +57,7 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <Music2 className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-xl font-semibold">Songs</h2>
+              <h2 className="text-xl font-semibold">My Songs</h2>
             </div>
             <ScrollArea className="h-[400px]">
               <div className="pr-4">
@@ -76,7 +77,7 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <Video className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-xl font-semibold">Videos</h2>
+              <h2 className="text-xl font-semibold">My Videos</h2>
             </div>
             <ScrollArea className="h-[400px]">
               <div className="pr-4">
@@ -100,6 +101,17 @@ export const MusicianContent = ({ musician, onProfileCreated }: MusicianContentP
           </div>
           <p className="text-muted-foreground mt-4">No content added yet</p>
         </div>
+      )}
+
+      {isOwner && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="font-semibold mb-4">My Network</h3>
+            <ScrollArea className="h-[300px]">
+              <Connections userId={user.id} />
+            </ScrollArea>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
