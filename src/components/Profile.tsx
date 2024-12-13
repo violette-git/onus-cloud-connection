@@ -82,13 +82,19 @@ export const Profile = () => {
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: Partial<ProfileType>) => {
       if (!user?.id) throw new Error("No user");
+      
+      // Convert the updates to a format that matches the database schema
+      const dbUpdates: Record<string, unknown> = {
+        ...updates,
+        comment_preferences: updates.comment_preferences ? 
+          { disable_comments: updates.comment_preferences.disable_comments } : 
+          { disable_comments: false },
+        social_links: updates.social_links || defaultSocialLinks
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          ...updates,
-          comment_preferences: updates.comment_preferences || { disable_comments: false },
-          social_links: updates.social_links || defaultSocialLinks
-        })
+        .update(dbUpdates)
         .eq('id', user.id);
       
       if (error) throw error;

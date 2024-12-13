@@ -39,7 +39,11 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
         if (contentError) throw contentError;
         if (!content) return null;
         
-        return content?.musician?.user;
+        const userProfile = content?.musician?.user;
+        return userProfile ? {
+          ...userProfile,
+          comment_preferences: ensureCommentPreferences(userProfile.comment_preferences)
+        } : null;
       } catch (error) {
         console.error('Error fetching content owner:', error);
         return null;
