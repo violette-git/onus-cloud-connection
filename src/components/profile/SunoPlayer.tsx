@@ -1,9 +1,11 @@
 interface SunoPlayerProps {
-  songUrl: string;
+  songId: string;
   className?: string;
 }
 
-export const SunoPlayer = ({ songUrl, className }: SunoPlayerProps) => {
+export const SunoPlayer = ({ songId, className }: SunoPlayerProps) => {
+  const cdnUrl = `https://cdn1.suno.ai/${songId}.mp3`;
+
   return (
     <div className={className}>
       <audio
@@ -11,7 +13,7 @@ export const SunoPlayer = ({ songUrl, className }: SunoPlayerProps) => {
         className="w-full rounded-lg"
         preload="metadata"
       >
-        <source src={songUrl} type="audio/mpeg" />
+        <source src={cdnUrl} type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
     </div>

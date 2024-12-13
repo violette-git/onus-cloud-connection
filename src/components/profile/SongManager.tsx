@@ -19,9 +19,33 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
   const [newSong, setNewSong] = useState({ title: "", url: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const extractSongId = (url: string): string | null => {
+    try {
+      const urlObj = new URL(url);
+      if (!urlObj.hostname.includes('suno')) {
+        return null;
+      }
+      const pathParts = urlObj.pathname.split('/');
+      return pathParts[pathParts.length - 1];
+    } catch (e) {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    const songId = extractSongId(newSong.url);
+    if (!songId) {
+      toast({
+        variant: "destructive",
+        title: "Invalid URL",
+        description: "Please provide a valid Suno song URL.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -29,7 +53,7 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
         .insert({
           musician_id: musicianId,
           title: newSong.title,
-          url: newSong.url,
+          url: songId, // Store just the song ID
         });
 
       if (error) throw error;
@@ -106,14 +130,14 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
 
           <div className="space-y-2">
             <label htmlFor="url" className="text-sm font-medium">
-              Audio URL
+              Suno Song URL
             </label>
             <Input
               id="url"
               type="url"
               value={newSong.url}
               onChange={(e) => setNewSong(prev => ({ ...prev, url: e.target.value }))}
-              placeholder="https://example.com/audio.mp3"
+              placeholder="https://suno.com/song/your-song-id"
               required
             />
           </div>
@@ -150,7 +174,7 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
                 Delete
               </Button>
             </div>
-            <SunoPlayer songUrl={song.url} />
+            <SunoPlayer songId={song.url} />
           </div>
         ))}
       </div>
