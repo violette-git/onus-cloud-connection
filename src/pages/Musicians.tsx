@@ -154,85 +154,87 @@ export const Musicians = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 pt-24 pb-12">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {user && userProfile?.role === 'observer' && (
-          <div className="bg-muted p-4 rounded-lg text-center space-y-2">
-            <p className="text-muted-foreground">Want to share your music with the world?</p>
-            <Button onClick={handleBecomeMusicianClick}>
-              Become a Musician
-            </Button>
-          </div>
-        )}
+    <div className="min-h-screen pt-24 pb-12">
+      <div className="onus-container">
+        <div className="space-y-8">
+          {user && userProfile?.role === 'observer' && (
+            <div className="bg-muted p-4 rounded-lg text-center space-y-2">
+              <p className="text-muted-foreground">Want to share your music with the world?</p>
+              <Button onClick={handleBecomeMusicianClick}>
+                Become a Musician
+              </Button>
+            </div>
+          )}
 
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input 
-              placeholder="Search musicians..." 
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input 
+                placeholder="Search musicians..." 
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select
+              value={selectedGenre}
+              onValueChange={setSelectedGenre}
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Genre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Genres</SelectItem>
+                {genres?.map((genre) => (
+                  <SelectItem key={genre.id} value={genre.id}>
+                    {genre.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select
-            value={selectedGenre}
-            onValueChange={setSelectedGenre}
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Genre" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Genres</SelectItem>
-              {genres?.map((genre) => (
-                <SelectItem key={genre.id} value={genre.id}>
-                  {genre.name}
-                </SelectItem>
+
+          {isLoading ? (
+            <div className="text-center text-muted-foreground">Loading musicians...</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {musicians?.map((musician) => (
+                <Card 
+                  key={musician.id} 
+                  className="overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
+                  onClick={() => handleMusicianClick(musician.id)}
+                >
+                  <CardContent className="p-0">
+                    <div className="aspect-square">
+                      <Avatar className="h-full w-full rounded-none">
+                        <AvatarImage 
+                          src={musician.profile?.avatar_url || musician.avatar_url || undefined}
+                          alt={musician.name}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="rounded-none">
+                          <User className="h-12 w-12 text-muted-foreground" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </CardContent>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{musician.name}</CardTitle>
+                    <CardDescription>
+                      {getGenreNames(musician)} • {musician.location || 'Unknown location'}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
               ))}
-            </SelectContent>
-          </Select>
+              
+              {musicians?.length === 0 && (
+                <div className="col-span-full text-center text-muted-foreground">
+                  No musicians found matching your criteria.
+                </div>
+              )}
+            </div>
+          )}
         </div>
-
-        {isLoading ? (
-          <div className="text-center text-muted-foreground">Loading musicians...</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {musicians?.map((musician) => (
-              <Card 
-                key={musician.id} 
-                className="overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
-                onClick={() => handleMusicianClick(musician.id)}
-              >
-                <CardContent className="p-0">
-                  <div className="aspect-square">
-                    <Avatar className="h-full w-full rounded-none">
-                      <AvatarImage 
-                        src={musician.profile?.avatar_url || musician.avatar_url || undefined}
-                        alt={musician.name}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="rounded-none">
-                        <User className="h-12 w-12 text-muted-foreground" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                </CardContent>
-                <CardHeader>
-                  <CardTitle className="text-lg">{musician.name}</CardTitle>
-                  <CardDescription>
-                    {getGenreNames(musician)} • {musician.location || 'Unknown location'}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
-            
-            {musicians?.length === 0 && (
-              <div className="col-span-full text-center text-muted-foreground">
-                No musicians found matching your criteria.
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

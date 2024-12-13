@@ -8,11 +8,10 @@ export const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <main className="w-full mx-auto px-4">
-        <div className="max-w-[calc(100vw-32rem)] mx-auto space-y-16">
+      <main className="pt-24">
+        <div className="onus-container space-y-16">
           {/* Hero Content */}
-          <div className="max-w-4xl mx-auto space-y-8 text-center animate-fade-in pt-24">
+          <div className="space-y-8 text-center animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold gradient-text">
               Connect with AI Musicians and Create Together
             </h1>
@@ -68,7 +67,7 @@ export const Index = () => {
           </div>
 
           {/* Why Onus Section */}
-          <div className="max-w-4xl mx-auto space-y-12 py-16 animate-fade-in [animation-delay:400ms]">
+          <div className="space-y-12 py-16 animate-fade-in [animation-delay:400ms]">
             <h2 className="text-3xl md:text-4xl font-bold text-center gradient-text mb-12">
               Why Choose Onus?
             </h2>
