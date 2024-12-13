@@ -118,33 +118,6 @@ export const Profile = () => {
     }
   };
 
-  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user?.id) return;
-
-    try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}-banner-${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      await updateProfileMutation.mutateAsync({ 
-        id: user.id,
-        banner_url: publicUrl 
-      });
-    } catch (error) {
-      console.error('Error uploading banner:', error);
-    }
-  };
-
   const isLoading = isUsernameLoading || isProfileLoading;
 
   if (isLoading) {
@@ -173,11 +146,6 @@ export const Profile = () => {
       musician={musician}
       isOwner={isOwner}
       onImageUpload={handleImageUpload}
-      onBannerUpload={handleBannerUpload}
-      onThemeUpdate={(colors) => updateProfileMutation.mutateAsync({ 
-        id: profile.id,
-        theme_colors: colors 
-      })}
       onSocialLinksUpdate={(newLinks) => updateProfileMutation.mutateAsync({ 
         id: profile.id,
         social_links: newLinks 

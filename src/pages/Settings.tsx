@@ -10,12 +10,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CommentPreferences } from "@/types/database";
 import { ensureCommentPreferences } from "@/types/database";
+import { ThemeCustomization } from "@/components/profile/ThemeCustomization";
+import { useProfileMutation } from "@/hooks/useProfileMutation";
 
 export const Settings = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const updateProfileMutation = useProfileMutation();
 
   const { data: profile } = useQuery({
     queryKey: ['profile', user?.id],
@@ -23,14 +26,12 @@ export const Settings = () => {
       if (!user?.id) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('comment_preferences')
+        .select('*')
         .eq('id', user.id)
         .single();
       
       if (error) throw error;
-      return {
-        comment_preferences: ensureCommentPreferences(data.comment_preferences)
-      };
+      return data;
     },
     enabled: !!user?.id,
   });
@@ -64,6 +65,33 @@ export const Settings = () => {
     },
   });
 
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}-banner-${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      await updateProfileMutation.mutateAsync({ 
+        id: user.id,
+        banner_url: publicUrl 
+      });
+    } catch (error) {
+      console.error('Error uploading banner:', error);
+    }
+  };
+
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -96,6 +124,17 @@ export const Settings = () => {
                 </div>
               </div>
             </div>
+
+            {profile && (
+              <ThemeCustomization
+                profile={profile}
+                onThemeUpdate={(colors) => updateProfileMutation.mutateAsync({ 
+                  id: profile.id,
+                  theme_colors: colors 
+                })}
+                onBannerUpload={handleBannerUpload}
+              />
+            )}
 
             <div className="p-6 rounded-lg border bg-card">
               <h2 className="text-xl font-semibold mb-4">Comment Settings</h2>

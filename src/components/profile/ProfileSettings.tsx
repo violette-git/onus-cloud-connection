@@ -12,9 +12,11 @@ interface ProfileSettingsProps {
   isLoading?: boolean;
 }
 
+type Visibility = 'public' | 'private' | 'followers';
+
 export const ProfileSettings = ({ profile, onUpdate, isLoading }: ProfileSettingsProps) => {
   const [handle, setHandle] = useState(profile.handle || '');
-  const [visibility, setVisibility] = useState(profile.visibility || 'public');
+  const [visibility, setVisibility] = useState<Visibility>((profile.visibility as Visibility) || 'public');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +54,7 @@ export const ProfileSettings = ({ profile, onUpdate, isLoading }: ProfileSetting
             <Label htmlFor="visibility">Profile Visibility</Label>
             <Select
               value={visibility}
-              onValueChange={setVisibility}
+              onValueChange={(value: Visibility) => setVisibility(value)}
             >
               <SelectTrigger id="visibility">
                 <SelectValue placeholder="Select visibility" />
