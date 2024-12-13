@@ -30,38 +30,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Get initial session
     const initializeAuth = async () => {
-      try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession()
-        if (initialSession) {
-          setSession(initialSession)
-          setUser(initialSession.user)
-        }
-      } catch (error) {
-        console.error('Error getting initial session:', error)
-      } finally {
+      const { data: { session: initialSession } } = await supabase.auth.getSession()
+      if (initialSession) {
+        setSession(initialSession)
+        setUser(initialSession.user)
+      }
+      setLoading(false)
+
+      // Listen for auth changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.id)
+        setSession(currentSession)
+        setUser(currentSession?.user ?? null)
         setLoading(false)
+      })
+
+      return () => {
+        subscription.unsubscribe()
       }
     }
 
-    initializeAuth()
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log("Auth state changed:", event, currentSession?.user?.id)
-      
-      if (currentSession) {
-        setSession(currentSession)
-        setUser(currentSession.user)
-      } else {
-        setSession(null)
-        setUser(null)
-      }
-      
-      setLoading(false)
-    })
-
+    const cleanup = initializeAuth()
     return () => {
-      subscription.unsubscribe()
+      cleanup.then(unsubscribe => unsubscribe?.())
     }
   }, [])
 
