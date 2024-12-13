@@ -28,32 +28,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Get initial session
-    const initializeAuth = async () => {
-      const { data: { session: initialSession } } = await supabase.auth.getSession()
-      if (initialSession) {
-        setSession(initialSession)
-        setUser(initialSession.user)
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
       setLoading(false)
+    })
 
-      // Listen for auth changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.id)
-        setSession(currentSession)
-        setUser(currentSession?.user ?? null)
-        setLoading(false)
-      })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session?.user?.id)
+      setSession(session)
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
 
-      return () => {
-        subscription.unsubscribe()
-      }
-    }
-
-    const cleanup = initializeAuth()
-    return () => {
-      cleanup.then(unsubscribe => unsubscribe?.())
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   const signOut = async () => {
