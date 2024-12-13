@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { VideoForm } from "./VideoForm";
 import { VideoEmbed } from "./VideoEmbed";
+import { CommentButton } from "./comments/CommentButton";
 import type { Video, VideoPlatform } from "@/types/profile";
 
 interface VideoManagerProps {
@@ -120,14 +121,19 @@ export const VideoManager = ({ musicianId, videos }: VideoManagerProps) => {
                 <h4 className="font-medium">{video.title}</h4>
                 <p className="text-sm text-muted-foreground capitalize">{video.platform}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(video.id)}
-                className="text-destructive hover:text-destructive"
-              >
-                Delete
-              </Button>
+              <div className="flex items-center gap-2">
+                <CommentButton contentId={video.id} contentType="video" />
+                {isOwner && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(video.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
             </div>
             <VideoEmbed video={video} />
           </div>

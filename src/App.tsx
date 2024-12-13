@@ -14,6 +14,7 @@ import { Notifications } from "@/pages/Notifications";
 import { Connections } from "@/pages/Connections";
 import { Messages } from "@/pages/Messages";
 import { MessageThread } from "@/pages/MessageThread";
+import { Comments } from "@/pages/Comments";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/connections" element={<Connections />} />
                 <Route path="/messages" element={<Messages />} />
                 <Route path="/messages/:id" element={<MessageThread />} />
+                <Route path="/comments/:type/:id" element={<Comments />} />
               </Routes>
               <Toaster />
             </div>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SunoPlayer } from "./SunoPlayer";
+import { CommentButton } from "./comments/CommentButton";
 import type { Song } from "@/types/profile";
 
 interface SongManagerProps {
@@ -165,14 +166,19 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
           >
             <div className="flex justify-between items-center">
               <h4 className="font-medium">{song.title}</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(song.id)}
-                className="text-destructive hover:text-destructive"
-              >
-                Delete
-              </Button>
+              <div className="flex items-center gap-2">
+                <CommentButton contentId={song.id} contentType="song" />
+                {isOwner && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(song.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    Delete
+                  </Button>
+                )}
+              </div>
             </div>
             <SunoPlayer songId={song.url} />
           </div>
