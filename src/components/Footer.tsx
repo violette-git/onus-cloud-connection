@@ -72,8 +72,8 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright - Reduced spacing */}
-        <div className="border-t border-border/40 mt-6 pt-3 text-center">
+        {/* Copyright - Centered between content and bottom */}
+        <div className="border-t border-border/40 mt-6 py-3 text-center">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} ONUS. All rights reserved.
           </p>
