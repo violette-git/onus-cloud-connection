@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, MessageSquareOff } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
 
@@ -15,6 +15,28 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch content owner's profile to check if comments are disabled
+  const { data: contentOwner } = useQuery({
+    queryKey: ['content-owner', contentType, contentId],
+    queryFn: async () => {
+      const table = contentType === 'song' ? 'songs' : 'videos';
+      const { data: content, error: contentError } = await supabase
+        .from(table)
+        .select(`
+          musician:musicians (
+            user:profiles (
+              comment_preferences
+            )
+          )
+        `)
+        .eq('id', contentId)
+        .single();
+
+      if (contentError) throw contentError;
+      return content?.musician?.user;
+    },
+  });
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ['comments', contentType, contentId],
@@ -147,6 +169,22 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
         <div className="h-24 bg-muted rounded-lg" />
         <div className="h-20 bg-muted rounded-lg" />
         <div className="h-20 bg-muted rounded-lg" />
+      </div>
+    );
+  }
+
+  const commentsDisabled = contentOwner?.comment_preferences?.disable_comments;
+
+  if (commentsDisabled) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <MessageSquareOff className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-xl font-semibold">Comments are disabled</h2>
+        </div>
+        <p className="text-center text-muted-foreground">
+          The creator has disabled comments for this content.
+        </p>
       </div>
     );
   }

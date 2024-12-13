@@ -3,16 +3,68 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, MessageSquareOff } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const Settings = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('comment_preferences')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (disableComments: boolean) => {
+      if (!user?.id) throw new Error("No user");
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          comment_preferences: { disable_comments: disableComments }
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast({
+        title: "Success",
+        description: "Your comment preferences have been updated.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not update preferences. Please try again.",
+      });
+      console.error('Error updating preferences:', error);
+    },
+  });
 
   if (!user) {
     return <Navigate to="/" replace />;
   }
+
+  const disableComments = profile?.comment_preferences?.disable_comments ?? false;
 
   return (
     <div className="min-h-screen">
@@ -42,10 +94,22 @@ export const Settings = () => {
             </div>
 
             <div className="p-6 rounded-lg border bg-card">
-              <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
-              <p className="text-muted-foreground">
-                Manage your account settings and preferences
-              </p>
+              <h2 className="text-xl font-semibold mb-4">Comment Settings</h2>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Disable Comments</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Turn off comments on all your content
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={disableComments}
+                    onCheckedChange={(checked) => updatePreferencesMutation.mutate(checked)}
+                  />
+                  <MessageSquareOff className="h-5 w-5" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
