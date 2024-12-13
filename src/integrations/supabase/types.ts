@@ -664,6 +664,12 @@ export type Database = {
         }
         Returns: unknown
       }
+      uuid_to_ltree_label: {
+        Args: {
+          uuid: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
