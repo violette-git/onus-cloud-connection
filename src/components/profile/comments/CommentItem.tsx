@@ -33,16 +33,16 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
     setIsReplying(false);
   };
 
-  const maxDepth = 5; // Maximum nesting level
+  const maxDepth = 5;
   const canReply = depth < maxDepth;
 
   return (
     <div className={`ml-${depth * 4}`}>
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start">
-            <div className="flex gap-3">
-              <Avatar className="h-10 w-10">
+      <Card className="bg-secondary/50">
+        <CardContent className="p-3">
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex gap-2 items-center flex-1 min-w-0">
+              <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={comment.user.avatar_url}
                   alt={comment.user.username || comment.user.full_name}
@@ -51,11 +51,11 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
                   <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-medium">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm truncate">
                   {comment.user.username || comment.user.full_name}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(comment.created_at), {
                     addSuffix: true,
                   })}
@@ -67,28 +67,28 @@ export const CommentItem = ({ comment, onDelete, onReply, depth = 0 }: CommentIt
                 variant="ghost"
                 size="icon"
                 onClick={() => onDelete(comment.id)}
-                className="text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive h-8 w-8"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3 w-3" />
               </Button>
             )}
           </div>
-          <p className="mt-3">{comment.content}</p>
+          <p className="mt-2 text-sm break-words">{comment.content}</p>
           {canReply && user && (
             <div className="mt-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-muted-foreground"
+                className="text-muted-foreground h-7 text-xs px-2"
                 onClick={() => setIsReplying(!isReplying)}
               >
-                <MessageSquare className="h-4 w-4 mr-2" />
+                <MessageSquare className="h-3 w-3 mr-1" />
                 Reply
               </Button>
             </div>
           )}
           {isReplying && (
-            <div className="mt-4">
+            <div className="mt-3">
               <CommentForm
                 onSubmit={handleReply}
                 isSubmitting={false}
