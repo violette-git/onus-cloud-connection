@@ -13,12 +13,16 @@ import { Music, Video } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { SongManager } from "@/components/profile/SongManager";
 import { VideoManager } from "@/components/profile/VideoManager";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const MusicianProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const { data: musician, isLoading } = useQuery({
+  const { data: musician, isLoading, error } = useQuery({
     queryKey: ['musician', id],
     queryFn: async () => {
       if (!id) return null;
@@ -51,12 +55,29 @@ export const MusicianProfile = () => {
           )
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching musician:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error('Musician not found');
+      }
+      
       return data;
     },
     enabled: !!id,
+    retry: false,
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "This musician profile doesn't exist or has been removed.",
+      });
+      navigate('/musicians');
+    }
   });
 
   if (isLoading) {
@@ -70,13 +91,7 @@ export const MusicianProfile = () => {
   }
 
   if (!musician) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-center text-muted-foreground">Musician not found</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const isOwner = user?.id === musician.user_id;
