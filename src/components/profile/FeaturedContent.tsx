@@ -3,11 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SunoPlayer } from "./SunoPlayer";
-import { VideoEmbed } from "./VideoEmbed";
-import { GripVertical } from "lucide-react";
-import type { Song, Video } from "@/types/profile";
 import { useToast } from "@/hooks/use-toast";
+import { FeaturedContentManager } from "./featured/FeaturedContentManager";
+import { FeaturedContentItem } from "./featured/FeaturedContentItem";
+import type { Song, Video } from "@/types/profile";
+import type { FeaturedItem } from "./featured/types";
 
 interface FeaturedContentProps {
   musicianId: string;
@@ -16,15 +16,12 @@ interface FeaturedContentProps {
   videos: Video[];
 }
 
-interface FeaturedItem {
-  id: string;
-  musician_id: string;
-  content_type: 'song' | 'video';
-  content_id: string;
-  display_order: number;
-}
-
-export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: FeaturedContentProps) => {
+export const FeaturedContent = ({ 
+  musicianId, 
+  isOwner, 
+  songs, 
+  videos 
+}: FeaturedContentProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -38,7 +35,7 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
         .select('*')
         .eq('musician_id', musicianId)
         .order('display_order');
-
+      
       if (error) throw error;
       return data as FeaturedItem[];
     }
@@ -121,11 +118,9 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
 
     if (draggedIndex === -1 || targetIndex === -1) return;
 
-    // Reorder items
     items.splice(draggedIndex, 1);
     items.splice(targetIndex, 0, draggedItem);
 
-    // Update display order
     const updatedItems = items.map((item, index) => ({
       ...item,
       display_order: index
@@ -139,56 +134,7 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
   const songCount = featuredItems?.filter(item => item.content_type === 'song').length ?? 0;
   const videoCount = featuredItems?.filter(item => item.content_type === 'video').length ?? 0;
 
-  const canAddSong = songCount < 3;
-  const canAddVideo = videoCount < 1;
-
   if (!featuredItems?.length && !isOwner) return null;
-
-  const renderContent = (item: FeaturedItem) => {
-    if (item.content_type === 'song') {
-      const song = songs.find(s => s.id === item.content_id);
-      if (!song) return null;
-      return (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{song.title}</h3>
-            {isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeMutation.mutate(item.id)}
-              >
-                Remove
-              </Button>
-            )}
-          </div>
-          <SunoPlayer songId={song.id} />
-        </div>
-      );
-    }
-
-    if (item.content_type === 'video') {
-      const video = videos.find(v => v.id === item.content_id);
-      if (!video) return null;
-      return (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{video.title}</h3>
-            {isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeMutation.mutate(item.id)}
-              >
-                Remove
-              </Button>
-            )}
-          </div>
-          <VideoEmbed video={video} />
-        </div>
-      );
-    }
-  };
 
   return (
     <Card>
@@ -205,66 +151,47 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
           )}
         </div>
 
-        {isEditing ? (
-          <div className="space-y-6">
-            {featuredItems?.map((item) => (
-              <div 
-                key={item.id} 
-                className="relative"
-                draggable={true}
-                onDragStart={() => handleDragStart(item)}
-                onDragOver={(e) => handleDragOver(e, item)}
-              >
-                <div className="absolute -left-6 top-1/2 -translate-y-1/2 cursor-move">
-                  <GripVertical className="h-5 w-5 text-muted-foreground" />
-                </div>
-                {renderContent(item)}
-              </div>
-            ))}
+        <div className="space-y-6">
+          {featuredItems?.map((item) => (
+            <FeaturedContentItem
+              key={item.id}
+              item={item}
+              songs={songs}
+              videos={videos}
+              isEditing={isEditing}
+              onRemove={(id) => removeMutation.mutate(id)}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+            />
+          ))}
 
-            <div className="flex flex-wrap gap-2 pt-4 border-t">
-              {canAddSong && songs.map(song => (
-                <Button
-                  key={song.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addMutation.mutate({
+          {isEditing && (
+            <div className="pt-4 border-t">
+              <FeaturedContentManager
+                songs={songs}
+                videos={videos}
+                featuredSongs={songCount}
+                featuredVideos={videoCount}
+                onAddSong={(songId) => {
+                  addMutation.mutate({
                     musician_id: musicianId,
                     content_type: 'song',
-                    content_id: song.id,
+                    content_id: songId,
                     display_order: (featuredItems?.length ?? 0)
-                  })}
-                >
-                  + Feature "{song.title}"
-                </Button>
-              ))}
-              
-              {canAddVideo && videos.map(video => (
-                <Button
-                  key={video.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => addMutation.mutate({
+                  });
+                }}
+                onAddVideo={(videoId) => {
+                  addMutation.mutate({
                     musician_id: musicianId,
                     content_type: 'video',
-                    content_id: video.id,
+                    content_id: videoId,
                     display_order: (featuredItems?.length ?? 0)
-                  })}
-                >
-                  + Feature "{video.title}"
-                </Button>
-              ))}
+                  });
+                }}
+              />
             </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {featuredItems?.map((item) => (
-              <div key={item.id}>
-                {renderContent(item)}
-              </div>
-            ))}
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );
