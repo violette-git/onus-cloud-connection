@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CommentPreferences } from "@/types/database";
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -64,7 +65,7 @@ export const Settings = () => {
     return <Navigate to="/" replace />;
   }
 
-  const disableComments = profile?.comment_preferences?.disable_comments ?? false;
+  const disableComments = (profile?.comment_preferences as CommentPreferences)?.disable_comments ?? false;
 
   return (
     <div className="min-h-screen">
@@ -116,4 +117,3 @@ export const Settings = () => {
       </main>
     </div>
   );
-};

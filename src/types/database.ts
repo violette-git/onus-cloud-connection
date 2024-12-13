@@ -12,6 +12,10 @@ export interface BaseRecord {
   updated_at?: string;
 }
 
+export interface CommentPreferences {
+  disable_comments: boolean;
+}
+
 // User and Profile related types
 export interface Profile extends BaseRecord {
   id: string;
@@ -20,6 +24,7 @@ export interface Profile extends BaseRecord {
   avatar_url: string | null;
   role: string;
   social_links: SocialLinks | null;
+  comment_preferences: CommentPreferences;
 }
 
 export interface SocialLinks {

@@ -5,10 +5,6 @@ import { SearchCollaborators } from "./collaborators/SearchCollaborators";
 import { useState } from "react";
 import type { Profile } from "@/types/profile";
 
-interface CollaboratorsListProps {
-  userId: string;
-}
-
 interface Collaborator {
   musician_id: string;
   requester_id: string;
@@ -21,7 +17,7 @@ interface Collaborator {
   requester: Profile;
 }
 
-export const CollaboratorsList = ({ userId }: CollaboratorsListProps) => {
+export const CollaboratorsList = ({ userId }: { userId: string }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: collaborations } = useQuery({

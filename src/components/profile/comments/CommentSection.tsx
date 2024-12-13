@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, MessageSquareOff } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
+import { CommentPreferences } from "@/types/database";
 
 interface CommentSectionProps {
   contentId: string;
@@ -24,8 +25,8 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
       const { data: content, error: contentError } = await supabase
         .from(table)
         .select(`
-          musician:musicians (
-            user:profiles (
+          musician:musicians!inner (
+            user:profiles!musicians_user_id_fkey (
               comment_preferences
             )
           )
@@ -173,7 +174,7 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
     );
   }
 
-  const commentsDisabled = contentOwner?.comment_preferences?.disable_comments;
+  const commentsDisabled = (contentOwner?.comment_preferences as CommentPreferences)?.disable_comments;
 
   if (commentsDisabled) {
     return (
@@ -214,4 +215,3 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
       </div>
     </div>
   );
-};
