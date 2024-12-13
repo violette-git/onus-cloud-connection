@@ -40,15 +40,18 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
 
   const addCommentMutation = useMutation({
     mutationFn: async (content: string) => {
+      // Only include the essential fields for comment creation
+      // Let the database trigger handle thread_path and depth
+      const newComment = {
+        content,
+        content_type: contentType,
+        content_id: contentId,
+        user_id: user?.id,
+      };
+
       const { error } = await supabase
         .from('comments')
-        .insert({
-          content,
-          content_type: contentType,
-          content_id: contentId,
-          user_id: user?.id,
-          parent_id: null
-        });
+        .insert(newComment);
 
       if (error) throw error;
     },
@@ -59,7 +62,8 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
         description: "Your comment has been posted successfully.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error adding comment:', error);
       toast({
         variant: "destructive",
         title: "Error",
