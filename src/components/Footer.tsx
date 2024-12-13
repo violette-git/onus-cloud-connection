@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Mail, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 
@@ -65,8 +65,7 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@onus.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
+                <a href="mailto:support@onus.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Support
                 </a>
               </li>
