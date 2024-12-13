@@ -28,37 +28,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Initialize auth state from any existing session
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      if (initialSession) {
-        console.log('Initial session found:', initialSession.user.id)
-        setSession(initialSession)
-        setUser(initialSession.user)
-      } else {
-        console.log('No initial session found')
-      }
-      setLoading(false)
-    })
+    let mounted = true
 
-    // Subscribe to auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, currentSession) => {
-      console.log('Auth state changed:', event, currentSession?.user?.id)
-      
-      if (currentSession) {
-        setSession(currentSession)
-        setUser(currentSession.user)
-      } else {
-        setSession(null)
-        setUser(null)
+    async function getInitialSession() {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession()
+        
+        if (mounted) {
+          if (initialSession) {
+            console.log('Initial session found:', initialSession.user.id)
+            setSession(initialSession)
+            setUser(initialSession.user)
+          } else {
+            console.log('No initial session found')
+            setSession(null)
+            setUser(null)
+          }
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error getting initial session:', error)
+        if (mounted) {
+          setSession(null)
+          setUser(null)
+          setLoading(false)
+        }
       }
-      
-      setLoading(false)
-    })
+    }
 
-    // Cleanup subscription on unmount
+    getInitialSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        console.log('Auth state changed:', event, currentSession?.user?.id)
+
+        if (mounted) {
+          if (currentSession) {
+            setSession(currentSession)
+            setUser(currentSession.user)
+          } else {
+            setSession(null)
+            setUser(null)
+          }
+          setLoading(false)
+        }
+      }
+    )
+
     return () => {
+      mounted = false
       subscription.unsubscribe()
     }
   }, []) // Empty dependency array since we only want to run this once
