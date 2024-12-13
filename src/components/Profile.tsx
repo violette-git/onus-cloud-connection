@@ -137,10 +137,9 @@ export const Profile = () => {
   const shouldRedirectToMusicianProfile = 
     urlUsername && 
     profile.id !== user?.id && 
-    profile.role === 'musician' && 
-    musician;
+    profile.role === 'musician';
 
-  if (shouldRedirectToMusicianProfile) {
+  if (shouldRedirectToMusicianProfile && musician) {
     return <Navigate to={`/musicians/${musician.id}`} replace />;
   }
 
