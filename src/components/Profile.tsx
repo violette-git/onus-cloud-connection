@@ -37,7 +37,7 @@ export const Profile = () => {
         ...data,
         social_links: data.social_links || defaultSocialLinks,
         comment_preferences: data.comment_preferences || { disable_comments: false }
-      } as Profile;
+      } as ProfileType;
     },
     enabled: !!targetUserId,
   });
@@ -83,7 +83,11 @@ export const Profile = () => {
       if (!user?.id) throw new Error("No user");
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update({
+          ...updates,
+          comment_preferences: updates.comment_preferences || { disable_comments: false },
+          social_links: updates.social_links || defaultSocialLinks
+        })
         .eq('id', user.id);
       
       if (error) throw error;

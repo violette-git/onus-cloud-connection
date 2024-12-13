@@ -28,7 +28,6 @@ export interface Profile extends BaseRecord {
 }
 
 export interface SocialLinks {
-  [key: string]: string;
   instagram: string;
   youtube: string;
   linkedin: string;

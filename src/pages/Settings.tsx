@@ -30,47 +30,16 @@ export const Settings = () => {
       return {
         ...data,
         comment_preferences: data.comment_preferences || { disable_comments: false }
-      };
+      } as { comment_preferences: CommentPreferences };
     },
     enabled: !!user?.id,
-  });
-
-  const updatePreferencesMutation = useMutation({
-    mutationFn: async (disableComments: boolean) => {
-      if (!user?.id) throw new Error("No user");
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          comment_preferences: { disable_comments: disableComments }
-        })
-        .eq('id', user.id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast({
-        title: "Success",
-        description: "Your comment preferences have been updated.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not update preferences. Please try again.",
-      });
-      console.error('Error updating preferences:', error);
-    },
   });
 
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
-  const disableComments = profile?.comment_preferences ? 
-    (profile.comment_preferences as CommentPreferences).disable_comments : 
-    false;
+  const disableComments = profile?.comment_preferences?.disable_comments ?? false;
 
   return (
     <div className="min-h-screen">
