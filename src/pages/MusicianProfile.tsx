@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SongManager } from "@/components/profile/SongManager";
 import { VideoManager } from "@/components/profile/VideoManager";
 import { FeaturedContent } from "@/components/profile/FeaturedContent";
+import { CommentSection } from "@/components/profile/comments/CommentSection";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -160,6 +161,16 @@ export const MusicianProfile = () => {
                     videos={musician.videos || []}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Comments Section */}
+            <Card>
+              <CardContent className="p-6">
+                <CommentSection 
+                  contentId={musician.id} 
+                  contentType="musician" 
+                />
               </CardContent>
             </Card>
           </div>
