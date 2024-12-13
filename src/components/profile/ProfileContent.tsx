@@ -3,7 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CreateMusicianForm } from "./CreateMusicianForm";
 import { SongManager } from "./SongManager";
 import { VideoManager } from "./VideoManager";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Connections } from "@/components/profile/Connections";
 import type { Musician } from "@/types/profile";
 
 interface ProfileContentProps {
@@ -31,66 +33,99 @@ export const ProfileContent = ({ musician, onProfileCreated }: ProfileContentPro
     );
   }
 
-  if (!musician) return null;
-
-  const isOwner = user?.id === musician.user_id;
+  if (!musician || !user) return null;
 
   return (
-    <div className="mt-12 space-y-8 max-w-4xl mx-auto px-4">
-      {musician.bio && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Bio</h2>
-          <p className="text-muted-foreground">{musician.bio}</p>
+    <div className="mt-12 space-y-6 max-w-4xl mx-auto px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Main Content Area */}
+        <div className="lg:col-span-8 space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Music2 className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold">My Songs</h2>
+              </div>
+              <ScrollArea className="h-[400px]">
+                <div className="pr-4">
+                  <SongManager 
+                    musicianId={musician.id} 
+                    songs={musician.songs || []}
+                  />
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Video className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold">My Videos</h2>
+              </div>
+              <ScrollArea className="h-[400px]">
+                <div className="pr-4">
+                  <VideoManager 
+                    musicianId={musician.id} 
+                    videos={musician.videos || []}
+                  />
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:col-span-4 space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-semibold mb-4">About</h3>
+              {musician.bio ? (
+                <p className="text-muted-foreground">{musician.bio}</p>
+              ) : (
+                <p className="text-muted-foreground italic">No bio available</p>
+              )}
+              {musician.musician_genres && musician.musician_genres.length > 0 && (
+                <>
+                  <div className="my-4 border-t" />
+                  <div>
+                    <h3 className="font-semibold mb-3">Genres</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {musician.musician_genres.map((mg, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-secondary rounded-full text-sm"
+                        >
+                          {mg.genre.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-semibold mb-4">My Network</h3>
+              <ScrollArea className="h-[300px]">
+                <Connections userId={user.id} />
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {(!musician.songs?.length && !musician.videos?.length) && (
+        <div className="text-center py-12">
+          <div className="flex justify-center space-x-4">
+            <Music2 className="h-12 w-12 text-muted-foreground" />
+            <Video className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground mt-4">No content added yet</p>
         </div>
       )}
-      
-      <div className="space-y-8">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">Songs</h2>
-            {isOwner && (
-              <Button>
-                <Music2 className="mr-2 h-4 w-4" />
-                Add Song
-              </Button>
-            )}
-          </div>
-          {isOwner && (
-            <SongManager 
-              musicianId={musician.id} 
-              songs={musician.songs || []}
-            />
-          )}
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold">Videos</h2>
-            {isOwner && (
-              <Button>
-                <Video className="mr-2 h-4 w-4" />
-                Add Video
-              </Button>
-            )}
-          </div>
-          {isOwner && (
-            <VideoManager 
-              musicianId={musician.id} 
-              videos={musician.videos || []}
-            />
-          )}
-        </div>
-
-        {(!musician.songs?.length && !musician.videos?.length) && (
-          <div className="text-center py-12">
-            <div className="flex justify-center space-x-4">
-              <Music2 className="h-12 w-12 text-muted-foreground" />
-              <Video className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground mt-4">No content added yet</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
