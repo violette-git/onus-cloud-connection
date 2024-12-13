@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { SunoPlayer } from "./SunoPlayer";
+import { MessageCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Song } from "@/types/profile";
 
 interface SongManagerProps {
@@ -14,6 +16,7 @@ interface SongManagerProps {
 
 export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
   const [newSong, setNewSong] = useState({ title: "", url: "" });
@@ -164,7 +167,16 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
             className="p-4 border rounded-lg space-y-2"
           >
             <div className="flex justify-between items-center">
-              <h4 className="font-medium">{song.title}</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="font-medium">{song.title}</h4>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(`/comments/song/${song.id}`)}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
