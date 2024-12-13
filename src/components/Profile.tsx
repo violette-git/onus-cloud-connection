@@ -9,10 +9,27 @@ import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "
 
 export const Profile = () => {
   const { user } = useAuth();
-  const { id: profileId } = useParams();
+  const { username: urlUsername } = useParams();
   const queryClient = useQueryClient();
   
-  const targetUserId = profileId || user?.id;
+  // First, fetch profile by username if provided in URL
+  const { data: profileByUsername, isLoading: isUsernameLoading } = useQuery({
+    queryKey: ['profile-by-username', urlUsername],
+    queryFn: async () => {
+      if (!urlUsername) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', urlUsername)
+        .single();
+      
+      if (error) return null;
+      return data;
+    },
+    enabled: !!urlUsername,
+  });
+
+  const targetUserId = profileByUsername?.id || (urlUsername ? null : user?.id);
 
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', targetUserId],
@@ -128,7 +145,9 @@ export const Profile = () => {
     }
   };
 
-  if (isProfileLoading) {
+  const isLoading = isUsernameLoading || isProfileLoading;
+
+  if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
   }
 
@@ -137,8 +156,8 @@ export const Profile = () => {
   }
 
   const shouldRedirectToMusicianProfile = 
-    profileId && 
-    profileId !== user?.id && 
+    urlUsername && 
+    profile.id !== user?.id && 
     profile.role === 'musician' && 
     musician;
 
