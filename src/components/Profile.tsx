@@ -1,22 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 import { useParams, Navigate } from "react-router-dom";
 import { ProfileView } from "./profile/ProfileView";
-import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
+import { useProfileMutation } from "@/hooks/useProfileMutation";
+import type { Profile as ProfileType } from "@/types/profile";
 import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
-
-const defaultSocialLinks: SocialLinks = {
-  instagram: "",
-  youtube: "",
-  linkedin: ""
-};
 
 export const Profile = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { id: profileId } = useParams();
   
   const targetUserId = profileId || user?.id;
@@ -33,7 +25,6 @@ export const Profile = () => {
       
       if (error) throw error;
       
-      // Ensure proper typing of JSON fields
       return {
         ...data,
         social_links: ensureSocialLinks(data.social_links),
@@ -80,47 +71,7 @@ export const Profile = () => {
     enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
   });
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (updates: Partial<ProfileType>) => {
-      if (!user?.id) throw new Error("No user");
-      
-      // Convert the updates to a format that matches the database schema
-      const dbUpdates: Record<string, unknown> = {
-        ...updates,
-        comment_preferences: updates.comment_preferences ? 
-          { disable_comments: updates.comment_preferences.disable_comments } : 
-          { disable_comments: false },
-        social_links: updates.social_links || defaultSocialLinks,
-        theme_colors: updates.theme_colors || {
-          primary: '#6B46C1',
-          secondary: '#4299E1',
-          accent: '#ED64A6'
-        }
-      };
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(dbUpdates)
-        .eq('id', user.id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast({
-        title: "Success!",
-        description: "Your profile has been updated.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not update profile. Please try again.",
-      });
-      console.error('Error updating profile:', error);
-    },
-  });
+  const updateProfileMutation = useProfileMutation();
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -140,13 +91,11 @@ export const Profile = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      await updateProfileMutation.mutateAsync({ avatar_url: publicUrl });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not upload image. Please try again.",
+      await updateProfileMutation.mutateAsync({ 
+        id: user.id,
+        avatar_url: publicUrl 
       });
+    } catch (error) {
       console.error('Error uploading image:', error);
     }
   };
@@ -169,27 +118,12 @@ export const Profile = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      await updateProfileMutation.mutateAsync({ banner_url: publicUrl });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not upload banner image. Please try again.",
+      await updateProfileMutation.mutateAsync({ 
+        id: user.id,
+        banner_url: publicUrl 
       });
+    } catch (error) {
       console.error('Error uploading banner:', error);
-    }
-  };
-
-  const handleThemeUpdate = async (colors: { primary: string; secondary: string; accent: string }) => {
-    try {
-      await updateProfileMutation.mutateAsync({ theme_colors: colors });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not update theme colors. Please try again.",
-      });
-      console.error('Error updating theme:', error);
     }
   };
 
@@ -220,21 +154,18 @@ export const Profile = () => {
       isOwner={isOwner}
       onImageUpload={handleImageUpload}
       onBannerUpload={handleBannerUpload}
-      onThemeUpdate={handleThemeUpdate}
-      onSocialLinksUpdate={async (newLinks) => {
-        try {
-          await updateProfileMutation.mutateAsync({ social_links: newLinks });
-        } catch (error) {
-          console.error('Error updating social links:', error);
-        }
-      }}
-      onBecomeMusicianClick={async () => {
-        try {
-          await updateProfileMutation.mutateAsync({ role: 'musician' });
-        } catch (error) {
-          console.error('Error becoming musician:', error);
-        }
-      }}
+      onThemeUpdate={(colors) => updateProfileMutation.mutateAsync({ 
+        id: profile.id,
+        theme_colors: colors 
+      })}
+      onSocialLinksUpdate={(newLinks) => updateProfileMutation.mutateAsync({ 
+        id: profile.id,
+        social_links: newLinks 
+      })}
+      onBecomeMusicianClick={() => updateProfileMutation.mutateAsync({ 
+        id: profile.id,
+        role: 'musician' 
+      })}
       onMusicianProfileCreated={() => {
         queryClient.invalidateQueries({ queryKey: ['profile'] });
         queryClient.invalidateQueries({ queryKey: ['musician'] });

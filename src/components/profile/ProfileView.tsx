@@ -2,6 +2,7 @@ import { ProfileHeader } from "./ProfileHeader";
 import { ProfileActions } from "./ProfileActions";
 import { ProfileContent } from "./ProfileContent";
 import { ThemeCustomization } from "./ThemeCustomization";
+import { ProfileSettings } from "./ProfileSettings";
 import type { Profile, Musician, SocialLinks } from "@/types/profile";
 
 interface ProfileViewProps {
@@ -45,7 +46,13 @@ export const ProfileView = ({
         />
 
         {isOwner && (
-          <div className="mt-8">
+          <div className="mt-8 space-y-8">
+            <ProfileSettings
+              profile={profile}
+              onUpdate={(updates) => onProfileUpdate(updates)}
+              isLoading={updateProfileMutation.isPending}
+            />
+            
             <ThemeCustomization
               profile={profile}
               onThemeUpdate={onThemeUpdate}
