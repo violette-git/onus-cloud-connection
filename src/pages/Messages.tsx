@@ -8,17 +8,19 @@ export const Messages = () => {
 
   if (!user) {
     return (
-      <div className="container mx-auto px-4 pt-24">
-        <p className="text-center text-muted-foreground">
-          Please sign in to view your messages.
-        </p>
+      <div className="pt-24">
+        <div className="onus-container">
+          <p className="text-center text-muted-foreground">
+            Please sign in to view your messages.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 pt-24">
-      <div className="max-w-4xl mx-auto">
+    <div className="pt-24">
+      <div className="onus-container">
         <BackButton />
         <h1 className="text-3xl font-bold mb-8">Messages</h1>
         <Card>

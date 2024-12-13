@@ -4,8 +4,8 @@ import { Search } from "lucide-react";
 
 export const Explore = () => {
   return (
-    <div className="container mx-auto px-4 pt-24 pb-12">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <div className="pt-24 pb-12">
+      <div className="onus-container space-y-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input 

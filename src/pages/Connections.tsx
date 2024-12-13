@@ -13,8 +13,10 @@ export const Connections = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-4 pt-16">
-        <ConnectionsComponent userId={user.id} />
+      <main className="pt-16">
+        <div className="onus-container">
+          <ConnectionsComponent userId={user.id} />
+        </div>
       </main>
     </div>
   );
