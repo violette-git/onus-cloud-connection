@@ -40,20 +40,22 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
 
   const addCommentMutation = useMutation({
     mutationFn: async (content: string) => {
-      // Only include the essential fields for comment creation
-      // Let the database trigger handle thread_path and depth
-      const newComment = {
-        content,
-        content_type: contentType,
-        content_id: contentId,
-        user_id: user?.id,
-      };
+      if (!user?.id) throw new Error('User must be logged in to comment');
 
       const { error } = await supabase
         .from('comments')
-        .insert(newComment);
+        .insert({
+          content,
+          content_type: contentType,
+          content_id: contentId,
+          user_id: user.id,
+        })
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', contentType, contentId] });
