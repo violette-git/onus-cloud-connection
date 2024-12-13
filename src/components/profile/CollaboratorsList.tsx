@@ -4,6 +4,7 @@ import { CollaboratorCard } from "./collaborators/CollaboratorCard";
 import { SearchCollaborators } from "./collaborators/SearchCollaborators";
 import { useState } from "react";
 import type { Profile } from "@/types/profile";
+import { ensureCommentPreferences, ensureSocialLinks } from "@/types/database";
 
 interface Collaborator {
   musician_id: string;
@@ -54,7 +55,22 @@ export const CollaboratorsList = ({ userId }: { userId: string }) => {
         throw error;
       }
 
-      return data as Collaborator[];
+      return (data as any[]).map(collab => ({
+        ...collab,
+        musician: {
+          ...collab.musician,
+          profile: {
+            ...collab.musician.profile,
+            social_links: ensureSocialLinks(collab.musician.profile.social_links),
+            comment_preferences: ensureCommentPreferences(collab.musician.profile.comment_preferences)
+          }
+        },
+        requester: {
+          ...collab.requester,
+          social_links: ensureSocialLinks(collab.requester.social_links),
+          comment_preferences: ensureCommentPreferences(collab.requester.comment_preferences)
+        }
+      })) as Collaborator[];
     },
     enabled: !!userId,
   });

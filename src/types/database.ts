@@ -32,3 +32,23 @@ export interface SocialLinks {
   youtube: string;
   linkedin: string;
 }
+
+// Helper function to ensure proper typing of JSON fields
+export const ensureCommentPreferences = (data: Json | null): CommentPreferences => {
+  if (!data || Array.isArray(data)) {
+    return { disable_comments: false };
+  }
+  return { disable_comments: Boolean((data as any).disable_comments) };
+};
+
+export const ensureSocialLinks = (data: Json | null): SocialLinks => {
+  if (!data || Array.isArray(data)) {
+    return { instagram: '', youtube: '', linkedin: '' };
+  }
+  const links = data as Record<string, string>;
+  return {
+    instagram: links.instagram || '',
+    youtube: links.youtube || '',
+    linkedin: links.linkedin || ''
+  };
+};

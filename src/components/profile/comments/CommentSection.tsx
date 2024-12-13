@@ -6,6 +6,7 @@ import { MessageSquare, MessageSquareOff } from "lucide-react";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
 import { CommentPreferences } from "@/types/database";
+import { ensureCommentPreferences } from "@/types/database";
 
 interface CommentSectionProps {
   contentId: string;

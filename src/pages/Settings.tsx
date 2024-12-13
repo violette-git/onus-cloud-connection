@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CommentPreferences } from "@/types/database";
+import { ensureCommentPreferences } from "@/types/database";
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -28,11 +29,39 @@ export const Settings = () => {
       
       if (error) throw error;
       return {
-        ...data,
-        comment_preferences: data.comment_preferences || { disable_comments: false }
-      } as { comment_preferences: CommentPreferences };
+        comment_preferences: ensureCommentPreferences(data.comment_preferences)
+      };
     },
     enabled: !!user?.id,
+  });
+
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (disableComments: boolean) => {
+      if (!user?.id) throw new Error("No user");
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          comment_preferences: { disable_comments: disableComments }
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast({
+        title: "Success!",
+        description: "Your preferences have been updated.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not update preferences. Please try again.",
+      });
+      console.error('Error updating preferences:', error);
+    },
   });
 
   if (!user) {

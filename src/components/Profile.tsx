@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useParams, Navigate } from "react-router-dom";
 import { ProfileView } from "./profile/ProfileView";
 import type { Profile as ProfileType, SocialLinks } from "@/types/profile";
+import { ensureCommentPreferences, ensureSocialLinks } from "@/types/database";
 
 const defaultSocialLinks: SocialLinks = {
   instagram: "",
@@ -35,8 +36,8 @@ export const Profile = () => {
       // Ensure proper typing of JSON fields
       return {
         ...data,
-        social_links: data.social_links || defaultSocialLinks,
-        comment_preferences: data.comment_preferences || { disable_comments: false }
+        social_links: ensureSocialLinks(data.social_links),
+        comment_preferences: ensureCommentPreferences(data.comment_preferences)
       } as ProfileType;
     },
     enabled: !!targetUserId,
