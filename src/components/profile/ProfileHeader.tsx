@@ -10,7 +10,7 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader = ({ profile, musician, isOwner, onImageUpload }: ProfileHeaderProps) => {
-  const displayName = profile?.full_name || profile?.username || "Anonymous User";
+  const displayName = musician?.name || profile?.full_name || profile?.username || "Anonymous User";
   const role = profile?.role === 'musician' ? 'Musician' : 'Music Enthusiast';
   
   return (
