@@ -117,3 +117,4 @@ export const Settings = () => {
       </main>
     </div>
   );
+};

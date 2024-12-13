@@ -215,3 +215,4 @@ export const CommentSection = ({ contentId, contentType }: CommentSectionProps) 
       </div>
     </div>
   );
+};
