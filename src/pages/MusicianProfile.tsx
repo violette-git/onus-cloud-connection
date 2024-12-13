@@ -144,6 +144,7 @@ export const MusicianProfile = () => {
                   <SongManager 
                     musicianId={musician.id} 
                     songs={musician.songs || []}
+                    isOwner={isOwner}
                   />
                 </div>
               </CardContent>
@@ -159,6 +160,7 @@ export const MusicianProfile = () => {
                   <VideoManager 
                     musicianId={musician.id} 
                     videos={musician.videos || []}
+                    isOwner={isOwner}
                   />
                 </div>
               </CardContent>
@@ -169,7 +171,7 @@ export const MusicianProfile = () => {
               <CardContent className="p-6">
                 <CommentSection 
                   contentId={musician.id} 
-                  contentType="musician" 
+                  contentType="song"  // Changed from "musician" to "song" to match allowed types
                 />
               </CardContent>
             </Card>

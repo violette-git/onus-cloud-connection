@@ -11,9 +11,10 @@ import type { Video, VideoPlatform } from "@/types/profile";
 interface VideoManagerProps {
   musicianId: string;
   videos: Video[];
+  isOwner?: boolean;
 }
 
-export const VideoManager = ({ musicianId, videos }: VideoManagerProps) => {
+export const VideoManager = ({ musicianId, videos, isOwner = false }: VideoManagerProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
@@ -93,7 +94,7 @@ export const VideoManager = ({ musicianId, videos }: VideoManagerProps) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Videos</h3>
-        {!isAdding && (
+        {!isAdding && isOwner && (
           <Button onClick={() => setIsAdding(true)} variant="outline">
             Add Video
           </Button>

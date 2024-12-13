@@ -11,9 +11,10 @@ import type { Song } from "@/types/profile";
 interface SongManagerProps {
   musicianId: string;
   songs: Song[];
+  isOwner?: boolean;
 }
 
-export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
+export const SongManager = ({ musicianId, songs, isOwner = false }: SongManagerProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isAdding, setIsAdding] = useState(false);
@@ -108,7 +109,7 @@ export const SongManager = ({ musicianId, songs }: SongManagerProps) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Songs</h3>
-        {!isAdding && (
+        {!isAdding && isOwner && (
           <Button onClick={() => setIsAdding(true)} variant="outline">
             Add Song
           </Button>
