@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SunoPlayer } from "./SunoPlayer";
 import { VideoEmbed } from "./VideoEmbed";
-import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import { GripVertical } from "lucide-react";
 import type { Song, Video } from "@/types/profile";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,6 +28,7 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
+  const [draggedItem, setDraggedItem] = useState<FeaturedItem | null>(null);
 
   const { data: featuredItems, isLoading } = useQuery({
     queryKey: ['featured-content', musicianId],
@@ -86,10 +87,18 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
   });
 
   const reorderMutation = useMutation({
-    mutationFn: async (items: { id: string; display_order: number }[]) => {
+    mutationFn: async (items: FeaturedItem[]) => {
       const { error } = await supabase
         .from('featured_content')
-        .upsert(items);
+        .upsert(
+          items.map(item => ({
+            id: item.id,
+            musician_id: item.musician_id,
+            content_type: item.content_type,
+            content_id: item.content_id,
+            display_order: item.display_order
+          }))
+        );
       
       if (error) throw error;
     },
@@ -97,6 +106,33 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
       queryClient.invalidateQueries({ queryKey: ['featured-content', musicianId] });
     }
   });
+
+  const handleDragStart = (item: FeaturedItem) => {
+    setDraggedItem(item);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetItem: FeaturedItem) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.id === targetItem.id) return;
+
+    const items = featuredItems?.slice() || [];
+    const draggedIndex = items.findIndex(item => item.id === draggedItem.id);
+    const targetIndex = items.findIndex(item => item.id === targetItem.id);
+
+    if (draggedIndex === -1 || targetIndex === -1) return;
+
+    // Reorder items
+    items.splice(draggedIndex, 1);
+    items.splice(targetIndex, 0, draggedItem);
+
+    // Update display order
+    const updatedItems = items.map((item, index) => ({
+      ...item,
+      display_order: index
+    }));
+
+    reorderMutation.mutate(updatedItems);
+  };
 
   if (isLoading) return null;
 
@@ -172,9 +208,15 @@ export const FeaturedContent = ({ musicianId, isOwner, songs, videos }: Featured
         {isEditing ? (
           <div className="space-y-6">
             {featuredItems?.map((item) => (
-              <div key={item.id} className="relative">
-                <div className="absolute -left-6 top-1/2 -translate-y-1/2">
-                  <DragHandleDots2Icon className="h-5 w-5 text-muted-foreground" />
+              <div 
+                key={item.id} 
+                className="relative"
+                draggable={true}
+                onDragStart={() => handleDragStart(item)}
+                onDragOver={(e) => handleDragOver(e, item)}
+              >
+                <div className="absolute -left-6 top-1/2 -translate-y-1/2 cursor-move">
+                  <GripVertical className="h-5 w-5 text-muted-foreground" />
                 </div>
                 {renderContent(item)}
               </div>
