@@ -70,13 +70,15 @@ export const MusicianProfile = () => {
     },
     enabled: !!id,
     retry: false,
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "This musician profile doesn't exist or has been removed.",
-      });
-      navigate('/musicians');
+    meta: {
+      onError: () => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "This musician profile doesn't exist or has been removed.",
+        });
+        navigate('/musicians');
+      }
     }
   });
 
