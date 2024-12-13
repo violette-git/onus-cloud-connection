@@ -1,7 +1,6 @@
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileActions } from "./ProfileActions";
 import { ProfileContent } from "./ProfileContent";
-import { ThemeCustomization } from "./ThemeCustomization";
 import { ProfileSettings } from "./ProfileSettings";
 import type { Profile, Musician, SocialLinks } from "@/types/profile";
 import { UseMutationResult } from "@tanstack/react-query";
@@ -11,8 +10,6 @@ interface ProfileViewProps {
   musician: Musician | null;
   isOwner: boolean;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onBannerUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onThemeUpdate: (colors: { primary: string; secondary: string; accent: string }) => void;
   onSocialLinksUpdate: (links: SocialLinks) => void;
   onBecomeMusicianClick: () => void;
   onMusicianProfileCreated: () => void;
@@ -24,8 +21,6 @@ export const ProfileView = ({
   musician,
   isOwner,
   onImageUpload,
-  onBannerUpload,
-  onThemeUpdate,
   onSocialLinksUpdate,
   onBecomeMusicianClick,
   onMusicianProfileCreated,
@@ -49,17 +44,11 @@ export const ProfileView = ({
         />
 
         {isOwner && (
-          <div className="mt-8 space-y-8">
+          <div className="mt-8">
             <ProfileSettings
               profile={profile}
               onUpdate={(updates) => updateProfileMutation.mutateAsync(updates)}
               isLoading={updateProfileMutation.isPending}
-            />
-            
-            <ThemeCustomization
-              profile={profile}
-              onThemeUpdate={onThemeUpdate}
-              onBannerUpload={onBannerUpload}
             />
           </div>
         )}

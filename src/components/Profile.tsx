@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useParams, Navigate } from "react-router-dom";
@@ -10,7 +10,6 @@ import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "
 export const Profile = () => {
   const { user } = useAuth();
   const { username: urlUsername } = useParams();
-  const queryClient = useQueryClient();
   
   // First, fetch profile by username if provided in URL
   const { data: profileByUsername, isLoading: isUsernameLoading } = useQuery({

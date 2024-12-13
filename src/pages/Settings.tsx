@@ -8,10 +8,11 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { CommentPreferences } from "@/types/database";
-import { ensureCommentPreferences } from "@/types/database";
+import { CommentPreferences, ThemeColors } from "@/types/database";
+import { ensureCommentPreferences, ensureThemeColors } from "@/types/database";
 import { ThemeCustomization } from "@/components/profile/ThemeCustomization";
 import { useProfileMutation } from "@/hooks/useProfileMutation";
+import type { Profile } from "@/types/profile";
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -31,38 +32,14 @@ export const Settings = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      
+      return {
+        ...data,
+        comment_preferences: ensureCommentPreferences(data.comment_preferences),
+        theme_colors: ensureThemeColors(data.theme_colors)
+      } as Profile;
     },
     enabled: !!user?.id,
-  });
-
-  const updatePreferencesMutation = useMutation({
-    mutationFn: async (disableComments: boolean) => {
-      if (!user?.id) throw new Error("No user");
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          comment_preferences: { disable_comments: disableComments }
-        })
-        .eq('id', user.id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast({
-        title: "Success!",
-        description: "Your preferences have been updated.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not update preferences. Please try again.",
-      });
-      console.error('Error updating preferences:', error);
-    },
   });
 
   const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +105,7 @@ export const Settings = () => {
             {profile && (
               <ThemeCustomization
                 profile={profile}
-                onThemeUpdate={(colors) => updateProfileMutation.mutateAsync({ 
+                onThemeUpdate={(colors: ThemeColors) => updateProfileMutation.mutateAsync({ 
                   id: profile.id,
                   theme_colors: colors 
                 })}
@@ -148,7 +125,10 @@ export const Settings = () => {
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={disableComments}
-                    onCheckedChange={(checked) => updatePreferencesMutation.mutate(checked)}
+                    onCheckedChange={(checked) => updateProfileMutation.mutateAsync({
+                      id: profile!.id,
+                      comment_preferences: { disable_comments: checked }
+                    })}
                   />
                   <MessageSquareOff className="h-5 w-5" />
                 </div>
