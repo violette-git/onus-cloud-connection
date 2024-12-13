@@ -54,8 +54,8 @@
   @apply relative before:absolute before:-inset-1 before:bg-gradient-to-r before:from-onus-purple before:via-onus-blue before:to-onus-pink before:rounded-lg before:-z-10;
 }
 
-/* Add new container class for consistent width */
+/* Container class for consistent width */
 .onus-container {
   @apply w-full mx-auto px-4;
-  max-width: min(100vw - 2rem, 64rem); /* This ensures content doesn't exceed navbar width */
+  max-width: min(100vw - 2rem, 1400px); /* Match the navbar's max-width from tailwind.config.ts */
 }

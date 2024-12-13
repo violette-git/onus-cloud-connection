@@ -23,7 +23,7 @@ export const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 w-screen bg-background/95 backdrop-blur-sm border-b border-border/40 z-50">
-      <div className="w-full max-w-screen-xl mx-auto h-16 flex items-center justify-between px-4">
+      <div className="onus-container h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <span className="text-2xl font-bold gradient-text">ONUS</span>
         </Link>
