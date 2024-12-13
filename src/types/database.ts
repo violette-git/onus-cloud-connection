@@ -33,6 +33,8 @@ export interface Profile extends BaseRecord {
   social_links: SocialLinks;
   comment_preferences: CommentPreferences;
   theme_colors: ThemeColors;
+  handle: string | null;
+  visibility: 'public' | 'private' | 'followers';
 }
 
 export interface SocialLinks {

@@ -4,6 +4,7 @@ import { ProfileContent } from "./ProfileContent";
 import { ThemeCustomization } from "./ThemeCustomization";
 import { ProfileSettings } from "./ProfileSettings";
 import type { Profile, Musician, SocialLinks } from "@/types/profile";
+import { UseMutationResult } from "@tanstack/react-query";
 
 interface ProfileViewProps {
   profile: Profile;
@@ -15,6 +16,7 @@ interface ProfileViewProps {
   onSocialLinksUpdate: (links: SocialLinks) => void;
   onBecomeMusicianClick: () => void;
   onMusicianProfileCreated: () => void;
+  updateProfileMutation: UseMutationResult<void, Error, Partial<Profile>>;
 }
 
 export const ProfileView = ({
@@ -26,7 +28,8 @@ export const ProfileView = ({
   onThemeUpdate,
   onSocialLinksUpdate,
   onBecomeMusicianClick,
-  onMusicianProfileCreated
+  onMusicianProfileCreated,
+  updateProfileMutation
 }: ProfileViewProps) => {
   return (
     <div className="animate-fade-in pb-12 min-h-screen bg-background">
@@ -49,7 +52,7 @@ export const ProfileView = ({
           <div className="mt-8 space-y-8">
             <ProfileSettings
               profile={profile}
-              onUpdate={(updates) => onProfileUpdate(updates)}
+              onUpdate={(updates) => updateProfileMutation.mutateAsync(updates)}
               isLoading={updateProfileMutation.isPending}
             />
             

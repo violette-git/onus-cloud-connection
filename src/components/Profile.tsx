@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useParams, Navigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "
 export const Profile = () => {
   const { user } = useAuth();
   const { id: profileId } = useParams();
+  const queryClient = useQueryClient();
   
   const targetUserId = profileId || user?.id;
 
@@ -170,6 +171,7 @@ export const Profile = () => {
         queryClient.invalidateQueries({ queryKey: ['profile'] });
         queryClient.invalidateQueries({ queryKey: ['musician'] });
       }}
+      updateProfileMutation={updateProfileMutation}
     />
   );
 };
