@@ -48,6 +48,44 @@ export type Database = {
           },
         ]
       }
+      featured_content: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          display_order: number
+          id: string
+          musician_id: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          musician_id: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          musician_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_content_musician_id_fkey"
+            columns: ["musician_id"]
+            isOneToOne: false
+            referencedRelation: "musicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string
