@@ -10,62 +10,106 @@ interface MusicianContentProps {
 
 export const MusicianContent = ({ musician, isOwner }: MusicianContentProps) => {
   return (
-    <div className="space-y-8">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Songs</h2>
-          {isOwner && (
-            <Button>
-              <Music2 className="mr-2 h-4 w-4" />
-              Add Song
-            </Button>
+    <div className="onus-container grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="lg:col-span-8 space-y-8">
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">Songs</h2>
+            {isOwner && (
+              <Button>
+                <Music2 className="mr-2 h-4 w-4" />
+                Add Song
+              </Button>
+            )}
+          </div>
+          {musician.songs && musician.songs.length > 0 ? (
+            <div className="grid gap-6">
+              {musician.songs.map((song) => (
+                <div key={song.id} className="p-6 bg-card rounded-lg border">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium">{song.title}</h3>
+                    {isOwner && (
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                        Delete
+                      </Button>
+                    )}
+                  </div>
+                  <audio controls className="w-full">
+                    <source src={song.url} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-card/50 rounded-lg border border-dashed">
+              <Music2 className="h-12 w-12 mx-auto text-muted-foreground" />
+              <p className="text-muted-foreground mt-4">No songs added yet</p>
+            </div>
           )}
         </div>
-        {musician.songs && musician.songs.length > 0 ? (
-          <div className="space-y-4">
-            {musician.songs.map((song) => (
-              <div key={song.id} className="p-4 bg-card rounded-lg">
-                <h3 className="font-medium mb-2">{song.title}</h3>
-                <audio controls className="w-full">
-                  <source src={song.url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            ))}
+
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">Videos</h2>
+            {isOwner && (
+              <Button>
+                <Video className="mr-2 h-4 w-4" />
+                Add Video
+              </Button>
+            )}
           </div>
-        ) : (
-          <p className="text-center text-muted-foreground">No songs added yet</p>
-        )}
+          {musician.videos && musician.videos.length > 0 ? (
+            <div className="grid gap-6">
+              {musician.videos.map((video) => (
+                <div key={video.id} className="p-6 bg-card rounded-lg border">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium">{video.title}</h3>
+                    {isOwner && (
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                        Delete
+                      </Button>
+                    )}
+                  </div>
+                  <div className="aspect-video rounded-lg overflow-hidden">
+                    <VideoEmbed video={video} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-card/50 rounded-lg border border-dashed">
+              <Video className="h-12 w-12 mx-auto text-muted-foreground" />
+              <p className="text-muted-foreground mt-4">No videos added yet</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Videos</h2>
-          {isOwner && (
-            <Button>
-              <Video className="mr-2 h-4 w-4" />
-              Add Video
-            </Button>
+      <div className="lg:col-span-4 space-y-8">
+        <div className="p-6 bg-card rounded-lg border">
+          <h3 className="text-lg font-semibold mb-4">About</h3>
+          {musician.bio ? (
+            <p className="text-muted-foreground">{musician.bio}</p>
+          ) : (
+            <p className="text-muted-foreground italic">No bio available</p>
           )}
         </div>
-        {musician.videos && musician.videos.length > 0 ? (
-          <div className="space-y-4">
-            {musician.videos.map((video) => (
-              <div key={video.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">{video.title}</h3>
-                  {isOwner && (
-                    <Button variant="ghost" className="text-destructive">
-                      Delete
-                    </Button>
-                  )}
-                </div>
-                <VideoEmbed video={video} />
-              </div>
-            ))}
+
+        {musician.musician_genres && musician.musician_genres.length > 0 && (
+          <div className="p-6 bg-card rounded-lg border">
+            <h3 className="text-lg font-semibold mb-4">Genres</h3>
+            <div className="flex flex-wrap gap-2">
+              {musician.musician_genres.map((mg, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-secondary rounded-full text-sm"
+                >
+                  {mg.genre.name}
+                </span>
+              ))}
+            </div>
           </div>
-        ) : (
-          <p className="text-center text-muted-foreground">No videos added yet</p>
         )}
       </div>
     </div>

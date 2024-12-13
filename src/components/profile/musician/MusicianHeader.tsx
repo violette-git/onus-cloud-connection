@@ -8,10 +8,10 @@ interface MusicianHeaderProps {
 
 export const MusicianHeader = ({ musician }: MusicianHeaderProps) => {
   return (
-    <div className="relative">
+    <div className="relative mb-32">
       <div className="h-48 md:h-64 bg-gradient-to-r from-onus-purple/20 via-onus-blue/20 to-onus-pink/20" />
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-24">
-        <div className="flex flex-col items-center space-y-4">
+      <div className="onus-container">
+        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-4">
           <div className="gradient-border relative">
             {musician.profile?.avatar_url ? (
               <img
