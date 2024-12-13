@@ -81,9 +81,6 @@ export const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Newsletter</h3>
             <form onSubmit={handleNewsletterSignup} className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Stay updated with our latest features and updates.
-              </p>
               <div className="flex gap-2">
                 <Input
                   type="email"
@@ -97,6 +94,9 @@ export const Footer = () => {
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Stay updated with our latest features and updates.
+              </p>
             </form>
           </div>
         </div>
