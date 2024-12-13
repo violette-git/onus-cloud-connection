@@ -3,14 +3,35 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Music, Video } from "lucide-react";
 import { SongManager } from "../SongManager";
 import { VideoManager } from "../VideoManager";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Musician } from "@/types/musician";
 
 interface MusicianContentProps {
   musician: Musician;
   isOwner: boolean;
+  isLoading?: boolean;
 }
 
-export const MusicianContent = ({ musician, isOwner }: MusicianContentProps) => {
+export const MusicianContent = ({ musician, isOwner, isLoading }: MusicianContentProps) => {
+  if (isLoading) {
+    return (
+      <>
+        <Card>
+          <CardContent className="p-6">
+            <Skeleton className="h-8 w-32 mb-6" />
+            <Skeleton className="h-[400px] w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <Skeleton className="h-8 w-32 mb-6" />
+            <Skeleton className="h-[400px] w-full" />
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
+
   return (
     <>
       <Card>

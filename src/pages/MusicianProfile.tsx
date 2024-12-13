@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { FeaturedContent } from "@/components/profile/FeaturedContent";
 import { useToast } from "@/hooks/use-toast";
+import { MusicianProfileSkeleton } from "@/components/profile/musician/MusicianProfileSkeleton";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const MusicianProfile = () => {
   const { id } = useParams();
@@ -76,13 +78,7 @@ export const MusicianProfile = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-center text-muted-foreground">Loading musician profile...</p>
-        </div>
-      </div>
-    );
+    return <MusicianProfileSkeleton />;
   }
 
   if (!musician) return null;
@@ -90,53 +86,50 @@ export const MusicianProfile = () => {
   const isOwner = user?.id === musician.user_id;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section with Gradient Background */}
-      <div className="h-[280px] bg-gradient-to-br from-onus-purple/20 via-onus-blue/20 to-onus-pink/20">
-        <div className="container mx-auto px-4 pt-8">
-          <BackButton />
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4">
-        {/* Profile Header Section */}
-        <div className="-mt-24 mb-12">
-          <MusicianHeader musician={musician} />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <div className="h-[280px] bg-gradient-to-br from-onus-purple/20 via-onus-blue/20 to-onus-pink/20">
+          <div className="container mx-auto px-4 pt-8">
+            <BackButton />
+          </div>
         </div>
 
-        {/* Featured Content Section */}
-        <div className="mb-8">
-          <FeaturedContent
-            musicianId={musician.id}
-            isOwner={isOwner}
-            songs={musician.songs || []}
-            videos={musician.videos || []}
-          />
-        </div>
+        <div className="container mx-auto px-4">
+          <div className="-mt-24 mb-12">
+            <MusicianHeader musician={musician} />
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Main Content Area */}
-          <div className="lg:col-span-8 space-y-6">
-            {isOwner && (
-              <Card>
-                <CardContent className="p-6">
-                  <CollaborationRequests musicianId={musician.id} />
-                </CardContent>
-              </Card>
-            )}
-
-            <MusicianContent 
-              musician={musician}
+          <div className="mb-8">
+            <FeaturedContent
+              musicianId={musician.id}
               isOwner={isOwner}
+              songs={musician.songs || []}
+              videos={musician.videos || []}
             />
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-4">
-            <MusicianAbout musician={musician} />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              {isOwner && (
+                <Card>
+                  <CardContent className="p-6">
+                    <CollaborationRequests musicianId={musician.id} />
+                  </CardContent>
+                </Card>
+              )}
+
+              <MusicianContent 
+                musician={musician}
+                isOwner={isOwner}
+              />
+            </div>
+
+            <div className="lg:col-span-4">
+              <MusicianAbout musician={musician} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
