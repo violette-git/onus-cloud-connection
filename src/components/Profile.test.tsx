@@ -33,7 +33,6 @@ vi.mock('@/integrations/supabase/client', () => ({
       gte: vi.fn(),
       lt: vi.fn(),
       lte: vi.fn(),
-      range: vi.fn(),
       like: vi.fn(),
       ilike: vi.fn(),
       is: vi.fn(),
@@ -46,7 +45,6 @@ vi.mock('@/integrations/supabase/client', () => ({
       or: vi.fn(),
       limit: vi.fn(),
       order: vi.fn(),
-      range: vi.fn(),
     })),
     storage: {
       from: vi.fn().mockReturnThis(),
