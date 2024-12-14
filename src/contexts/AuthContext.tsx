@@ -28,57 +28,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    let mounted = true
-
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession()
-        
-        if (mounted) {
-          if (initialSession) {
-            console.log('Initial session found:', initialSession.user.id)
-            setSession(initialSession)
-            setUser(initialSession.user)
-          } else {
-            console.log('No initial session found')
-            setSession(null)
-            setUser(null)
-          }
-          setLoading(false)
-        }
-      } catch (error) {
-        console.error('Error getting initial session:', error)
-        if (mounted) {
-          setSession(null)
-          setUser(null)
-          setLoading(false)
-        }
+    // Set up Supabase session persistence
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      if (initialSession) {
+        setSession(initialSession)
+        setUser(initialSession.user)
       }
-    }
+      setLoading(false)
+    })
 
-    getInitialSession()
-
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, currentSession) => {
-        if (mounted) {
-          if (currentSession) {
-            console.log('Auth state changed - Session found:', currentSession.user.id)
-            setSession(currentSession)
-            setUser(currentSession.user)
-          } else {
-            console.log('Auth state changed - No session')
-            setSession(null)
-            setUser(null)
-          }
-          setLoading(false)
-        }
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log('Auth state changed:', event)
+      if (currentSession) {
+        setSession(currentSession)
+        setUser(currentSession.user)
+      } else {
+        setSession(null)
+        setUser(null)
       }
-    )
+      setLoading(false)
+    })
 
     return () => {
-      mounted = false
       subscription.unsubscribe()
     }
   }, [])

@@ -12,6 +12,9 @@ export const Profile = () => {
   const { username: urlUsername } = useParams();
   const queryClient = useQueryClient();
   
+  // If we're on /profile without a username, this is the private profile view
+  const isPrivateView = !urlUsername;
+  
   // First, fetch profile by username if provided in URL
   const { data: profileByUsername, isLoading: isUsernameLoading } = useQuery({
     queryKey: ['profile-by-username', urlUsername],
@@ -29,7 +32,8 @@ export const Profile = () => {
     enabled: !!urlUsername,
   });
 
-  const targetUserId = profileByUsername?.id || (urlUsername ? null : user?.id);
+  // For private view, use user.id, for public view use the found profile id
+  const targetUserId = isPrivateView ? user?.id : profileByUsername?.id;
 
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', targetUserId],
@@ -134,9 +138,9 @@ export const Profile = () => {
     return <div className="flex items-center justify-center h-screen">This profile is private</div>;
   }
 
+  // If this is a public musician profile view, redirect to the musician profile page
   const shouldRedirectToMusicianProfile = 
-    urlUsername && 
-    profile.id !== user?.id && 
+    !isPrivateView && 
     profile.role === 'musician';
 
   if (shouldRedirectToMusicianProfile && musician) {
