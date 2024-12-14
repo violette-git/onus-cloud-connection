@@ -13,8 +13,8 @@ interface ThemeCustomizationProps {
 }
 
 export const ThemeCustomization = ({ 
-  profile, 
-  onThemeUpdate, 
+  profile,
+  onThemeUpdate,
   onBannerUpload 
 }: ThemeCustomizationProps) => {
   const [colors, setColors] = useState({
