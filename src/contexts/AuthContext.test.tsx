@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
+import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -15,16 +16,39 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
-const mockUser = {
+const mockUser: User = {
   id: 'test-user-id',
   email: 'test@example.com',
+  app_metadata: {},
+  user_metadata: {},
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+  role: '',
+  aal: null,
+  amr: [],
+  session_id: '',
+  phone: '',
+  confirmed_at: '',
+  email_confirmed_at: '',
+  factors: null,
+  identities: null,
+  last_sign_in_at: '',
+  recovery_sent_at: null,
+  updated_at: '',
+  banned_until: null,
+  confirmation_sent_at: '',
+  invited_at: null,
+  phone_confirmed_at: null,
+  deleted_at: null
 };
 
-const mockSession = {
+const mockSession: Session = {
   user: mockUser,
   access_token: 'mock-token',
   refresh_token: 'mock-refresh-token',
-  expires_at: Date.now() + 3600000,
+  expires_in: 3600,
+  expires_at: Date.now() + 3600,
+  token_type: 'bearer'
 };
 
 const TestComponent = () => {
@@ -62,7 +86,7 @@ describe('AuthContext', () => {
     // Mock auth state change subscription
     vi.mocked(supabase.auth.onAuthStateChange).mockImplementation((callback) => {
       callback('SIGNED_IN', mockSession);
-      return { data: { subscription: { unsubscribe: vi.fn() } } };
+      return { data: { subscription: { id: '1', callback, unsubscribe: vi.fn() } } };
     });
 
     const { getByText } = renderAuthProvider();

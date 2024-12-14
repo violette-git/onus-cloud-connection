@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Profile } from './Profile';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
+import type { User, Session, AuthChangeEvent, Subscription } from '@supabase/supabase-js';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -35,9 +36,39 @@ const queryClient = new QueryClient({
   },
 });
 
-const mockUser = {
+const mockUser: User = {
   id: 'test-user-id',
   email: 'test@example.com',
+  app_metadata: {},
+  user_metadata: {},
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+  role: '',
+  aal: null,
+  amr: [],
+  session_id: '',
+  phone: '',
+  confirmed_at: '',
+  email_confirmed_at: '',
+  factors: null,
+  identities: null,
+  last_sign_in_at: '',
+  recovery_sent_at: null,
+  updated_at: '',
+  banned_until: null,
+  confirmation_sent_at: '',
+  invited_at: null,
+  phone_confirmed_at: null,
+  deleted_at: null
+};
+
+const mockSession: Session = {
+  user: mockUser,
+  access_token: 'mock-token',
+  refresh_token: 'mock-refresh-token',
+  expires_in: 3600,
+  expires_at: Date.now() + 3600,
+  token_type: 'bearer'
 };
 
 const mockProfile = {
@@ -45,7 +76,11 @@ const mockProfile = {
   username: 'testuser',
   full_name: 'Test User',
   role: 'musician',
-  social_links: {},
+  social_links: {
+    instagram: '',
+    youtube: '',
+    linkedin: ''
+  },
   comment_preferences: { disable_comments: false },
   theme_colors: {
     primary: '#000000',
@@ -71,28 +106,18 @@ describe('Profile Component', () => {
     vi.clearAllMocks();
     // Mock successful auth session
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
-      data: {
-        session: {
-          user: mockUser,
-          access_token: 'mock-token',
-          refresh_token: 'mock-refresh-token',
-        },
-      },
+      data: { session: mockSession },
       error: null,
     });
     
     // Mock auth state change subscription
     vi.mocked(supabase.auth.onAuthStateChange).mockImplementation((callback) => {
-      callback('SIGNED_IN', {
-        user: mockUser,
-        access_token: 'mock-token',
-        refresh_token: 'mock-refresh-token',
-      });
-      return { data: { subscription: { unsubscribe: vi.fn() } } };
+      callback('SIGNED_IN', mockSession);
+      return { data: { subscription: { id: '1', callback, unsubscribe: vi.fn() } } };
     });
 
     // Mock profile fetch
-    vi.mocked(supabase.from).mockImplementation((table) => ({
+    vi.mocked(supabase.from).mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: mockProfile, error: null }),
