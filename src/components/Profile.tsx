@@ -8,7 +8,7 @@ import type { Profile as ProfileType } from "@/types/profile";
 import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
 
 export const Profile = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { username: urlUsername } = useParams();
   const queryClient = useQueryClient();
   
@@ -54,7 +54,8 @@ export const Profile = () => {
         theme_colors: ensureThemeColors(data.theme_colors)
       } as ProfileType;
     },
-    enabled: !!targetUserId,
+    enabled: !!targetUserId && !authLoading,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   const { data: musician, isLoading: isMusicianLoading } = useQuery({
@@ -91,6 +92,7 @@ export const Profile = () => {
       return data;
     },
     enabled: !!targetUserId && !!profile?.role && profile.role === 'musician',
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
   const updateProfileMutation = useProfileMutation();
@@ -122,7 +124,7 @@ export const Profile = () => {
     }
   };
 
-  const isLoading = isUsernameLoading || isProfileLoading;
+  const isLoading = authLoading || isUsernameLoading || isProfileLoading;
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading profile...</div>;
