@@ -3,7 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { vi } from 'vitest';
-import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
+import type { User, Session } from '@supabase/supabase-js';
+import '@testing-library/jest-dom';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -24,22 +25,13 @@ const mockUser: User = {
   aud: 'authenticated',
   created_at: new Date().toISOString(),
   role: '',
-  aal: null,
-  amr: [],
-  session_id: '',
   phone: '',
   confirmed_at: '',
   email_confirmed_at: '',
-  factors: null,
-  identities: null,
   last_sign_in_at: '',
-  recovery_sent_at: null,
   updated_at: '',
-  banned_until: null,
-  confirmation_sent_at: '',
-  invited_at: null,
-  phone_confirmed_at: null,
-  deleted_at: null
+  identities: null,
+  factors: null,
 };
 
 const mockSession: Session = {

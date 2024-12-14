@@ -6,6 +6,7 @@ import { useProfileMutation } from "@/hooks/useProfileMutation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { Profile } from "@/types/profile";
+import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -22,7 +23,13 @@ export const Settings = () => {
         .single();
       
       if (error) throw error;
-      return data as Profile;
+      
+      return {
+        ...data,
+        social_links: ensureSocialLinks(data.social_links),
+        comment_preferences: ensureCommentPreferences(data.comment_preferences),
+        theme_colors: ensureThemeColors(data.theme_colors)
+      } as Profile;
     },
     enabled: !!user?.id,
   });
