@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 
 const SUNO_EXTENSION_URL = "https://chrome.google.com/webstore/detail/suno-extension/[extension-id]";
 const SUNO_ME_URL = "https://suno.com/me";
@@ -26,7 +26,14 @@ export const LinkSunoAccount = () => {
   const [showExtensionPrompt, setShowExtensionPrompt] = useState(true);
 
   const generateLinkingCode = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to generate a linking code.",
+      });
+      return;
+    }
     
     setLoading(true);
     try {
@@ -46,6 +53,7 @@ export const LinkSunoAccount = () => {
 
       if (error) throw error;
 
+      console.log('Linking code generated:', data.code);
       setLinkingCode(data.code);
       toast({
         title: "Linking code generated",
@@ -142,16 +150,23 @@ export const LinkSunoAccount = () => {
         <div className="space-y-4">
           <Button
             onClick={generateLinkingCode}
-            disabled={loading}
+            disabled={loading || !user}
             className="w-full"
           >
-            Generate Linking Code
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              'Generate Linking Code'
+            )}
           </Button>
           
           {linkingCode && (
-            <div className="p-4 bg-muted rounded-md text-center">
+            <div className="p-4 bg-muted rounded-md text-center border border-border">
               <p className="text-sm text-muted-foreground">Your linking code:</p>
-              <p className="text-xl font-mono">{linkingCode}</p>
+              <p className="text-xl font-mono mt-2">{linkingCode}</p>
               <p className="text-sm text-muted-foreground mt-2">
                 Use this code in the Suno extension on your profile page
               </p>
