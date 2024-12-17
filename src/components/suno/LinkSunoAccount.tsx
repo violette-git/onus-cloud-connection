@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -11,14 +11,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Download } from "lucide-react";
+
+const SUNO_EXTENSION_URL = "https://chrome.google.com/webstore/detail/suno-extension/[extension-id]";
+const SUNO_ME_URL = "https://suno.com/me";
 
 export const LinkSunoAccount = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [sunoUsername, setSunoUsername] = useState("");
-  const [sunoEmail, setSunoEmail] = useState("");
   const [linkingCode, setLinkingCode] = useState("");
+  const [showExtensionPrompt, setShowExtensionPrompt] = useState(true);
 
   const generateLinkingCode = async () => {
     if (!user) return;
@@ -44,8 +49,11 @@ export const LinkSunoAccount = () => {
       setLinkingCode(data.code);
       toast({
         title: "Linking code generated",
-        description: "Use this code in the Suno app to link your account",
+        description: "Use this code in the Suno extension to link your account",
       });
+      
+      // Open Suno profile page in a new tab
+      window.open(SUNO_ME_URL, '_blank');
     } catch (error) {
       console.error('Error generating linking code:', error);
       toast({
@@ -58,41 +66,43 @@ export const LinkSunoAccount = () => {
     }
   };
 
-  const handleLinkAccount = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      const { error } = await supabase.functions.invoke('link-suno-account', {
-        body: {
-          code: linkingCode,
-          sunoUsername,
-          sunoEmail
-        }
-      });
+  // This function will be called by the extension through window.postMessage
+  const handleExtensionMessage = async (event: MessageEvent) => {
+    if (event.data.type === 'SUNO_ACCOUNT_LINKED' && event.data.sunoUsername && event.data.sunoEmail) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            suno_username: event.data.sunoUsername,
+            suno_email: event.data.sunoEmail
+          })
+          .eq('id', user?.id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success!",
-        description: "Your Suno account has been linked.",
-      });
+        toast({
+          title: "Success!",
+          description: "Your Suno account has been linked.",
+        });
 
-      // Clear form
-      setSunoUsername("");
-      setSunoEmail("");
-      setLinkingCode("");
-    } catch (error) {
-      console.error('Error linking account:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not link Suno account. Please check your details and try again.",
-      });
-    } finally {
-      setLoading(false);
+        // Redirect to private profile
+        navigate('/profile');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not update profile with Suno details. Please try again.",
+        });
+      }
     }
   };
+
+  // Add event listener for extension messages
+  useState(() => {
+    window.addEventListener('message', handleExtensionMessage);
+    return () => window.removeEventListener('message', handleExtensionMessage);
+  }, []);
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -102,8 +112,36 @@ export const LinkSunoAccount = () => {
           Connect your Suno account to enable AI music generation features
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
+      <CardContent className="space-y-6">
+        {showExtensionPrompt && (
+          <Alert>
+            <AlertDescription className="space-y-4">
+              <p>To link your Suno account, you'll need to:</p>
+              <ol className="list-decimal pl-4 space-y-2">
+                <li>Install the Suno Chrome extension</li>
+                <li>Generate a linking code</li>
+                <li>Use the code in the extension on your Suno profile page</li>
+              </ol>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.open(SUNO_EXTENSION_URL, '_blank')}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Install Suno Extension
+              </Button>
+              <Button 
+                variant="link" 
+                className="w-full"
+                onClick={() => setShowExtensionPrompt(false)}
+              >
+                I already have the extension
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-4">
           <Button
             onClick={generateLinkingCode}
             disabled={loading}
@@ -111,47 +149,16 @@ export const LinkSunoAccount = () => {
           >
             Generate Linking Code
           </Button>
+          
           {linkingCode && (
             <div className="p-4 bg-muted rounded-md text-center">
               <p className="text-sm text-muted-foreground">Your linking code:</p>
               <p className="text-xl font-mono">{linkingCode}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Use this code in the Suno extension on your profile page
+              </p>
             </div>
           )}
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="sunoUsername" className="text-sm font-medium">
-              Suno Username
-            </label>
-            <Input
-              id="sunoUsername"
-              value={sunoUsername}
-              onChange={(e) => setSunoUsername(e.target.value)}
-              placeholder="Your Suno username"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="sunoEmail" className="text-sm font-medium">
-              Suno Email
-            </label>
-            <Input
-              id="sunoEmail"
-              type="email"
-              value={sunoEmail}
-              onChange={(e) => setSunoEmail(e.target.value)}
-              placeholder="Your Suno email address"
-            />
-          </div>
-
-          <Button
-            onClick={handleLinkAccount}
-            disabled={loading || !sunoUsername || !sunoEmail}
-            className="w-full"
-          >
-            Link Account
-          </Button>
         </div>
       </CardContent>
     </Card>

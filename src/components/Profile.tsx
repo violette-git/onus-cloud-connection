@@ -151,6 +151,28 @@ export const Profile = () => {
 
   const isOwner = user?.id === profile.id;
 
+  // Add a listener for extension messages
+  useState(() => {
+    const handleExtensionMessage = async (event: MessageEvent) => {
+      if (event.data.type === 'SUNO_ACCOUNT_LINKED' && 
+          event.data.sunoUsername && 
+          event.data.sunoEmail &&
+          user?.id) {
+        await updateProfileMutation.mutateAsync({
+          id: user.id,
+          suno_username: event.data.sunoUsername,
+          suno_email: event.data.sunoEmail
+        });
+        
+        // Invalidate queries to refresh the data
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
+      }
+    };
+
+    window.addEventListener('message', handleExtensionMessage);
+    return () => window.removeEventListener('message', handleExtensionMessage);
+  }, [user?.id]);
+
   return (
     <ProfileView
       profile={profile}
