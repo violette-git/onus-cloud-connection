@@ -6,6 +6,7 @@ import { ProfileView } from "./profile/ProfileView";
 import { useProfileMutation } from "@/hooks/useProfileMutation";
 import type { Profile as ProfileType } from "@/types/profile";
 import { ensureCommentPreferences, ensureSocialLinks, ensureThemeColors } from "@/types/database";
+import { useState, useEffect } from "react"; // Added useState import
 
 export const Profile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -152,7 +153,9 @@ export const Profile = () => {
   const isOwner = user?.id === profile.id;
 
   // Add a listener for extension messages
-  useState(() => {
+
+  // Add a listener for extension messages
+  useEffect(() => {
     const handleExtensionMessage = async (event: MessageEvent) => {
       if (event.data.type === 'SUNO_ACCOUNT_LINKED' && 
           event.data.sunoUsername && 

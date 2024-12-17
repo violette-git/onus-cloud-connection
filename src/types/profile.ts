@@ -13,6 +13,8 @@ export interface Profile {
   created_at: string;
   updated_at?: string;
   rich_text_bio?: string | null;
+  suno_username?: string | null;  // Added Suno fields
+  suno_email?: string | null;     // Added Suno fields
 }
 
 export interface SocialLinks {

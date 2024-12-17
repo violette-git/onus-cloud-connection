@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,43 +66,41 @@ export const LinkSunoAccount = () => {
     }
   };
 
-  // This function will be called by the extension through window.postMessage
-  const handleExtensionMessage = async (event: MessageEvent) => {
-    if (event.data.type === 'SUNO_ACCOUNT_LINKED' && event.data.sunoUsername && event.data.sunoEmail) {
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            suno_username: event.data.sunoUsername,
-            suno_email: event.data.sunoEmail
-          })
-          .eq('id', user?.id);
+  useEffect(() => {
+    const handleExtensionMessage = async (event: MessageEvent) => {
+      if (event.data.type === 'SUNO_ACCOUNT_LINKED' && event.data.sunoUsername && event.data.sunoEmail) {
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update({
+              suno_username: event.data.sunoUsername,
+              suno_email: event.data.sunoEmail
+            })
+            .eq('id', user?.id);
 
-        if (error) throw error;
+          if (error) throw error;
 
-        toast({
-          title: "Success!",
-          description: "Your Suno account has been linked.",
-        });
+          toast({
+            title: "Success!",
+            description: "Your Suno account has been linked.",
+          });
 
-        // Redirect to private profile
-        navigate('/profile');
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Could not update profile with Suno details. Please try again.",
-        });
+          // Redirect to private profile
+          navigate('/profile');
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not update profile with Suno details. Please try again.",
+          });
+        }
       }
-    }
-  };
+    };
 
-  // Add event listener for extension messages
-  useState(() => {
     window.addEventListener('message', handleExtensionMessage);
     return () => window.removeEventListener('message', handleExtensionMessage);
-  }, []);
+  }, [user?.id, navigate, toast]);
 
   return (
     <Card className="w-full max-w-md mx-auto">
