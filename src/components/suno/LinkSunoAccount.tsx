@@ -18,7 +18,6 @@ const SUNO_EXTENSION_URL = "https://chrome.google.com/webstore/detail/suno-exten
 const SUNO_ME_URL = "https://suno.com/me";
 
 export const LinkSunoAccount = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -26,15 +25,6 @@ export const LinkSunoAccount = () => {
   const [showExtensionPrompt, setShowExtensionPrompt] = useState(true);
 
   const generateLinkingCode = async () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to generate a linking code.",
-      });
-      return;
-    }
-    
     setLoading(true);
     try {
       // Create a linking code that expires in 1 hour
@@ -44,7 +34,6 @@ export const LinkSunoAccount = () => {
       const { data, error } = await supabase
         .from('linking_codes')
         .insert({
-          user_id: user.id,
           code: Math.random().toString(36).substring(2, 15),
           expires_at: expiresAt.toISOString()
         })
@@ -78,29 +67,27 @@ export const LinkSunoAccount = () => {
     const handleExtensionMessage = async (event: MessageEvent) => {
       if (event.data.type === 'SUNO_ACCOUNT_LINKED' && event.data.sunoUsername && event.data.sunoEmail) {
         try {
-          const { error } = await supabase
-            .from('profiles')
-            .update({
-              suno_username: event.data.sunoUsername,
-              suno_email: event.data.sunoEmail
-            })
-            .eq('id', user?.id);
+          // Create a new user account with the Suno details
+          const { data: authData, error: signUpError } = await supabase.auth.signUp({
+            email: event.data.sunoEmail,
+            password: Math.random().toString(36).substring(2, 15), // Generate a random password
+          });
 
-          if (error) throw error;
+          if (signUpError) throw signUpError;
 
           toast({
             title: "Success!",
-            description: "Your Suno account has been linked.",
+            description: "Your Suno account has been linked and your account has been created.",
           });
 
           // Redirect to private profile
           navigate('/profile');
         } catch (error) {
-          console.error('Error updating profile:', error);
+          console.error('Error creating account:', error);
           toast({
             variant: "destructive",
             title: "Error",
-            description: "Could not update profile with Suno details. Please try again.",
+            description: "Could not create account with Suno details. Please try again.",
           });
         }
       }
@@ -108,7 +95,7 @@ export const LinkSunoAccount = () => {
 
     window.addEventListener('message', handleExtensionMessage);
     return () => window.removeEventListener('message', handleExtensionMessage);
-  }, [user?.id, navigate, toast]);
+  }, [navigate, toast]);
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -150,7 +137,7 @@ export const LinkSunoAccount = () => {
         <div className="space-y-4">
           <Button
             onClick={generateLinkingCode}
-            disabled={loading || !user}
+            disabled={loading}
             className="w-full"
           >
             {loading ? (
