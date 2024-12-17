@@ -100,7 +100,7 @@ export const LinkSunoAccount = () => {
 
     window.addEventListener('message', handleExtensionMessage);
     return () => window.removeEventListener('message', handleExtensionMessage);
-  }, []);
+  });
 
   return (
     <Card className="w-full max-w-md mx-auto">
