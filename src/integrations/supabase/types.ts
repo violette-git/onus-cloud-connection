@@ -211,6 +211,33 @@ export type Database = {
           },
         ]
       }
+      linking_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       musician_genres: {
         Row: {
           created_at: string
@@ -394,6 +421,8 @@ export type Database = {
           rich_text_bio: string | null
           role: string
           social_links: Json | null
+          suno_email: string | null
+          suno_username: string | null
           theme_colors: Json | null
           updated_at: string | null
           username: string | null
@@ -410,6 +439,8 @@ export type Database = {
           rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
+          suno_email?: string | null
+          suno_username?: string | null
           theme_colors?: Json | null
           updated_at?: string | null
           username?: string | null
@@ -426,6 +457,8 @@ export type Database = {
           rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
+          suno_email?: string | null
+          suno_username?: string | null
           theme_colors?: Json | null
           updated_at?: string | null
           username?: string | null
