@@ -21,20 +21,20 @@ export const LinkSunoAccount = () => {
   const [showExtensionPrompt, setShowExtensionPrompt] = useState(true);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
-  const [newUserId, setNewUserId] = useState<string | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
+  const [newUserId, setNewUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
       console.log("LinkSunoAccount: Received message:", event.data);
       
-      // Handle complete-suno-linking message
       if (event.data.type === 'complete-suno-linking') {
         const { username, email, userId, isNewUser } = event.data;
         console.log("LinkSunoAccount: Received linking completion", { username, email, userId, isNewUser });
         
         setSunoDetails({ username, email });
-        
+        setLinkingStatus('pending');
+
         if (isNewUser) {
           console.log("LinkSunoAccount: New user detected, showing password dialog");
           setNewUserId(userId);
@@ -46,6 +46,7 @@ export const LinkSunoAccount = () => {
             title: "Success",
             description: "Your Suno account has been linked successfully!",
           });
+          // Add a delay before navigation to show the success message
           setTimeout(() => {
             navigate('/profile');
           }, 2000);
@@ -70,11 +71,14 @@ export const LinkSunoAccount = () => {
 
     try {
       console.log("LinkSunoAccount: Updating user password");
-      const { error } = await supabase.auth.updateUser({ 
-        password: values.password 
-      });
       
-      if (error) throw error;
+      // First sign in as the new user to get their session
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: sunoDetails?.email || '',
+        password: values.password
+      });
+
+      if (signInError) throw signInError;
 
       setLinkingStatus('completed');
       toast({
@@ -83,6 +87,7 @@ export const LinkSunoAccount = () => {
       });
       
       setShowPasswordDialog(false);
+      // Add a delay before navigation to show the success message
       setTimeout(() => {
         navigate('/profile');
       }, 2000);
@@ -110,19 +115,21 @@ export const LinkSunoAccount = () => {
 
     return (
       <>
-        {showExtensionPrompt && (
+        {showExtensionPrompt && !showPasswordDialog && (
           <ExtensionPrompt
             onSkip={() => setShowExtensionPrompt(false)}
             extensionUrl={SUNO_EXTENSION_URL}
           />
         )}
-        <LinkingProcess 
-          onSunoDetails={setSunoDetails}
-          onLinkingCode={code => {
-            console.log("LinkSunoAccount: Generated linking code:", code);
-            setLinkingStatus('pending');
-          }}
-        />
+        {!showPasswordDialog && (
+          <LinkingProcess 
+            onSunoDetails={setSunoDetails}
+            onLinkingCode={code => {
+              console.log("LinkSunoAccount: Generated linking code:", code);
+              setLinkingStatus('pending');
+            }}
+          />
+        )}
       </>
     );
   };
