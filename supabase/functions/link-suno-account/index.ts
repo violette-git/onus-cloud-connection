@@ -50,91 +50,48 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Check if user exists with this email
-    const { data: existingUser, error: userError } = await supabaseClient.auth
-      .admin.listUsers()
+    // Update the linking code with Suno details
+    const { error: updateError } = await supabaseClient
+      .from('linking_codes')
+      .update({ 
+        suno_username: username,
+        suno_email: email,
+        used_at: new Date().toISOString()
+      })
+      .eq('code', code)
 
-    const userExists = existingUser?.users.some(user => user.email === email)
+    if (updateError) {
+      console.error('Error updating linking code:', updateError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to update linking code' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-    let userId: string
-
-    if (!userExists) {
-      // Create a new user with a temporary password
-      const tempPassword = Math.random().toString(36).substring(2, 15)
-      const { data: newUser, error: createError } = await supabaseClient.auth.admin
-        .createUser({
-          email: email,
-          password: tempPassword,
-          email_confirm: true
+    // Update the profile if a user_id exists
+    if (linkingCode.user_id) {
+      const { error: profileError } = await supabaseClient
+        .from('profiles')
+        .update({
+          suno_username: username,
+          suno_email: email,
+          linking_status: 'linked'
         })
+        .eq('id', linkingCode.user_id)
 
-      if (createError) {
-        console.error('Error creating new user:', createError)
+      if (profileError) {
+        console.error('Error updating profile:', profileError)
         return new Response(
-          JSON.stringify({ 
-            error: 'Failed to create user account',
-            details: createError.message 
-          }),
+          JSON.stringify({ error: 'Failed to update profile' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
-
-      userId = newUser.user.id
-      console.log('Created new user:', userId)
-    } else {
-      console.error('User already exists with this email')
-      return new Response(
-        JSON.stringify({ error: 'User already exists with this email' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Update the linking code with the user ID
-    const { error: updateLinkingError } = await supabaseClient
-      .from('linking_codes')
-      .update({ 
-        user_id: userId,
-        used_at: new Date().toISOString()
-      })
-      .eq('id', linkingCode.id)
-
-    if (updateLinkingError) {
-      console.error('Error updating linking code:', updateLinkingError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to update linking code',
-          details: updateLinkingError.message 
-        }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Update the profile with Suno details
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .update({
-        suno_username: username,
-        suno_email: email,
-        linking_status: 'linked'
-      })
-      .eq('id', userId)
-
-    if (profileError) {
-      console.error('Error updating profile:', profileError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to update profile',
-          details: profileError.message 
-        }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
     }
 
     return new Response(
       JSON.stringify({ 
         message: 'Successfully linked Suno account',
-        isNewUser: true,
-        userId: userId
+        userId: linkingCode.user_id 
       }),
       { 
         status: 200, 
@@ -143,12 +100,9 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Unexpected error in link-suno-account function:', error)
+    console.error('Unexpected error:', error)
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        details: error.message 
-      }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
