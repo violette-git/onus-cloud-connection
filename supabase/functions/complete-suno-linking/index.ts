@@ -9,16 +9,26 @@ interface RequestBody {
 }
 
 Deno.serve(async (req) => {
+  // Log the incoming request
+  console.log('complete-suno-linking: Received request:', {
+    method: req.method,
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries())
+  });
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { username, email, userId, isNewUser } = await req.json() as RequestBody;
-    console.log('Completing Suno linking for:', { username, email, userId, isNewUser });
+    const requestBody = await req.json() as RequestBody;
+    console.log('complete-suno-linking: Request body:', requestBody);
+
+    const { username, email, userId, isNewUser } = requestBody;
+    console.log('complete-suno-linking: Processing request for:', { username, email, userId, isNewUser });
 
     if (!username || !email || !userId) {
-      console.error('Missing required fields');
+      console.error('complete-suno-linking: Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -30,6 +40,8 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    console.log('complete-suno-linking: Updating profile for user:', userId);
+
     const { error: updateError } = await supabaseClient
       .from('profiles')
       .update({
@@ -40,12 +52,14 @@ Deno.serve(async (req) => {
       .eq('id', userId)
 
     if (updateError) {
-      console.error('Error updating profile:', updateError);
+      console.error('complete-suno-linking: Error updating profile:', updateError);
       return new Response(
         JSON.stringify({ error: 'Failed to update profile' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log('complete-suno-linking: Successfully updated profile, sending response');
 
     return new Response(
       JSON.stringify({
@@ -60,7 +74,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in complete-suno-linking:', error);
+    console.error('complete-suno-linking: Error processing request:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
