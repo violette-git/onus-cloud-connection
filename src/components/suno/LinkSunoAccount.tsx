@@ -29,59 +29,30 @@ export const LinkSunoAccount = () => {
     const handleExtensionMessage = async (event: MessageEvent) => {
       if (event.data.type === 'SUNO_ACCOUNT_LINKED' && 
           event.data.sunoUsername && 
-          event.data.sunoEmail &&
-          linkingCode) {  // Make sure we have a linking code
+          event.data.sunoEmail) {
         
-        if (isLinking) return; // Prevent multiple simultaneous calls
-        setIsLinking(true);
-        
-        try {
-          const response = await fetch('https://uticeouohtomjezepctd.functions.supabase.co/link-suno-account', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
-              username: event.data.sunoUsername,
-              email: event.data.sunoEmail,
-              code: linkingCode  // Use the stored linking code
-            })
-          });
+        setSunoDetails({
+          username: event.data.sunoUsername,
+          email: event.data.sunoEmail
+        });
 
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Failed to link account');
-          }
-
-          // Handle the successful linking response
-          if (data.isNewUser && data.userId) {
-            setNewUserId(data.userId);
-            setShowPasswordDialog(true);
-          } else {
-            toast({
-              title: "Success",
-              description: "Your Suno account has been linked successfully!",
-            });
-            navigate('/profile');
-          }
-        } catch (error) {
-          console.error('Error linking account:', error);
+        // Handle the successful linking response
+        if (event.data.isNewUser && event.data.userId) {
+          setNewUserId(event.data.userId);
+          setShowPasswordDialog(true);
+        } else {
           toast({
-            variant: "destructive",
-            title: "Error",
-            description: error instanceof Error ? error.message : "Failed to link account",
+            title: "Success",
+            description: "Your Suno account has been linked successfully!",
           });
-        } finally {
-          setIsLinking(false);
+          navigate('/profile');
         }
       }
     };
 
     window.addEventListener('message', handleExtensionMessage);
     return () => window.removeEventListener('message', handleExtensionMessage);
-  }, [navigate, toast, isLinking, linkingCode]); // Add linkingCode to dependencies
+  }, [navigate, toast]);
 
   const handlePasswordSubmit = async (values: { password: string }) => {
     if (!newUserId) return;
@@ -126,7 +97,7 @@ export const LinkSunoAccount = () => {
 
         <LinkingProcess 
           onSunoDetails={setSunoDetails} 
-          onLinkingCode={setLinkingCode}  // Add prop to receive linking code
+          onLinkingCode={setLinkingCode}
         />
       </CardContent>
 
