@@ -22,48 +22,60 @@ export const LinkSunoAccount = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [newUserId, setNewUserId] = useState<string | null>(null);
-  const [isLinking, setIsLinking] = useState(false);
-  const [linkingCode, setLinkingCode] = useState<string | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
 
+  // Listen for messages from the Suno extension
   useEffect(() => {
-    const handleExtensionMessage = async (event: MessageEvent) => {
-      if (event.data.type === 'SUNO_ACCOUNT_LINKED' && 
-          event.data.sunoUsername && 
-          event.data.sunoEmail) {
+    const handleExtensionMessage = (event: MessageEvent) => {
+      console.log("Received message:", event.data);
+      
+      // Only handle messages with the correct type
+      if (event.data.type === 'SUNO_ACCOUNT_LINKED') {
+        console.log("Processing SUNO_ACCOUNT_LINKED message");
         
-        setSunoDetails({
-          username: event.data.sunoUsername,
-          email: event.data.sunoEmail
-        });
-
-        // Handle the successful linking response
-        if (event.data.isNewUser && event.data.userId) {
-          setNewUserId(event.data.userId);
-          setShowPasswordDialog(true);
-        } else {
-          setLinkingStatus('completed');
-          toast({
-            title: "Success",
-            description: "Your Suno account has been linked successfully!",
+        if (event.data.sunoUsername && event.data.sunoEmail) {
+          setSunoDetails({
+            username: event.data.sunoUsername,
+            email: event.data.sunoEmail
           });
-          // Add a small delay before navigation to show the success state
-          setTimeout(() => {
-            navigate('/profile');
-          }, 2000);
+
+          // If this is a new user, show the password dialog
+          if (event.data.isNewUser && event.data.userId) {
+            console.log("New user detected, showing password dialog");
+            setNewUserId(event.data.userId);
+            setShowPasswordDialog(true);
+          } else {
+            // Existing user, mark as completed and redirect
+            console.log("Existing user, completing flow");
+            setLinkingStatus('completed');
+            toast({
+              title: "Success",
+              description: "Your Suno account has been linked successfully!",
+            });
+            setTimeout(() => {
+              navigate('/profile');
+            }, 2000);
+          }
         }
       }
     };
 
+    // Add the event listener
     window.addEventListener('message', handleExtensionMessage);
-    return () => window.removeEventListener('message', handleExtensionMessage);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('message', handleExtensionMessage);
+    };
   }, [navigate, toast]);
 
-  const handlePasswordSubmit = async (values: { password: string }) => {
+  const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
     if (!newUserId) return;
 
     try {
-      const { error } = await supabase.auth.updateUser({ password: values.password });
+      const { error } = await supabase.auth.updateUser({ 
+        password: values.password 
+      });
       
       if (error) throw error;
 
@@ -74,7 +86,6 @@ export const LinkSunoAccount = () => {
       });
       
       setShowPasswordDialog(false);
-      // Add a small delay before navigation to show the success state
       setTimeout(() => {
         navigate('/profile');
       }, 2000);
@@ -108,10 +119,12 @@ export const LinkSunoAccount = () => {
             extensionUrl={SUNO_EXTENSION_URL}
           />
         )}
-
         <LinkingProcess 
-          onSunoDetails={setSunoDetails} 
-          onLinkingCode={setLinkingCode}
+          onSunoDetails={setSunoDetails}
+          onLinkingCode={code => {
+            console.log("Generated linking code:", code);
+            setLinkingStatus('pending');
+          }}
         />
       </>
     );
