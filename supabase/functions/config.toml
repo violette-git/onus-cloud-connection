@@ -1,0 +1,4 @@
+project_id = "uticeouohtomjezepctd"
+
+[functions.link-suno-account]
+verify_jwt = false

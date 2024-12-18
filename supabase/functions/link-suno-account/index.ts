@@ -52,7 +52,8 @@ Deno.serve(async (req) => {
       .from('profiles')
       .update({
         suno_username: sunoUsername,
-        suno_email: sunoEmail
+        suno_email: sunoEmail,
+        linking_status: 'linked'
       })
       .eq('id', linkingCode.user_id)
 

@@ -418,6 +418,7 @@ export type Database = {
           full_name: string | null
           handle: string | null
           id: string
+          linking_status: string | null
           rich_text_bio: string | null
           role: string
           social_links: Json | null
@@ -436,6 +437,7 @@ export type Database = {
           full_name?: string | null
           handle?: string | null
           id: string
+          linking_status?: string | null
           rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
@@ -454,6 +456,7 @@ export type Database = {
           full_name?: string | null
           handle?: string | null
           id?: string
+          linking_status?: string | null
           rich_text_bio?: string | null
           role?: string
           social_links?: Json | null
