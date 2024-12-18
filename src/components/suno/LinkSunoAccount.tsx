@@ -31,6 +31,7 @@ export const LinkSunoAccount = () => {
       console.log("LinkSunoAccount: Received message event:", event);
       console.log("LinkSunoAccount: Message data:", event.data);
       
+      // Check if the message contains the required fields
       const { username, email, isNewUser, userId } = event.data;
       
       if (username && email) {
@@ -58,7 +59,7 @@ export const LinkSunoAccount = () => {
       }
     };
 
-    // Add the event listener
+    // Add the event listener without origin restrictions
     console.log("LinkSunoAccount: Adding message event listener");
     window.addEventListener('message', handleExtensionMessage);
 
