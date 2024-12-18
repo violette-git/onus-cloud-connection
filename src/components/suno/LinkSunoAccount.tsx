@@ -34,7 +34,7 @@ export const LinkSunoAccount = () => {
       try {
         const { data, error } = await supabase
           .from('linking_codes')
-          .select('used_at, user_id')
+          .select('used_at, user_id, suno_username, suno_email')
           .eq('code', currentLinkingCode)
           .single();
 
@@ -43,6 +43,10 @@ export const LinkSunoAccount = () => {
         // If the code has been used, trigger password creation
         if (data.used_at && !showPasswordDialog) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
+          setSunoDetails({
+            username: data.suno_username || '',
+            email: data.suno_email || ''
+          });
           setShowPasswordDialog(true);
           // Clear the interval since we don't need to check anymore
           if (intervalId) clearInterval(intervalId);
@@ -89,25 +93,19 @@ export const LinkSunoAccount = () => {
 
   const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
     try {
-      console.log("LinkSunoAccount: Setting up new account");
+      console.log("LinkSunoAccount: Setting up password for linked account");
       
-      // Create a new user with the generated email and password
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: sunoDetails?.email || '',
-        password: values.password,
-        options: {
-          data: {
-            suno_username: sunoDetails?.username,
-          }
-        }
+      // Update the user's password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: values.password
       });
 
-      if (signUpError) throw signUpError;
+      if (updateError) throw updateError;
 
       setLinkingStatus('completed');
       toast({
         title: "Success",
-        description: "Your account has been created successfully!",
+        description: "Your password has been set successfully!",
       });
       
       setShowPasswordDialog(false);
@@ -115,11 +113,11 @@ export const LinkSunoAccount = () => {
         navigate('/profile');
       }, 2000);
     } catch (error) {
-      console.error('LinkSunoAccount: Error creating account:', error);
+      console.error('LinkSunoAccount: Error setting password:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create account. Please try again.",
+        description: "Failed to set password. Please try again.",
       });
     }
   };
@@ -144,18 +142,16 @@ export const LinkSunoAccount = () => {
 
     return (
       <>
-        {showExtensionPrompt && !showPasswordDialog && (
+        {showExtensionPrompt && (
           <ExtensionPrompt
             onSkip={() => setShowExtensionPrompt(false)}
             extensionUrl={SUNO_EXTENSION_URL}
           />
         )}
-        {!showPasswordDialog && (
-          <LinkingProcess 
-            onSunoDetails={setSunoDetails}
-            onLinkingCode={handleLinkingCode}
-          />
-        )}
+        <LinkingProcess 
+          onSunoDetails={setSunoDetails}
+          onLinkingCode={handleLinkingCode}
+        />
       </>
     );
   };

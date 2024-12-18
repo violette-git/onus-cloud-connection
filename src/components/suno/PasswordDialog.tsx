@@ -4,6 +4,7 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -51,7 +52,10 @@ export const PasswordDialog = ({ open, onOpenChange, onSubmit }: PasswordDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Your Password</DialogTitle>
+          <DialogTitle>Set Your Password</DialogTitle>
+          <DialogDescription>
+            Create a password for your linked Suno account
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -82,7 +86,7 @@ export const PasswordDialog = ({ open, onOpenChange, onSubmit }: PasswordDialogP
               )}
             />
             <Button type="submit" className="w-full">
-              Create Account
+              Set Password
             </Button>
           </form>
         </Form>

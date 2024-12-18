@@ -217,6 +217,8 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
+          suno_email: string | null
+          suno_username: string | null
           used_at: string | null
           user_id: string | null
         }
@@ -225,6 +227,8 @@ export type Database = {
           created_at?: string
           expires_at: string
           id?: string
+          suno_email?: string | null
+          suno_username?: string | null
           used_at?: string | null
           user_id?: string | null
         }
@@ -233,6 +237,8 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          suno_email?: string | null
+          suno_username?: string | null
           used_at?: string | null
           user_id?: string | null
         }
