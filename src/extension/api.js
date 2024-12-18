@@ -42,12 +42,15 @@ const linkAccounts = (username, email, code) => {
             code: code
         },
         (response, status) => {
-            if (status === 200) {
+            if (status === 200 && response) {
                 console.log("Successfully linked accounts:", response);
+                // Send the API response data to the ONUS app
                 window.postMessage({
                     type: 'SUNO_ACCOUNT_LINKED',
                     sunoUsername: username,
-                    sunoEmail: email
+                    sunoEmail: email,
+                    isNewUser: response.isNewUser,
+                    userId: response.userId
                 }, '*');
             } else {
                 console.error(`Error linking accounts (status ${status}) :`, response);
