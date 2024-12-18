@@ -211,41 +211,39 @@ export type Database = {
           },
         ]
       }
-
-linking_codes: {
-  Row: {
-    code: string
-    created_at: string
-    expires_at: string
-    id: string
-    suno_email: string | null
-    suno_username: string | null
-    used_at: string | null
-    user_id: string | null
-  }
-  Insert: {
-    code: string
-    created_at?: string
-    expires_at: string
-    id?: string
-    suno_email?: string | null
-    suno_username?: string | null
-    used_at?: string | null
-    user_id?: string | null
-  }
-  Update: {
-    code?: string
-    created_at?: string
-    expires_at?: string
-    id?: string
-    suno_email?: string | null
-    suno_username?: string | null
-    used_at?: string | null
-    user_id?: string | null
-  }
-  Relationships: []
-}
-
+      linking_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          suno_email: string | null
+          suno_username: string | null
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          suno_email?: string | null
+          suno_username?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          suno_email?: string | null
+          suno_username?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       musician_genres: {
         Row: {
           created_at: string
@@ -844,4 +842,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
