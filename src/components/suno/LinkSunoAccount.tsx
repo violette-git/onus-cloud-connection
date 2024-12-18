@@ -22,8 +22,49 @@ export const LinkSunoAccount = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
+  const [currentLinkingCode, setCurrentLinkingCode] = useState<string | null>(null);
 
-  // Listen for extension messages for backward compatibility
+  // Poll for linking code status
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const checkLinkingCode = async () => {
+      if (!currentLinkingCode || linkingStatus !== 'pending') return;
+
+      try {
+        const { data, error } = await supabase
+          .from('linking_codes')
+          .select('used_at, user_id')
+          .eq('code', currentLinkingCode)
+          .single();
+
+        if (error) throw error;
+
+        // If the code has been used, trigger password creation
+        if (data.used_at && !showPasswordDialog) {
+          console.log("LinkSunoAccount: Linking code used, showing password dialog");
+          setShowPasswordDialog(true);
+          // Clear the interval since we don't need to check anymore
+          if (intervalId) clearInterval(intervalId);
+        }
+      } catch (error) {
+        console.error('Error checking linking code status:', error);
+      }
+    };
+
+    if (currentLinkingCode && linkingStatus === 'pending') {
+      // Check immediately
+      checkLinkingCode();
+      // Then check every 5 seconds
+      intervalId = setInterval(checkLinkingCode, 5000);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [currentLinkingCode, linkingStatus, showPasswordDialog]);
+
+  // Legacy extension message handler
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
       if (event.data.type === 'complete-suno-linking') {
@@ -85,15 +126,8 @@ export const LinkSunoAccount = () => {
 
   const handleLinkingCode = async (code: string) => {
     console.log("LinkSunoAccount: Generated linking code:", code);
+    setCurrentLinkingCode(code);
     setLinkingStatus('pending');
-    
-    // Show password dialog immediately after generating code
-    setShowPasswordDialog(true);
-    // For testing, set some dummy suno details
-    setSunoDetails({
-      username: "testuser",
-      email: "testuser@suno.ai"
-    });
   };
 
   const renderContent = () => {
