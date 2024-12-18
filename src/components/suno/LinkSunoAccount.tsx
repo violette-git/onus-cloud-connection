@@ -42,7 +42,7 @@ export const LinkSunoAccount = () => {
         if (error) throw error;
 
         // If the code has been used and we have user details
-        if (data.used_at && data.suno_username && data.suno_email && !showPasswordDialog) {
+        if (data.used_at && data.suno_username && data.suno_email) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
           setSunoDetails({
             username: data.suno_username,
@@ -50,6 +50,7 @@ export const LinkSunoAccount = () => {
           });
           setUserId(data.user_id);
           setShowPasswordDialog(true);
+          setShowExtensionPrompt(false);
           // Clear the interval since we don't need to check anymore
           if (intervalId) clearInterval(intervalId);
         }
@@ -150,7 +151,7 @@ export const LinkSunoAccount = () => {
             extensionUrl={SUNO_EXTENSION_URL}
           />
         )}
-        {!showPasswordDialog && (
+        {!showExtensionPrompt && !showPasswordDialog && (
           <LinkingProcess 
             onSunoDetails={setSunoDetails}
             onLinkingCode={handleLinkingCode}
