@@ -27,26 +27,30 @@ export const LinkSunoAccount = () => {
   // Listen for messages from the Suno extension
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
-      console.log("Received message:", event.data);
+      // Log all incoming messages for debugging
+      console.log("LinkSunoAccount: Received message event:", event);
+      console.log("LinkSunoAccount: Message data:", event.data);
+      console.log("LinkSunoAccount: Message origin:", event.origin);
       
-      // Only handle messages with the correct type
+      // Accept messages from any origin since they're coming from suno.com
       if (event.data.type === 'SUNO_ACCOUNT_LINKED') {
-        console.log("Processing SUNO_ACCOUNT_LINKED message");
+        console.log("LinkSunoAccount: Processing SUNO_ACCOUNT_LINKED message");
         
-        if (event.data.sunoUsername && event.data.sunoEmail) {
+        const { sunoUsername, sunoEmail, isNewUser, userId } = event.data;
+        
+        if (sunoUsername && sunoEmail) {
+          console.log("LinkSunoAccount: Setting Suno details", { sunoUsername, sunoEmail });
           setSunoDetails({
-            username: event.data.sunoUsername,
-            email: event.data.sunoEmail
+            username: sunoUsername,
+            email: sunoEmail
           });
 
-          // If this is a new user, show the password dialog
-          if (event.data.isNewUser && event.data.userId) {
-            console.log("New user detected, showing password dialog");
-            setNewUserId(event.data.userId);
+          if (isNewUser && userId) {
+            console.log("LinkSunoAccount: New user detected, showing password dialog", { userId });
+            setNewUserId(userId);
             setShowPasswordDialog(true);
           } else {
-            // Existing user, mark as completed and redirect
-            console.log("Existing user, completing flow");
+            console.log("LinkSunoAccount: Existing user, completing flow");
             setLinkingStatus('completed');
             toast({
               title: "Success",
@@ -61,18 +65,24 @@ export const LinkSunoAccount = () => {
     };
 
     // Add the event listener
+    console.log("LinkSunoAccount: Adding message event listener");
     window.addEventListener('message', handleExtensionMessage);
 
     // Cleanup
     return () => {
+      console.log("LinkSunoAccount: Removing message event listener");
       window.removeEventListener('message', handleExtensionMessage);
     };
   }, [navigate, toast]);
 
   const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
-    if (!newUserId) return;
+    if (!newUserId) {
+      console.error("LinkSunoAccount: No userId available for password update");
+      return;
+    }
 
     try {
+      console.log("LinkSunoAccount: Updating user password");
       const { error } = await supabase.auth.updateUser({ 
         password: values.password 
       });
@@ -90,7 +100,7 @@ export const LinkSunoAccount = () => {
         navigate('/profile');
       }, 2000);
     } catch (error) {
-      console.error('Error setting password:', error);
+      console.error('LinkSunoAccount: Error setting password:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -122,7 +132,7 @@ export const LinkSunoAccount = () => {
         <LinkingProcess 
           onSunoDetails={setSunoDetails}
           onLinkingCode={code => {
-            console.log("Generated linking code:", code);
+            console.log("LinkSunoAccount: Generated linking code:", code);
             setLinkingStatus('pending');
           }}
         />
