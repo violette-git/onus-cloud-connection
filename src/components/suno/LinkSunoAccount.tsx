@@ -30,7 +30,6 @@ export const LinkSunoAccount = () => {
       // Log all incoming messages for debugging
       console.log("LinkSunoAccount: Received message event:", event);
       console.log("LinkSunoAccount: Message data:", event.data);
-      console.log("LinkSunoAccount: Message origin:", event.origin);
       
       // Handle the completion response from the edge function
       if (event.data.success === true) {
@@ -43,36 +42,6 @@ export const LinkSunoAccount = () => {
           setSunoDetails({
             username: username,
             email: email
-          });
-
-          if (isNewUser && userId) {
-            console.log("LinkSunoAccount: New user detected, showing password dialog", { userId });
-            setNewUserId(userId);
-            setShowPasswordDialog(true);
-          } else {
-            console.log("LinkSunoAccount: Existing user, completing flow");
-            setLinkingStatus('completed');
-            toast({
-              title: "Success",
-              description: "Your Suno account has been linked successfully!",
-            });
-            setTimeout(() => {
-              navigate('/profile');
-            }, 2000);
-          }
-        }
-      }
-      // Also keep handling SUNO_ACCOUNT_LINKED messages for backward compatibility
-      else if (event.data.type === 'SUNO_ACCOUNT_LINKED') {
-        console.log("LinkSunoAccount: Processing SUNO_ACCOUNT_LINKED message");
-        
-        const { sunoUsername, sunoEmail, isNewUser, userId } = event.data;
-        
-        if (sunoUsername && sunoEmail) {
-          console.log("LinkSunoAccount: Setting Suno details", { sunoUsername, sunoEmail });
-          setSunoDetails({
-            username: sunoUsername,
-            email: sunoEmail
           });
 
           if (isNewUser && userId) {
