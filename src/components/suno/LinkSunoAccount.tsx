@@ -31,34 +31,29 @@ export const LinkSunoAccount = () => {
       console.log("LinkSunoAccount: Received message event:", event);
       console.log("LinkSunoAccount: Message data:", event.data);
       
-      // Handle the completion response from the edge function
-      if (event.data.success === true) {
-        console.log("LinkSunoAccount: Processing successful linking completion");
-        
-        const { username, email, isNewUser, userId } = event.data;
-        
-        if (username && email) {
-          console.log("LinkSunoAccount: Setting Suno details", { username, email });
-          setSunoDetails({
-            username: username,
-            email: email
-          });
+      const { username, email, isNewUser, userId } = event.data;
+      
+      if (username && email) {
+        console.log("LinkSunoAccount: Setting Suno details", { username, email });
+        setSunoDetails({
+          username: username,
+          email: email
+        });
 
-          if (isNewUser && userId) {
-            console.log("LinkSunoAccount: New user detected, showing password dialog", { userId });
-            setNewUserId(userId);
-            setShowPasswordDialog(true);
-          } else {
-            console.log("LinkSunoAccount: Existing user, completing flow");
-            setLinkingStatus('completed');
-            toast({
-              title: "Success",
-              description: "Your Suno account has been linked successfully!",
-            });
-            setTimeout(() => {
-              navigate('/profile');
-            }, 2000);
-          }
+        if (isNewUser && userId) {
+          console.log("LinkSunoAccount: New user detected, showing password dialog", { userId });
+          setNewUserId(userId);
+          setShowPasswordDialog(true);
+        } else {
+          console.log("LinkSunoAccount: Existing user, completing flow");
+          setLinkingStatus('completed');
+          toast({
+            title: "Success",
+            description: "Your Suno account has been linked successfully!",
+          });
+          setTimeout(() => {
+            navigate('/profile');
+          }, 2000);
         }
       }
     };
