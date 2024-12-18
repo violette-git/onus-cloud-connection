@@ -95,7 +95,23 @@ export const LinkSunoAccount = () => {
     try {
       console.log("LinkSunoAccount: Setting up password for linked account");
       
-      // Update the user's password
+      if (!sunoDetails?.email) {
+        throw new Error("Email is missing");
+      }
+
+      // First, sign in with email (passwordless)
+      const { error: signInError } = await supabase.auth.signInWithOtp({
+        email: sunoDetails.email,
+        options: {
+          data: {
+            suno_username: sunoDetails.username,
+          }
+        }
+      });
+
+      if (signInError) throw signInError;
+
+      // Then update the password
       const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
