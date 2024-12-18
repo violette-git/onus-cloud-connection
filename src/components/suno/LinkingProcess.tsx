@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import { LinkingCodeDisplay } from "./LinkingCodeDisplay";
 
 interface LinkingProcessProps {
@@ -30,18 +30,7 @@ export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
         .single();
 
       if (error) throw error;
-
       setLinkingCode(data.code);
-      
-      // Open Suno profile page in a new tab after successfully generating the code
-      const sunoWindow = window.open('https://suno.ai/me', '_blank');
-      if (!sunoWindow) {
-        toast({
-          variant: "destructive",
-          title: "Popup Blocked",
-          description: "Please allow popups and try again.",
-        });
-      }
     } catch (error) {
       console.error('Error generating linking code:', error);
       toast({
@@ -52,6 +41,10 @@ export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openSunoProfile = () => {
+    window.open('https://suno.ai/me', '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -71,7 +64,19 @@ export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
         )}
       </Button>
       
-      <LinkingCodeDisplay code={linkingCode} />
+      {linkingCode && (
+        <>
+          <LinkingCodeDisplay code={linkingCode} />
+          <Button 
+            onClick={openSunoProfile}
+            variant="outline"
+            className="w-full"
+          >
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Open Suno Profile
+          </Button>
+        </>
+      )}
     </div>
   );
 };
