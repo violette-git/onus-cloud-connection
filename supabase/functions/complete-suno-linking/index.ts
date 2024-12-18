@@ -9,7 +9,6 @@ interface RequestBody {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -18,7 +17,6 @@ Deno.serve(async (req) => {
     const { username, email, userId, isNewUser } = await req.json() as RequestBody;
     console.log('Completing Suno linking for:', { username, email, userId, isNewUser });
 
-    // Validate required fields
     if (!username || !email || !userId) {
       console.error('Missing required fields');
       return new Response(
@@ -27,13 +25,11 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Update the profile with linking status
     const { error: updateError } = await supabaseClient
       .from('profiles')
       .update({
@@ -51,17 +47,28 @@ Deno.serve(async (req) => {
       )
     }
 
-    return new Response(
-      JSON.stringify({ 
-        message: 'Suno linking completed successfully',
-        isNewUser,
-        userId
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
+    // Return HTML with script to send postMessage
+    const html = `
+      <html>
+        <script>
+          window.opener.postMessage({
+            type: 'SUNO_ACCOUNT_LINKED',
+            sunoUsername: '${username}',
+            sunoEmail: '${email}',
+            isNewUser: ${isNewUser},
+            userId: '${userId}'
+          }, '*');
+          window.close();
+        </script>
+      </html>
+    `;
+
+    return new Response(html, { 
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'text/html' 
+      } 
+    });
 
   } catch (error) {
     console.error('Error in complete-suno-linking:', error);
