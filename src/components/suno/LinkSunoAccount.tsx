@@ -32,20 +32,20 @@ export const LinkSunoAccount = () => {
       if (!currentLinkingCode || linkingStatus !== 'pending') return;
 
       try {
-        const { data, error } = await supabase
+        const { data: linkingCode, error } = await supabase
           .from('linking_codes')
-          .select('used_at, user_id, suno_username, suno_email')
+          .select('used_at, suno_username, suno_email')
           .eq('code', currentLinkingCode)
           .maybeSingle();
 
         if (error) throw error;
 
         // If the code has been used and we have the required data
-        if (data?.used_at && data?.suno_email) {
+        if (linkingCode?.used_at && linkingCode?.suno_email) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
           setSunoDetails({
-            username: data.suno_username || '',
-            email: data.suno_email
+            username: linkingCode.suno_username || '',
+            email: linkingCode.suno_email
           });
           setShowPasswordDialog(true);
           // Clear the interval since we don't need to check anymore
