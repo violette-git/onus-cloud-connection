@@ -32,43 +32,25 @@ function makeApiCall(method, url, data, callback) {
 const linkAccounts = (username, email, code) => {
     console.log(`Attempting to link accounts for ${username} and email ${email} with code ${code}`);
     
+    // First, update the linking code record with Suno details
     makeApiCall(
-        'POST',
-        'https://uticeouohtomjezepctd.functions.supabase.co/link-suno-account',
+        'PATCH',
+        'https://uticeouohtomjezepctd.supabase.co/rest/v1/linking_codes',
         {
-            username: username,
-            email: email,
-            code: code
+            suno_username: username,
+            suno_email: email,
+            used_at: new Date().toISOString()
         },
         (response, status) => {
             if (status === 200 && response) {
-                console.log("Successfully linked accounts:", response);
-                
-                // Make the second API call to complete the linking process
-                makeApiCall(
-                    'POST',
-                    'https://uticeouohtomjezepctd.functions.supabase.co/complete-suno-linking',
-                    {
-                        username: username,
-                        email: email,
-                        userId: response.userId,
-                        isNewUser: response.isNewUser
-                    },
-                    (completionResponse, completionStatus) => {
-                        if (completionStatus === 200 && completionResponse) {
-                            console.log("Successfully completed linking process:", completionResponse);
-                            // Send message to the ONUS app
-                            window.postMessage(completionResponse, '*');
-                        } else {
-                            console.error(`Error completing linking process (status ${completionStatus}):`, completionResponse);
-                            console.log("Detailed error:", completionResponse?.message || "Unknown error");
-                        }
-                    }
-                );
+                console.log("Successfully updated linking code:", response);
             } else {
-                console.error(`Error linking accounts (status ${status}):`, response);
+                console.error(`Error updating linking code (status ${status}):`, response);
                 console.log("Detailed error:", response?.message || "Unknown error");
             }
         }
     );
 };
+
+// Export for use in the extension
+window.linkAccounts = linkAccounts;
