@@ -7,9 +7,10 @@ import { LinkingCodeDisplay } from "./LinkingCodeDisplay";
 
 interface LinkingProcessProps {
   onSunoDetails: (details: { username: string; email: string }) => void;
+  onLinkingCode: (code: string) => void;
 }
 
-export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
+export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [linkingCode, setLinkingCode] = useState("");
@@ -30,7 +31,10 @@ export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
         .single();
 
       if (error) throw error;
-      setLinkingCode(data.code);
+      
+      const code = data.code;
+      setLinkingCode(code);
+      onLinkingCode(code); // Pass the code back up to parent
     } catch (error) {
       console.error('Error generating linking code:', error);
       toast({

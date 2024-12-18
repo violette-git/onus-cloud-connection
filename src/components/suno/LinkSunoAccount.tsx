@@ -23,17 +23,19 @@ export const LinkSunoAccount = () => {
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [newUserId, setNewUserId] = useState<string | null>(null);
   const [isLinking, setIsLinking] = useState(false);
+  const [linkingCode, setLinkingCode] = useState<string | null>(null);
 
   useEffect(() => {
     const handleExtensionMessage = async (event: MessageEvent) => {
       if (event.data.type === 'SUNO_ACCOUNT_LINKED' && 
           event.data.sunoUsername && 
-          event.data.sunoEmail) {
+          event.data.sunoEmail &&
+          linkingCode) {  // Make sure we have a linking code
         
+        if (isLinking) return; // Prevent multiple simultaneous calls
         setIsLinking(true);
         
         try {
-          // Wait for the API response
           const response = await fetch('https://uticeouohtomjezepctd.functions.supabase.co/link-suno-account', {
             method: 'POST',
             headers: {
@@ -43,7 +45,7 @@ export const LinkSunoAccount = () => {
             body: JSON.stringify({
               username: event.data.sunoUsername,
               email: event.data.sunoEmail,
-              code: event.data.code
+              code: linkingCode  // Use the stored linking code
             })
           });
 
@@ -79,7 +81,7 @@ export const LinkSunoAccount = () => {
 
     window.addEventListener('message', handleExtensionMessage);
     return () => window.removeEventListener('message', handleExtensionMessage);
-  }, [navigate, toast]);
+  }, [navigate, toast, isLinking, linkingCode]); // Add linkingCode to dependencies
 
   const handlePasswordSubmit = async (values: { password: string }) => {
     if (!newUserId) return;
@@ -122,7 +124,10 @@ export const LinkSunoAccount = () => {
           />
         )}
 
-        <LinkingProcess onSunoDetails={setSunoDetails} />
+        <LinkingProcess 
+          onSunoDetails={setSunoDetails} 
+          onLinkingCode={setLinkingCode}  // Add prop to receive linking code
+        />
       </CardContent>
 
       <PasswordDialog
