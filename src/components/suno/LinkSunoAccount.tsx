@@ -24,14 +24,12 @@ export const LinkSunoAccount = () => {
   const [newUserId, setNewUserId] = useState<string | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
 
-  // Listen for messages from the Suno extension
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
-      // Log all incoming messages for debugging
       console.log("LinkSunoAccount: Received message event:", event);
       console.log("LinkSunoAccount: Message data:", event.data);
       
-      // Check if the message contains the required fields
+      // Extract data from the message
       const { username, email, isNewUser, userId } = event.data;
       
       if (username && email) {
@@ -59,13 +57,29 @@ export const LinkSunoAccount = () => {
       }
     };
 
-    // Add the event listener without origin restrictions
-    console.log("LinkSunoAccount: Adding message event listener");
+    // Set up message channel
+    console.log("LinkSunoAccount: Setting up message channel");
     window.addEventListener('message', handleExtensionMessage);
 
-    // Cleanup
+    // Notify extension that we're ready to receive messages
+    const targetOrigins = [
+      'https://preview--onus-cloud-connection.lovable.app',
+      'http://localhost:3000',
+      'https://lovable.dev',
+      'https://gptengineer.app'
+    ];
+
+    targetOrigins.forEach(origin => {
+      try {
+        window.parent.postMessage({ type: 'SUNO_LINK_READY' }, origin);
+        console.log(`LinkSunoAccount: Sent ready message to ${origin}`);
+      } catch (error) {
+        console.log(`LinkSunoAccount: Failed to send ready message to ${origin}`, error);
+      }
+    });
+
     return () => {
-      console.log("LinkSunoAccount: Removing message event listener");
+      console.log("LinkSunoAccount: Cleaning up message listener");
       window.removeEventListener('message', handleExtensionMessage);
     };
   }, [navigate, toast]);
