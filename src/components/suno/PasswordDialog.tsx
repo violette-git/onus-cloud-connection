@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -37,10 +36,9 @@ interface PasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: PasswordForm) => Promise<void>;
-  username?: string;
 }
 
-export const PasswordDialog = ({ open, onOpenChange, onSubmit, username }: PasswordDialogProps) => {
+export const PasswordDialog = ({ open, onOpenChange, onSubmit }: PasswordDialogProps) => {
   const form = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
@@ -54,9 +52,6 @@ export const PasswordDialog = ({ open, onOpenChange, onSubmit, username }: Passw
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Your Password</DialogTitle>
-          <DialogDescription>
-            Welcome {username}! Please create a password for your account.
-          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
