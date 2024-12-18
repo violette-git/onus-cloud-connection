@@ -32,48 +32,27 @@ export const LinkSunoAccount = () => {
       if (!currentLinkingCode || linkingStatus !== 'pending') return;
 
       try {
-        console.log("Checking linking code status for:", currentLinkingCode);
-        
         const { data, error } = await supabase
           .from('linking_codes')
           .select('used_at, user_id, suno_username, suno_email')
           .eq('code', currentLinkingCode)
-          .maybeSingle(); // Changed from single() to maybeSingle()
+          .single();
 
-        if (error) {
-          console.error('Error checking linking code status:', error);
-          // Only show error toast if it's not a "no rows returned" error
-          if (!error.message.includes("no rows")) {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to check linking status. Please try again.",
-            });
-          }
-          return;
-        }
-
-        // If no data found, just continue polling
-        if (!data) {
-          console.log("No linking code found, continuing to poll...");
-          return;
-        }
-
-        console.log("Received linking code data:", data);
+        if (error) throw error;
 
         // If the code has been used, trigger password creation
-        if (data.used_at && !showPasswordDialog && data.suno_username && data.suno_email) {
+        if (data.used_at && !showPasswordDialog) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
           setSunoDetails({
-            username: data.suno_username,
-            email: data.suno_email
+            username: data.suno_username || '',
+            email: data.suno_email || ''
           });
           setShowPasswordDialog(true);
           // Clear the interval since we don't need to check anymore
           if (intervalId) clearInterval(intervalId);
         }
       } catch (error) {
-        console.error('Error in checkLinkingCode:', error);
+        console.error('Error checking linking code status:', error);
       }
     };
 
@@ -87,8 +66,9 @@ export const LinkSunoAccount = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [currentLinkingCode, linkingStatus, showPasswordDialog, toast]);
+  }, [currentLinkingCode, linkingStatus, showPasswordDialog]);
 
+  // Legacy extension message handler
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
       if (event.data.type === 'complete-suno-linking') {
