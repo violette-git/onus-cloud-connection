@@ -60,6 +60,15 @@ Deno.serve(async (req) => {
 
     console.log('Found valid linking code:', linkingCode)
 
+    // Ensure we have a valid user_id
+    if (!linkingCode.user_id) {
+      console.error('Linking code has no associated user_id')
+      return new Response(
+        JSON.stringify({ error: 'Invalid linking code - no user associated' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Update the profile with Suno details
     const { error: updateError } = await supabaseClient
       .from('profiles')
