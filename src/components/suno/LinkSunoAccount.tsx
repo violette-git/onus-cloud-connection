@@ -36,18 +36,21 @@ export const LinkSunoAccount = () => {
           username: event.data.sunoUsername,
           email: event.data.sunoEmail
         });
-        setLinkingStatus('completed');
 
         // Handle the successful linking response
         if (event.data.isNewUser && event.data.userId) {
           setNewUserId(event.data.userId);
           setShowPasswordDialog(true);
         } else {
+          setLinkingStatus('completed');
           toast({
             title: "Success",
             description: "Your Suno account has been linked successfully!",
           });
-          navigate('/profile');
+          // Add a small delay before navigation to show the success state
+          setTimeout(() => {
+            navigate('/profile');
+          }, 2000);
         }
       }
     };
@@ -64,13 +67,17 @@ export const LinkSunoAccount = () => {
       
       if (error) throw error;
 
+      setLinkingStatus('completed');
       toast({
         title: "Success",
         description: "Your password has been set successfully!",
       });
       
       setShowPasswordDialog(false);
-      navigate('/profile');
+      // Add a small delay before navigation to show the success state
+      setTimeout(() => {
+        navigate('/profile');
+      }, 2000);
     } catch (error) {
       console.error('Error setting password:', error);
       toast({
