@@ -22,83 +22,78 @@ export const LinkSunoAccount = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
-  const [newUserId, setNewUserId] = useState<string | null>(null);
 
+  // Listen for extension messages for backward compatibility
   useEffect(() => {
     const handleExtensionMessage = (event: MessageEvent) => {
-      console.log("LinkSunoAccount: Received message:", event.data);
-      
       if (event.data.type === 'complete-suno-linking') {
-        const { username, email, userId, isNewUser } = event.data;
-        console.log("LinkSunoAccount: Received linking completion", { username, email, userId, isNewUser });
+        const { username, email } = event.data;
+        console.log("LinkSunoAccount: Received linking completion", { username, email });
         
         setSunoDetails({ username, email });
-        setLinkingStatus('pending');
-
-        if (isNewUser) {
-          console.log("LinkSunoAccount: New user detected, showing password dialog");
-          setNewUserId(userId);
-          setShowPasswordDialog(true);
-        } else {
-          console.log("LinkSunoAccount: Existing user, completing flow");
-          setLinkingStatus('completed');
-          toast({
-            title: "Success",
-            description: "Your Suno account has been linked successfully!",
-          });
-          // Add a delay before navigation to show the success message
-          setTimeout(() => {
-            navigate('/profile');
-          }, 2000);
-        }
+        setLinkingStatus('completed');
+        toast({
+          title: "Success",
+          description: "Your Suno account has been linked successfully!",
+        });
+        setTimeout(() => {
+          navigate('/profile');
+        }, 2000);
       }
     };
 
     window.addEventListener('message', handleExtensionMessage);
-    console.log("LinkSunoAccount: Added message listener");
-
-    return () => {
-      window.removeEventListener('message', handleExtensionMessage);
-      console.log("LinkSunoAccount: Removed message listener");
-    };
+    return () => window.removeEventListener('message', handleExtensionMessage);
   }, [navigate, toast]);
 
   const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
-    if (!newUserId) {
-      console.error("LinkSunoAccount: No userId available for password update");
-      return;
-    }
-
     try {
-      console.log("LinkSunoAccount: Updating user password");
+      console.log("LinkSunoAccount: Setting up new account");
       
-      // First sign in as the new user to get their session
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+      // Create a new user with the generated email and password
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: sunoDetails?.email || '',
-        password: values.password
+        password: values.password,
+        options: {
+          data: {
+            suno_username: sunoDetails?.username,
+          }
+        }
       });
 
-      if (signInError) throw signInError;
+      if (signUpError) throw signUpError;
 
       setLinkingStatus('completed');
       toast({
         title: "Success",
-        description: "Your password has been set successfully!",
+        description: "Your account has been created successfully!",
       });
       
       setShowPasswordDialog(false);
-      // Add a delay before navigation to show the success message
       setTimeout(() => {
         navigate('/profile');
       }, 2000);
     } catch (error) {
-      console.error('LinkSunoAccount: Error setting password:', error);
+      console.error('LinkSunoAccount: Error creating account:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to set password. Please try again.",
+        description: "Failed to create account. Please try again.",
       });
     }
+  };
+
+  const handleLinkingCode = async (code: string) => {
+    console.log("LinkSunoAccount: Generated linking code:", code);
+    setLinkingStatus('pending');
+    
+    // Show password dialog immediately after generating code
+    setShowPasswordDialog(true);
+    // For testing, set some dummy suno details
+    setSunoDetails({
+      username: "testuser",
+      email: "testuser@suno.ai"
+    });
   };
 
   const renderContent = () => {
@@ -124,10 +119,7 @@ export const LinkSunoAccount = () => {
         {!showPasswordDialog && (
           <LinkingProcess 
             onSunoDetails={setSunoDetails}
-            onLinkingCode={code => {
-              console.log("LinkSunoAccount: Generated linking code:", code);
-              setLinkingStatus('pending');
-            }}
+            onLinkingCode={handleLinkingCode}
           />
         )}
       </>
