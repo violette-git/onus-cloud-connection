@@ -2,9 +2,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { corsHeaders } from '../_shared/cors.ts'
 
 interface RequestBody {
+  username: string;
+  email: string;
   code: string;
-  sunoUsername: string;
-  sunoEmail: string;
 }
 
 Deno.serve(async (req) => {
@@ -14,15 +14,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Basic authorization check using Bearer token
-    const authHeader = req.headers.get('authorization')
-    const expectedAuth = `Bearer ${Deno.env.get('SUNO_API_KEY')}`
-    
-    if (!authHeader || authHeader !== expectedAuth) {
-      console.error('Authorization failed:', {
-        received: authHeader,
-        expected: expectedAuth,
-      })
+    // Basic authorization check using API key
+    const apiKey = req.headers.get('apikey')
+    if (!apiKey || apiKey !== Deno.env.get('SUPABASE_ANON_KEY')) {
+      console.error('Authorization failed: Invalid API key')
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -35,7 +30,7 @@ Deno.serve(async (req) => {
     )
 
     // Get the request body
-    const { code, sunoUsername, sunoEmail }: RequestBody = await req.json()
+    const { username, email, code }: RequestBody = await req.json()
 
     // Validate the linking code
     const { data: linkingCode, error: linkingCodeError } = await supabaseClient
@@ -66,8 +61,8 @@ Deno.serve(async (req) => {
     const { error: updateError } = await supabaseClient
       .from('profiles')
       .update({
-        suno_username: sunoUsername,
-        suno_email: sunoEmail,
+        suno_username: username,
+        suno_email: email,
         linking_status: 'linked'
       })
       .eq('id', linkingCode.user_id)
