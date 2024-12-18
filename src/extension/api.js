@@ -1,3 +1,7 @@
+// Define your API keys at the top of the file
+const SUNO_API_KEY = 'YOUR_SUNO_API_KEY'; // This should be replaced with the actual key
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // This should be replaced with the actual key
+
 function makeApiCall(method, url, data, callback) {
     console.log("Making API call:", method, url, data);
     GM_xmlhttpRequest({
