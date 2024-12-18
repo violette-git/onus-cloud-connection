@@ -10,6 +10,7 @@ import {
 import { ExtensionPrompt } from "./ExtensionPrompt";
 import { LinkingProcess } from "./LinkingProcess";
 import { PasswordDialog } from "./PasswordDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const SUNO_EXTENSION_URL = "https://chrome.google.com/webstore/detail/suno-extension/[extension-id]";
 
