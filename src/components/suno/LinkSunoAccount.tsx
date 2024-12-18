@@ -40,11 +40,11 @@ export const LinkSunoAccount = () => {
 
         if (error) throw error;
 
-        // If the code has been used and we have the required data
-        if (linkingCode?.used_at && linkingCode?.suno_email) {
+        // If we have the required Suno account details
+        if (linkingCode?.suno_email && linkingCode?.suno_username) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
           setSunoDetails({
-            username: linkingCode.suno_username || '',
+            username: linkingCode.suno_username,
             email: linkingCode.suno_email
           });
           setShowPasswordDialog(true);
