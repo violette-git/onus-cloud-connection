@@ -14,20 +14,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('Authorization failed: Missing Authorization header')
-      return new Response(
-        JSON.stringify({ error: 'Missing Authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     // Get API key
     const apiKey = req.headers.get('apikey')
     if (!apiKey) {
-      console.error('Authorization failed: Missing API key')
+      console.error('Missing API key')
       return new Response(
         JSON.stringify({ error: 'Missing API key' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -41,6 +31,7 @@ Deno.serve(async (req) => {
 
     // Get the request body
     const { username, email, code }: RequestBody = await req.json()
+    console.log('Received request with:', { username, email, code })
 
     // Validate the linking code
     const { data: linkingCode, error: linkingCodeError } = await supabaseClient
@@ -67,6 +58,8 @@ Deno.serve(async (req) => {
       )
     }
 
+    console.log('Found valid linking code:', linkingCode)
+
     // Update the profile with Suno details
     const { error: updateError } = await supabaseClient
       .from('profiles')
@@ -80,10 +73,15 @@ Deno.serve(async (req) => {
     if (updateError) {
       console.error('Error updating profile:', updateError)
       return new Response(
-        JSON.stringify({ error: 'Failed to update profile' }),
+        JSON.stringify({ 
+          error: 'Failed to update profile',
+          details: updateError.message 
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log('Successfully updated profile for user:', linkingCode.user_id)
 
     // Mark the linking code as used
     const { error: usedCodeError } = await supabaseClient
@@ -102,9 +100,12 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in link-suno-account function:', error)
+    console.error('Unexpected error in link-suno-account function:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
