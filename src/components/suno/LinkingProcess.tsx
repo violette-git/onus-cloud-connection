@@ -32,7 +32,16 @@ export const LinkingProcess = ({ onSunoDetails }: LinkingProcessProps) => {
       if (error) throw error;
 
       setLinkingCode(data.code);
-      window.open('https://suno.com/me', '_blank');
+      
+      // Open Suno profile page in a new tab after successfully generating the code
+      const sunoWindow = window.open('https://suno.ai/me', '_blank');
+      if (!sunoWindow) {
+        toast({
+          variant: "destructive",
+          title: "Popup Blocked",
+          description: "Please allow popups and try again.",
+        });
+      }
     } catch (error) {
       console.error('Error generating linking code:', error);
       toast({
