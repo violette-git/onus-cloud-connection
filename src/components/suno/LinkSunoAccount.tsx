@@ -24,6 +24,7 @@ export const LinkSunoAccount = () => {
   const [newUserId, setNewUserId] = useState<string | null>(null);
   const [isLinking, setIsLinking] = useState(false);
   const [linkingCode, setLinkingCode] = useState<string | null>(null);
+  const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
 
   useEffect(() => {
     const handleExtensionMessage = async (event: MessageEvent) => {
@@ -35,6 +36,7 @@ export const LinkSunoAccount = () => {
           username: event.data.sunoUsername,
           email: event.data.sunoEmail
         });
+        setLinkingStatus('completed');
 
         // Handle the successful linking response
         if (event.data.isNewUser && event.data.userId) {
@@ -79,15 +81,20 @@ export const LinkSunoAccount = () => {
     }
   };
 
-  return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Link Suno Account</CardTitle>
-        <CardDescription>
-          Connect your Suno account to enable AI music generation features
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+  const renderContent = () => {
+    if (linkingStatus === 'completed') {
+      return (
+        <div className="text-center space-y-4">
+          <h3 className="text-lg font-medium">Account Linked Successfully!</h3>
+          <p className="text-muted-foreground">
+            Your Suno account has been linked. You will be redirected shortly...
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <>
         {showExtensionPrompt && (
           <ExtensionPrompt
             onSkip={() => setShowExtensionPrompt(false)}
@@ -99,6 +106,20 @@ export const LinkSunoAccount = () => {
           onSunoDetails={setSunoDetails} 
           onLinkingCode={setLinkingCode}
         />
+      </>
+    );
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Link Suno Account</CardTitle>
+        <CardDescription>
+          Connect your Suno account to enable AI music generation features
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {renderContent()}
       </CardContent>
 
       <PasswordDialog
