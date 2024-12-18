@@ -16,10 +16,10 @@ Deno.serve(async (req) => {
   try {
     // Basic authorization check using API key
     const apiKey = req.headers.get('apikey')
-    if (!apiKey || apiKey !== Deno.env.get('SUPABASE_ANON_KEY')) {
-      console.error('Authorization failed: Invalid API key')
+    if (!apiKey) {
+      console.error('Authorization failed: Missing API key')
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Missing API key' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
