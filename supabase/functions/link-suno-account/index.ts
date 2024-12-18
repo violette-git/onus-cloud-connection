@@ -14,7 +14,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Basic authorization check using API key
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      console.error('Authorization failed: Missing Authorization header')
+      return new Response(
+        JSON.stringify({ error: 'Missing Authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get API key
     const apiKey = req.headers.get('apikey')
     if (!apiKey) {
       console.error('Authorization failed: Missing API key')
