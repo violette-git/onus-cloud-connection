@@ -1,6 +1,5 @@
-// Define your API keys at the top of the file
-const SUNO_API_KEY = 'YOUR_SUNO_API_KEY'; // This should be replaced with the actual key
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // This should be replaced with the actual key
+// Define your API key at the top of the file
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0aWNlb3VvaHRvbWplemVwY3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg2NDQ4MDAsImV4cCI6MjAyNDIyMDgwMH0.dPTGXg1zCWU9xpbF2dQsuG8RuOWMEKB_0Ct-ZPGBGFk';
 
 function makeApiCall(method, url, data, callback) {
     console.log("Making API call:", method, url, data);
@@ -8,7 +7,6 @@ function makeApiCall(method, url, data, callback) {
         method: method,
         url: url,
         headers: {
-            'Authorization': `Bearer ${SUNO_API_KEY}`,
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY
         },
