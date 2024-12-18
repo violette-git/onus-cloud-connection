@@ -32,7 +32,7 @@ export const LinkSunoAccount = () => {
       if (!currentLinkingCode || linkingStatus !== 'pending') return;
 
       try {
-        console.log("LinkSunoAccount: Checking linking code status");
+        console.log("LinkSunoAccount: Checking linking code status for code:", currentLinkingCode);
         const { data: linkingCode, error } = await supabase
           .from('linking_codes')
           .select('used_at, suno_username, suno_email')
@@ -41,19 +41,28 @@ export const LinkSunoAccount = () => {
 
         if (error) throw error;
 
+        console.log("LinkSunoAccount: Received linking code data:", linkingCode);
+
         // If we have the required Suno account details
         if (linkingCode?.suno_email && linkingCode?.suno_username) {
-          console.log("LinkSunoAccount: Linking code used, showing password dialog");
+          console.log("LinkSunoAccount: Found Suno details, showing password dialog", {
+            email: linkingCode.suno_email,
+            username: linkingCode.suno_username
+          });
+          
           setSunoDetails({
             username: linkingCode.suno_username,
             email: linkingCode.suno_email
           });
           setShowPasswordDialog(true);
+          setLinkingStatus('completed');
           // Clear the interval since we don't need to check anymore
           if (intervalId) clearInterval(intervalId);
+        } else {
+          console.log("LinkSunoAccount: No Suno details yet", linkingCode);
         }
       } catch (error) {
-        console.error('Error checking linking code status:', error);
+        console.error('LinkSunoAccount: Error checking linking code status:', error);
       }
     };
 

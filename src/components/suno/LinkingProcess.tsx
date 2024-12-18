@@ -18,6 +18,7 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
   const generateLinkingCode = async () => {
     setLoading(true);
     try {
+      console.log("LinkingProcess: Generating new linking code");
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 1);
 
@@ -33,10 +34,11 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
       if (error) throw error;
       
       const code = data.code;
+      console.log("LinkingProcess: Generated code:", code);
       setLinkingCode(code);
       onLinkingCode(code); // Pass the code back up to parent
     } catch (error) {
-      console.error('Error generating linking code:', error);
+      console.error('LinkingProcess: Error generating linking code:', error);
       toast({
         variant: "destructive",
         title: "Error",
