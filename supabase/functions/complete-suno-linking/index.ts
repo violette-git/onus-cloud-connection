@@ -47,28 +47,17 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Return HTML with script to send postMessage
-    const html = `
-      <html>
-        <script>
-          window.opener.postMessage({
-            type: 'SUNO_ACCOUNT_LINKED',
-            sunoUsername: '${username}',
-            sunoEmail: '${email}',
-            isNewUser: ${isNewUser},
-            userId: '${userId}'
-          }, '*');
-          window.close();
-        </script>
-      </html>
-    `;
-
-    return new Response(html, { 
-      headers: { 
-        ...corsHeaders, 
-        'Content-Type': 'text/html' 
-      } 
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        type: 'SUNO_ACCOUNT_LINKED',
+        sunoUsername: username,
+        sunoEmail: email,
+        isNewUser,
+        userId
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
     console.error('Error in complete-suno-linking:', error);

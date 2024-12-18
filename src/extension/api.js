@@ -29,7 +29,6 @@ function makeApiCall(method, url, data, callback) {
     });
 }
 
-// Example usage:
 const linkAccounts = (username, email, code) => {
     console.log(`Attempting to link accounts for ${username} and email ${email} with code ${code}`);
     
@@ -58,14 +57,8 @@ const linkAccounts = (username, email, code) => {
                     (completionResponse, completionStatus) => {
                         if (completionStatus === 200 && completionResponse) {
                             console.log("Successfully completed linking process:", completionResponse);
-                            // Send the final success message to the ONUS app
-                            window.postMessage({
-                                type: 'SUNO_ACCOUNT_LINKED',
-                                sunoUsername: username,
-                                sunoEmail: email,
-                                isNewUser: response.isNewUser,
-                                userId: response.userId
-                            }, '*');
+                            // Send message to the ONUS app
+                            window.postMessage(completionResponse, '*');
                         } else {
                             console.error(`Error completing linking process (status ${completionStatus}):`, completionResponse);
                             console.log("Detailed error:", completionResponse?.message || "Unknown error");
