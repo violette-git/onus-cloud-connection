@@ -32,6 +32,7 @@ export const LinkSunoAccount = () => {
       if (!currentLinkingCode || linkingStatus !== 'pending') return;
 
       try {
+        console.log("LinkSunoAccount: Checking linking code status");
         const { data: linkingCode, error } = await supabase
           .from('linking_codes')
           .select('used_at, suno_username, suno_email')
