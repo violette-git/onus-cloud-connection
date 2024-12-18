@@ -16,10 +16,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Check for Suno API key in headers
+    // Basic authorization check
     const authHeader = req.headers.get('authorization')
     if (!authHeader || authHeader !== `Bearer ${SUNO_API_KEY}`) {
-      console.error('Missing or invalid authorization header')
+      console.error('Missing or invalid authorization header:', authHeader)
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
+      // Use service role key for admin access
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
