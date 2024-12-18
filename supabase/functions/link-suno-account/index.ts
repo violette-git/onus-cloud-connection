@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { corsHeaders } from '../_shared/cors.ts'
 
+const SUNO_API_KEY = Deno.env.get('SUNO_API_KEY')
+
 interface RequestBody {
   code: string;
   sunoUsername: string;
@@ -14,6 +16,16 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Check for Suno API key in headers
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader || authHeader !== `Bearer ${SUNO_API_KEY}`) {
+      console.error('Missing or invalid authorization header')
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
