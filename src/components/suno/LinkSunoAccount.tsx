@@ -36,16 +36,16 @@ export const LinkSunoAccount = () => {
           .from('linking_codes')
           .select('used_at, user_id, suno_username, suno_email')
           .eq('code', currentLinkingCode)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
-        // If the code has been used, trigger password creation
-        if (data.used_at && !showPasswordDialog) {
+        // If the code has been used and we have the required data
+        if (data?.used_at && data?.suno_email) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
           setSunoDetails({
             username: data.suno_username || '',
-            email: data.suno_email || ''
+            email: data.suno_email
           });
           setShowPasswordDialog(true);
           // Clear the interval since we don't need to check anymore
@@ -68,35 +68,12 @@ export const LinkSunoAccount = () => {
     };
   }, [currentLinkingCode, linkingStatus, showPasswordDialog]);
 
-  // Legacy extension message handler
-  useEffect(() => {
-    const handleExtensionMessage = (event: MessageEvent) => {
-      if (event.data.type === 'complete-suno-linking') {
-        const { username, email } = event.data;
-        console.log("LinkSunoAccount: Received linking completion", { username, email });
-        
-        setSunoDetails({ username, email });
-        setLinkingStatus('completed');
-        toast({
-          title: "Success",
-          description: "Your Suno account has been linked successfully!",
-        });
-        setTimeout(() => {
-          navigate('/profile');
-        }, 2000);
-      }
-    };
-
-    window.addEventListener('message', handleExtensionMessage);
-    return () => window.removeEventListener('message', handleExtensionMessage);
-  }, [navigate, toast]);
-
   const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
     try {
       console.log("LinkSunoAccount: Setting up password for linked account");
       
       if (!sunoDetails?.email) {
-        throw new Error("Email is missing");
+        throw new Error("Email is missing from Suno account details");
       }
 
       // First, sign in with email (passwordless)
