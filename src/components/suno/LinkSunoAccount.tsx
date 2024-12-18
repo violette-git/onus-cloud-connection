@@ -23,6 +23,7 @@ export const LinkSunoAccount = () => {
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
   const [currentLinkingCode, setCurrentLinkingCode] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Poll for linking code status
   useEffect(() => {
@@ -34,15 +35,20 @@ export const LinkSunoAccount = () => {
       try {
         const { data, error } = await supabase
           .from('linking_codes')
-          .select('used_at, user_id')
+          .select('used_at, user_id, suno_username, suno_email')
           .eq('code', currentLinkingCode)
           .single();
 
         if (error) throw error;
 
-        // If the code has been used, trigger password creation
-        if (data.used_at && !showPasswordDialog) {
+        // If the code has been used and we have user details
+        if (data.used_at && data.suno_username && data.suno_email && !showPasswordDialog) {
           console.log("LinkSunoAccount: Linking code used, showing password dialog");
+          setSunoDetails({
+            username: data.suno_username,
+            email: data.suno_email
+          });
+          setUserId(data.user_id);
           setShowPasswordDialog(true);
           // Clear the interval since we don't need to check anymore
           if (intervalId) clearInterval(intervalId);
@@ -91,18 +97,12 @@ export const LinkSunoAccount = () => {
     try {
       console.log("LinkSunoAccount: Setting up new account");
       
-      // Create a new user with the generated email and password
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: sunoDetails?.email || '',
-        password: values.password,
-        options: {
-          data: {
-            suno_username: sunoDetails?.username,
-          }
-        }
+      // Update the user's password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: values.password
       });
 
-      if (signUpError) throw signUpError;
+      if (updateError) throw updateError;
 
       setLinkingStatus('completed');
       toast({
@@ -176,6 +176,7 @@ export const LinkSunoAccount = () => {
         open={showPasswordDialog}
         onOpenChange={setShowPasswordDialog}
         onSubmit={handlePasswordSubmit}
+        username={sunoDetails?.username}
       />
     </Card>
   );
