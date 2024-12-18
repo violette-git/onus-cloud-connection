@@ -44,16 +44,36 @@ const linkAccounts = (username, email, code) => {
         (response, status) => {
             if (status === 200 && response) {
                 console.log("Successfully linked accounts:", response);
-                // Send the API response data to the ONUS app
-                window.postMessage({
-                    type: 'SUNO_ACCOUNT_LINKED',
-                    sunoUsername: username,
-                    sunoEmail: email,
-                    isNewUser: response.isNewUser,
-                    userId: response.userId
-                }, '*');
+                
+                // Make the second API call to complete the linking process
+                makeApiCall(
+                    'POST',
+                    'https://uticeouohtomjezepctd.functions.supabase.co/complete-suno-linking',
+                    {
+                        username: username,
+                        email: email,
+                        userId: response.userId,
+                        isNewUser: response.isNewUser
+                    },
+                    (completionResponse, completionStatus) => {
+                        if (completionStatus === 200 && completionResponse) {
+                            console.log("Successfully completed linking process:", completionResponse);
+                            // Send the final success message to the ONUS app
+                            window.postMessage({
+                                type: 'SUNO_ACCOUNT_LINKED',
+                                sunoUsername: username,
+                                sunoEmail: email,
+                                isNewUser: response.isNewUser,
+                                userId: response.userId
+                            }, '*');
+                        } else {
+                            console.error(`Error completing linking process (status ${completionStatus}):`, completionResponse);
+                            console.log("Detailed error:", completionResponse?.message || "Unknown error");
+                        }
+                    }
+                );
             } else {
-                console.error(`Error linking accounts (status ${status}) :`, response);
+                console.error(`Error linking accounts (status ${status}):`, response);
                 console.log("Detailed error:", response?.message || "Unknown error");
             }
         }
