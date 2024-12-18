@@ -176,7 +176,6 @@ export const LinkSunoAccount = () => {
         open={showPasswordDialog}
         onOpenChange={setShowPasswordDialog}
         onSubmit={handlePasswordSubmit}
-        username={sunoDetails?.username}
       />
     </Card>
   );
