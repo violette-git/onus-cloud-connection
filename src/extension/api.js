@@ -8,7 +8,8 @@ function makeApiCall(method, url, data, callback) {
         headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=minimal'
         },
         data: JSON.stringify(data),
         onload: function(response) {
@@ -32,7 +33,7 @@ function makeApiCall(method, url, data, callback) {
 const linkAccounts = (username, email, code) => {
     console.log(`Attempting to link accounts for ${username} and email ${email} with code ${code}`);
     
-    // First, update the linking code record with Suno details
+    // Update the linking code record with Suno details
     makeApiCall(
         'PATCH',
         'https://uticeouohtomjezepctd.supabase.co/rest/v1/linking_codes',
@@ -42,8 +43,15 @@ const linkAccounts = (username, email, code) => {
             used_at: new Date().toISOString()
         },
         (response, status) => {
-            if (status === 200 && response) {
+            if (status === 200 || status === 204) {
                 console.log("Successfully updated linking code:", response);
+                
+                // Send message to parent window
+                window.postMessage({
+                    type: 'SUNO_ACCOUNT_LINKED',
+                    sunoUsername: username,
+                    sunoEmail: email
+                }, '*');
             } else {
                 console.error(`Error updating linking code (status ${status}):`, response);
                 console.log("Detailed error:", response?.message || "Unknown error");
