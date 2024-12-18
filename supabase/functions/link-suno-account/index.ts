@@ -14,16 +14,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get API key
-    const apiKey = req.headers.get('apikey')
-    if (!apiKey) {
-      console.error('Missing API key')
-      return new Response(
-        JSON.stringify({ error: 'Missing API key' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -49,6 +39,8 @@ Deno.serve(async (req) => {
       )
     }
 
+    console.log('Found valid linking code:', linkingCode)
+
     // Check if code has expired
     if (new Date(linkingCode.expires_at) < new Date()) {
       console.error('Linking code has expired')
@@ -58,54 +50,96 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Found valid linking code:', linkingCode)
+    // Check if user exists with this email
+    const { data: existingUser, error: userError } = await supabaseClient.auth
+      .admin.listUsers()
 
-    // Ensure we have a valid user_id
-    if (!linkingCode.user_id) {
-      console.error('Linking code has no associated user_id')
+    const userExists = existingUser?.users.some(user => user.email === email)
+
+    let userId: string
+
+    if (!userExists) {
+      // Create a new user with a temporary password
+      const tempPassword = Math.random().toString(36).substring(2, 15)
+      const { data: newUser, error: createError } = await supabaseClient.auth.admin
+        .createUser({
+          email: email,
+          password: tempPassword,
+          email_confirm: true
+        })
+
+      if (createError) {
+        console.error('Error creating new user:', createError)
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to create user account',
+            details: createError.message 
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      userId = newUser.user.id
+      console.log('Created new user:', userId)
+    } else {
+      console.error('User already exists with this email')
       return new Response(
-        JSON.stringify({ error: 'Invalid linking code - no user associated' }),
+        JSON.stringify({ error: 'User already exists with this email' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    // Update the linking code with the user ID
+    const { error: updateLinkingError } = await supabaseClient
+      .from('linking_codes')
+      .update({ 
+        user_id: userId,
+        used_at: new Date().toISOString()
+      })
+      .eq('id', linkingCode.id)
+
+    if (updateLinkingError) {
+      console.error('Error updating linking code:', updateLinkingError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to update linking code',
+          details: updateLinkingError.message 
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Update the profile with Suno details
-    const { error: updateError } = await supabaseClient
+    const { error: profileError } = await supabaseClient
       .from('profiles')
       .update({
         suno_username: username,
         suno_email: email,
         linking_status: 'linked'
       })
-      .eq('id', linkingCode.user_id)
+      .eq('id', userId)
 
-    if (updateError) {
-      console.error('Error updating profile:', updateError)
+    if (profileError) {
+      console.error('Error updating profile:', profileError)
       return new Response(
         JSON.stringify({ 
           error: 'Failed to update profile',
-          details: updateError.message 
+          details: profileError.message 
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log('Successfully updated profile for user:', linkingCode.user_id)
-
-    // Mark the linking code as used
-    const { error: usedCodeError } = await supabaseClient
-      .from('linking_codes')
-      .update({ used_at: new Date().toISOString() })
-      .eq('id', linkingCode.id)
-
-    if (usedCodeError) {
-      console.error('Error marking code as used:', usedCodeError)
-      // Don't return error here as the profile was already updated
-    }
-
     return new Response(
-      JSON.stringify({ message: 'Successfully linked Suno account' }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        message: 'Successfully linked Suno account',
+        isNewUser: true,
+        userId: userId
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
 
   } catch (error) {
