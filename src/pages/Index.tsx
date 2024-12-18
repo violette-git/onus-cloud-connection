@@ -8,7 +8,7 @@ export const Index = () => {
   const isSigningUp = new URLSearchParams(window.location.search).get('signup') === 'true';
 
   // Only show linking component if user is signing up
-  if (user && isSigningUp) {
+  if (isSigningUp) {
     return (
       <div className="min-h-screen pt-24 pb-12">
         <div className="onus-container">
@@ -38,7 +38,7 @@ export const Index = () => {
                 </Button>
               </Link>
               {!user && (
-                <Link to="/auth?mode=signup">
+                <Link to="/?signup=true">
                   <Button size="lg" variant="outline">
                     Join Now
                   </Button>
@@ -76,12 +76,12 @@ export const Index = () => {
               Join our growing community of musicians and start creating today.
             </p>
             {!user && (
-              <Link to="/auth?mode=signup">
+              <Link to="/?signup=true">
                 <Button size="lg" className="bg-onus-purple hover:bg-onus-purple/90">
                   Get Started
                 </Button>
               </Link>
-            )}
+              )}
           </div>
         </div>
       </div>
