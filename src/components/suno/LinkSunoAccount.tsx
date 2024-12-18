@@ -22,6 +22,7 @@ export const LinkSunoAccount = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
   const [newUserId, setNewUserId] = useState<string | null>(null);
+  const [isLinking, setIsLinking] = useState(false);
 
   useEffect(() => {
     const handleExtensionMessage = async (event: MessageEvent) => {
@@ -29,16 +30,49 @@ export const LinkSunoAccount = () => {
           event.data.sunoUsername && 
           event.data.sunoEmail) {
         
-        // Handle the successful linking response
-        if (event.data.isNewUser && event.data.userId) {
-          setNewUserId(event.data.userId);
-          setShowPasswordDialog(true);
-        } else {
-          toast({
-            title: "Success",
-            description: "Your Suno account has been linked successfully!",
+        setIsLinking(true);
+        
+        try {
+          // Wait for the API response
+          const response = await fetch('https://uticeouohtomjezepctd.functions.supabase.co/link-suno-account', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              username: event.data.sunoUsername,
+              email: event.data.sunoEmail,
+              code: event.data.code
+            })
           });
-          navigate('/profile');
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to link account');
+          }
+
+          // Handle the successful linking response
+          if (data.isNewUser && data.userId) {
+            setNewUserId(data.userId);
+            setShowPasswordDialog(true);
+          } else {
+            toast({
+              title: "Success",
+              description: "Your Suno account has been linked successfully!",
+            });
+            navigate('/profile');
+          }
+        } catch (error) {
+          console.error('Error linking account:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error instanceof Error ? error.message : "Failed to link account",
+          });
+        } finally {
+          setIsLinking(false);
         }
       }
     };
