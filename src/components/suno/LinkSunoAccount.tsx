@@ -12,6 +12,7 @@ import { LinkingProcess } from "./LinkingProcess";
 import { PasswordDialog } from "./PasswordDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const SUNO_EXTENSION_URL = "https://chrome.google.com/webstore/detail/suno-extension/[extension-id]";
 
@@ -21,8 +22,9 @@ export const LinkSunoAccount = () => {
   const [showExtensionPrompt, setShowExtensionPrompt] = useState(true);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [sunoDetails, setSunoDetails] = useState<{ username: string; email: string } | null>(null);
-  const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed'>('not_started');
+  const [linkingStatus, setLinkingStatus] = useState<'not_started' | 'pending' | 'completed' | 'error'>('not_started');
   const [currentLinkingCode, setCurrentLinkingCode] = useState<string | null>(null);
+  const [linkingError, setLinkingError] = useState<string | null>(null);
 
   // Poll for linking code status
   useEffect(() => {
@@ -63,6 +65,15 @@ export const LinkSunoAccount = () => {
         }
       } catch (error) {
         console.error('LinkSunoAccount: Error checking linking code status:', error);
+        setLinkingError('Failed to check linking code status. Please try again.');
+        setLinkingStatus('error');
+        // Clear the interval since we encountered an error
+        if (intervalId) clearInterval(intervalId);
+        toast({
+          variant: "destructive",
+          title: "Connection Error",
+          description: "Failed to check linking status. Please try again.",
+        });
       }
     };
 
@@ -76,7 +87,7 @@ export const LinkSunoAccount = () => {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [currentLinkingCode, linkingStatus, showPasswordDialog]);
+  }, [currentLinkingCode, linkingStatus, showPasswordDialog, toast]);
 
   const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
     try {
@@ -117,6 +128,8 @@ export const LinkSunoAccount = () => {
       }, 2000);
     } catch (error) {
       console.error('LinkSunoAccount: Error setting password:', error);
+      setLinkingError('Failed to set password. Please try again later.');
+      setLinkingStatus('error');
       toast({
         variant: "destructive",
         title: "Error",
@@ -143,6 +156,27 @@ export const LinkSunoAccount = () => {
       );
     }
 
+    if (linkingStatus === 'error') {
+      return (
+        <div className="text-center space-y-4">
+          <h3 className="text-lg font-medium text-destructive">Error Linking Account</h3>
+          <p className="text-muted-foreground">
+            {linkingError || "An unexpected error occurred. Please try again."}
+          </p>
+          <Button 
+            onClick={() => {
+              setLinkingStatus('not_started');
+              setLinkingError(null);
+              setCurrentLinkingCode(null);
+            }}
+            variant="outline"
+          >
+            Try Again
+          </Button>
+        </div>
+      );
+    }
+
     return (
       <>
         {showExtensionPrompt && (
@@ -154,6 +188,7 @@ export const LinkSunoAccount = () => {
         <LinkingProcess 
           onSunoDetails={setSunoDetails}
           onLinkingCode={handleLinkingCode}
+          isLoading={linkingStatus === 'pending'}
         />
       </>
     );

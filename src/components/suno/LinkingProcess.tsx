@@ -8,9 +8,10 @@ import { LinkingCodeDisplay } from "./LinkingCodeDisplay";
 interface LinkingProcessProps {
   onSunoDetails: (details: { username: string; email: string }) => void;
   onLinkingCode: (code: string) => void;
+  isLoading?: boolean;
 }
 
-export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessProps) => {
+export const LinkingProcess = ({ onSunoDetails, onLinkingCode, isLoading = false }: LinkingProcessProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [linkingCode, setLinkingCode] = useState("");
@@ -21,7 +22,6 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
       console.log("LinkingProcess: Generating new linking code");
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 1);
-
       const { data, error } = await supabase
         .from('linking_codes')
         .insert({
@@ -30,7 +30,6 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
         })
         .select()
         .single();
-
       if (error) throw error;
       
       const code = data.code;
@@ -57,13 +56,18 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
     <div className="space-y-4">
       <Button
         onClick={generateLinkingCode}
-        disabled={loading}
+        disabled={loading || isLoading}
         className="w-full"
       >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Generating...
+          </>
+        ) : isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Waiting for connection...
           </>
         ) : (
           'Generate Linking Code'
@@ -77,6 +81,7 @@ export const LinkingProcess = ({ onSunoDetails, onLinkingCode }: LinkingProcessP
             onClick={openSunoProfile}
             variant="outline"
             className="w-full"
+            disabled={isLoading}
           >
             <ExternalLink className="mr-2 h-4 w-4" />
             Open Suno Profile
