@@ -14,6 +14,50 @@ export interface BaseRecord {
 
 export interface CommentPreferences {
   disable_comments: boolean;
+  require_follow_to_comment?: boolean;
+  moderation_enabled?: boolean;
+}
+
+export interface ForumTopic {
+  id: string;
+  title: string;
+  content: string;
+  user_id: string;
+  created_at: string;
+  updated_at?: string;
+  slug: string;
+  category: string;
+  is_pinned: boolean;
+  is_locked: boolean;
+}
+
+export interface Comment {
+  id: string;
+  created_at: string;
+  content: string;
+  content_type: 'song' | 'video' | 'forum';
+  content_id: string;
+  user_id: string;
+  parent_id: string | null;
+  thread_path: string;
+  forum_topic_id?: string;
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      comments: {
+        Row: Comment;
+        Insert: Omit<Comment, 'id' | 'created_at'>;
+        Update: Partial<Comment>;
+      };
+      forum_topics: {
+        Row: ForumTopic;
+        Insert: Omit<ForumTopic, 'id' | 'created_at'>;
+        Update: Partial<ForumTopic>;
+      };
+    };
+  };
 }
 
 export interface ThemeColors {

@@ -38,8 +38,16 @@ export const useProfileMutation = () => {
       
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    onSuccess: (_, variables) => {
+      // Invalidate all relevant query variations
+      queryClient.invalidateQueries({ 
+        queryKey: ['profile', variables.id],
+        refetchType: 'active'
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['profile'],
+        exact: true
+      });
       toast({
         title: "Success!",
         description: "Your profile has been updated.",

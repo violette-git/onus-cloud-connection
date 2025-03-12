@@ -24,6 +24,13 @@ export const NavLinks = ({ onNavigate }: NavLinksProps) => {
       >
         Musicians
       </Link>
+      <Link
+        to="/forum"
+        className="text-muted-foreground hover:text-foreground transition-colors"
+        onClick={onNavigate}
+      >
+        Forum
+      </Link>
       {user && (
         <Link 
           to="/connections" 

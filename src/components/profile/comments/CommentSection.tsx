@@ -10,7 +10,7 @@ import { ensureCommentPreferences } from "@/types/database";
 
 interface CommentSectionProps {
   contentId: string;
-  contentType: 'song' | 'video';
+  contentType: 'song' | 'video' | 'forum';
 }
 
 export const CommentSection = ({ contentId, contentType }: CommentSectionProps) => {

@@ -8,6 +8,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +17,8 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   signOut: async () => {},
+  login: async () => {},
+  signUp: async () => {},
 });
 
 export const useAuth = () => {
@@ -28,30 +32,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Initialize auth state from localStorage if available
-    const storedSession = localStorage.getItem('supabase.auth.token');
-    if (storedSession) {
-      try {
-        const parsedSession = JSON.parse(storedSession);
-        if (parsedSession?.currentSession) {
-          setSession(parsedSession.currentSession);
-          setUser(parsedSession.currentSession.user);
-        }
-      } catch (error) {
-        console.error('Error parsing stored session:', error);
-      }
-    }
-
     // Set up Supabase session persistence
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       if (initialSession) {
         setSession(initialSession);
         setUser(initialSession.user);
-        // Store session in localStorage
-        localStorage.setItem('supabase.auth.token', JSON.stringify({
-          currentSession: initialSession,
-          expiresAt: initialSession.expires_at
-        }));
       }
       setLoading(false);
     });
@@ -62,15 +47,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
-        // Update stored session
-        localStorage.setItem('supabase.auth.token', JSON.stringify({
-          currentSession: currentSession,
-          expiresAt: currentSession.expires_at
-        }));
       } else {
         setSession(null);
         setUser(null);
-        localStorage.removeItem('supabase.auth.token');
       }
       setLoading(false);
     });
@@ -83,11 +62,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      localStorage.removeItem('supabase.auth.token');
       navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  // Temporary mock authentication methods
+  const login = async (email: string, password: string) => {
+    if (email === 'test@onus.com' && password === 'testpass123') {
+      const mockUser = {
+        id: 'mock-user-123',
+        email: 'test@onus.com',
+        user_metadata: { name: 'Test User' },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString()
+      } as unknown as User;
+      
+      setUser(mockUser);
+      setSession({
+        access_token: 'mock-token',
+        refresh_token: 'mock-refresh-token',
+        expires_in: 3600,
+        token_type: 'bearer',
+        user: mockUser
+      } as Session);
+      navigate('/');
+    }
+  };
+
+  const signUp = async (email: string, password: string) => {
+    // For testing purposes, treat signup same as login
+    return login(email, password);
   };
 
   const value = {
@@ -95,6 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     session,
     loading,
     signOut,
+    login,
+    signUp,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

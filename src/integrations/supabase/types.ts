@@ -9,6 +9,52 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      forum_topics: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          title: string
+          content: string
+          user_id: string
+          slug: string
+          category: string
+          is_pinned: boolean
+          is_locked: boolean
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          title: string
+          content: string
+          user_id: string
+          slug: string
+          category: string
+          is_pinned?: boolean
+          is_locked?: boolean
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          title?: string
+          content?: string
+          user_id?: string
+          slug?: string
+          category?: string
+          is_pinned?: boolean
+          is_locked?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_topics_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      };
       collaborators: {
         Row: {
           created_at: string

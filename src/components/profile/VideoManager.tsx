@@ -25,8 +25,36 @@ export const VideoManager = ({ musicianId, videos, isOwner = false }: VideoManag
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!newVideo.title || !newVideo.url || !newVideo.platform) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields.",
+      });
+      return;
+    }
+    
+    if (!isValidUrl(newVideo.url)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid URL",
+        description: "Please enter a valid URL.",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
