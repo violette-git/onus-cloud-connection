@@ -17,7 +17,7 @@ export const ForumTopicList = () => {
             full_name,
             avatar_url
           ),
-          comment_count:comments!comments_forum_topic_id_fkey (count)
+          comment_count:comments!comments_forum_topic_id_fkey (count:exact)
         `)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
