@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { VideoEmbed } from "@/components/profile/VideoEmbed";
 import { SunoPlayer } from "@/components/profile/SunoPlayer";
 import { Card } from "@/components/ui/card";
-import type { Video } from "@/types/musician";
+import type { Video } from "@/types/database";
+import type { Profile } from "@/types/profile";
 
 interface SongContent {
   id: string;
@@ -36,8 +37,8 @@ export const Comments = () => {
       const table = type === 'song' ? 'songs' : 'videos';
       const { data, error } = await supabase
         .from(table)
-        .select(`
-          *,
+        .select(`*
+          ,
           musician:musicians (
             name
           )

@@ -12,17 +12,49 @@ import {
 import { Eye, EyeOff } from 'lucide-react';
 
 export const AuthForm = () => {
-  const { login } = useAuth();
+  const { login, signUp } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
-    navigate('/');
+    setError('');
+
+    if (isSignUp && password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    try {
+      let response;
+      if (isSignUp) {
+        response = await signUp(email, password);
+      } else {
+        response = await login(email, password);
+      }
+
+      const { data, error } = response;
+
+      if (error) {
+        console.error('Authentication error:', error);
+        if (error.status === 429) {
+          setError('Too many requests. Please try again later.');
+        } else {
+          setError(error.message);
+        }
+      } else if (data) {
+        console.log('Authentication successful:', data);
+        navigate('/profile'); // Redirect to profile page
+      }
+    } catch (error) {
+      console.error('Unexpected authentication error:', error);
+      setError('An unexpected error occurred.');
+    }
   };
 
   return (
@@ -71,6 +103,23 @@ export const AuthForm = () => {
             </button>
           </div>
         </div>
+        {isSignUp && (
+          <div className="space-y-2">
+            <Label className="text-white" htmlFor="confirmPassword">
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type={showPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="text-white bg-gray-800 border-gray-700 pr-10"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+        )}
+        {error && <div className="text-red-500">{error}</div>}
         <Button type="submit" className="w-full">
           {isSignUp ? 'Sign Up' : 'Sign In'}
         </Button>

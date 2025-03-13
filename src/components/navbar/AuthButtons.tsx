@@ -69,7 +69,7 @@ export const AuthButtons = ({ onAction }: AuthButtonsProps) => {
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage 
-                  src={profile?.avatar_url}
+src={profile?.avatar_url || undefined}
                   alt={displayName}
                   className="object-cover"
                 />

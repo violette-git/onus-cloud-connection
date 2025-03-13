@@ -1,0 +1,53 @@
+src/components/profile/FollowingList.tsx(51,46): error TS2339: Property 'followee_id' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(73,44): error TS2339: Property 'id' does not exist on type 'SelectQueryError<"column 'email' does not exist on 'profiles'.">'.
+src/components/profile/FollowingList.tsx(73,60): error TS2339: Property 'followee_id' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(75,65): error TS2339: Property 'followee_id' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(79,18): error TS2339: Property 'id' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(81,27): error TS2339: Property 'followee_id' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(82,26): error TS2339: Property 'created_at' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(83,26): error TS2339: Property 'updated_at' does not exist on type 'SelectQueryError<"column 'followee_id' does not exist on 'followers'.">'.
+src/components/profile/FollowingList.tsx(84,15): error TS2352: Conversion of type 'SelectQueryError<"column 'email' does not exist on 'profiles'.">' to type 'Profile' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ error: true; } & String' is missing the following properties from type 'Profile': id, email, avatar_url, banner_url, and 9 more.
+src/components/profile/musician/MusicianContent.tsx(57,35): error TS2739: Type 'Video' is missing the following properties from type 'Video': created_at, updated_at
+src/components/profile/musician/MusicianMedia.tsx(55,29): error TS2739: Type 'Video' is missing the following properties from type 'Video': created_at, updated_at
+src/components/profile/MusicianActions.tsx(77,31): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/components/profile/MusicianActions.tsx(103,13): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/components/profile/ProfileHeader.tsx(16,31): error TS2339: Property 'banner_url' does not exist on type 'Profile'.
+src/components/profile/ProfileHeader.tsx(17,37): error TS2339: Property 'banner_url' does not exist on type 'Profile'.
+src/components/profile/ProfileSettings.tsx(18,48): error TS2339: Property 'handle' does not exist on type 'Profile'.
+src/components/profile/ProfileSettings.tsx(25,7): error TS2353: Object literal may only specify known properties, and 'handle' does not exist in type 'Partial<Profile>'.
+src/components/profile/ThemeCustomization.tsx(34,18): error TS18047: 'colors' is possibly 'null'.
+src/components/profile/ThemeCustomization.tsx(47,18): error TS18047: 'colors' is possibly 'null'.
+src/components/profile/ThemeCustomization.tsx(60,18): error TS18047: 'colors' is possibly 'null'.
+src/components/profile/VideoEmbed.tsx(14,9): error TS2367: This comparison appears to be unintentional because the types 'VideoPlatform' and '"tiktok"' have no overlap.
+src/components/profile/VideoEmbed.tsx(48,7): error TS2367: This comparison appears to be unintentional because the types '"vimeo" | "dailymotion"' and '"tiktok"' have no overlap.
+src/contexts/AuthContext.test.tsx(33,3): error TS2322: Type 'null' is not assignable to type 'UserIdentity[] | undefined'.
+src/contexts/AuthContext.test.tsx(34,3): error TS2322: Type 'null' is not assignable to type 'Factor[] | undefined'.
+src/main.tsx(2,17): error TS5097: An import path can only end with a '.tsx' extension when 'allowImportingTsExtensions' is enabled.
+src/pages/Comments.tsx(79,27): error TS2322: Type 'VideoContent' is not assignable to type 'Video'.
+  Types of property 'platform' are incompatible.
+    Type 'import("C:/Users/viale/OneDrive/Documents/ONUS/onus-cloud-connection/src/types/database").VideoPlatform' is not assignable to type 'import("C:/Users/viale/OneDrive/Documents/ONUS/onus-cloud-connection/src/types/profile").VideoPlatform'.
+      Type '"other"' is not assignable to type 'VideoPlatform'.
+src/pages/MusicianProfile.tsx(99,29): error TS2322: Type '{ avatar_url: string | null; bio: string | null; created_at: string; genre_id: string | null; id: string; location: string | null; name: string; updated_at: string; user_id: string | null; profile: { ...; } | null; musician_genres: { ...; }[]; songs: { ...; }[]; videos: { ...; }[]; }' is not assignable to type 'Musician'.
+  Types of property 'profile' are incompatible.
+    Type '{ avatar_url: string | null; username: string | null; full_name: string | null; } | null' is not assignable to type 'MusicianProfile | undefined'.
+      Type 'null' is not assignable to type 'MusicianProfile | undefined'.
+src/pages/MusicianProfile.tsx(107,15): error TS2322: Type '{ id: string; title: string; url: string; platform: string; created_at: string; updated_at: string; }[]' is not assignable to type 'Video[]'.
+  Type '{ id: string; title: string; url: string; platform: string; created_at: string; updated_at: string; }' is not assignable to type 'Video'.
+    Types of property 'platform' are incompatible.
+      Type 'string' is not assignable to type 'VideoPlatform'.
+src/pages/MusicianProfile.tsx(122,17): error TS2322: Type '{ avatar_url: string | null; bio: string | null; created_at: string; genre_id: string | null; id: string; location: string | null; name: string; updated_at: string; user_id: string | null; profile: { ...; } | null; musician_genres: { ...; }[]; songs: { ...; }[]; videos: { ...; }[]; }' is not assignable to type 'Musician'.
+  Types of property 'profile' are incompatible.
+    Type '{ avatar_url: string | null; username: string | null; full_name: string | null; } | null' is not assignable to type 'MusicianProfile | undefined'.
+      Type 'null' is not assignable to type 'MusicianProfile | undefined'.
+src/pages/MusicianProfile.tsx(128,30): error TS2322: Type '{ avatar_url: string | null; bio: string | null; created_at: string; genre_id: string | null; id: string; location: string | null; name: string; updated_at: string; user_id: string | null; profile: { ...; } | null; musician_genres: { ...; }[]; songs: { ...; }[]; videos: { ...; }[]; }' is not assignable to type 'Musician'.
+  Types of property 'profile' are incompatible.
+    Type '{ avatar_url: string | null; username: string | null; full_name: string | null; } | null' is not assignable to type 'MusicianProfile | undefined'.
+      Type 'null' is not assignable to type 'MusicianProfile | undefined'.
+src/pages/Settings.tsx(27,14): error TS2352: Conversion of type '{ social_links: SocialLinks; comment_preferences: CommentPreferences; theme_colors: ThemeColors; avatar_url: string | null; banner_url: string | null; ... 11 more ...; visibility: string | null; }' to type 'Profile' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ social_links: SocialLinks; comment_preferences: CommentPreferences; theme_colors: ThemeColors; avatar_url: string | null; banner_url: string | null; ... 11 more ...; visibility: string | null; }' is missing the following properties from type 'Profile': email, bio, first_name, last_name, and 2 more.
+src/test/mockData.ts(16,3): error TS2322: Type 'null' is not assignable to type 'UserIdentity[] | undefined'.
+src/test/mockData.ts(17,3): error TS2322: Type 'null' is not assignable to type 'Factor[] | undefined'.
+src/types/musician.ts(1,10): error TS2305: Module '"./database"' has no exported member 'BaseRecord'.

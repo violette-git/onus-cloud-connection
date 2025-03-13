@@ -11,7 +11,8 @@ export const VideoEmbed = ({ video }: VideoEmbedProps) => {
 
   useEffect(() => {
     // Load TikTok embed script if it's a TikTok video
-    if (video.platform === 'tiktok' && tiktokContainerRef.current) {
+if (video.platform === 'tiktok' && tiktokContainerRef.current) {
+  // Handle tiktok platform
       const script = document.createElement('script');
       script.src = 'https://www.tiktok.com/embed.js';
       script.async = true;
@@ -45,7 +46,8 @@ export const VideoEmbed = ({ video }: VideoEmbedProps) => {
     );
   }
 
-  if (video.platform === 'tiktok') {
+if (video.platform === 'tiktok') {
+  // Handle tiktok platform
     return (
       <div ref={tiktokContainerRef} className="tiktok-embed">
         <blockquote 

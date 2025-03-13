@@ -1,69 +1,110 @@
-# Welcome to your Lovable project
+# ONUS Cloud Connection
 
-## Project info
+## Overview
+ONUS Cloud Connection is a web application designed to facilitate collaboration and communication among musicians. It provides features such as forums, messaging, notifications, and profile management.
 
-**URL**: https://lovable.dev/projects/40561ec8-ee30-4a72-994d-3a178224bbbe
+## Features
+- **Forum**: A platform for musicians to discuss topics, share ideas, and engage in community discussions.
+- **Messaging**: A messaging system for musicians to send nudges and communicate privately.
+- **Notifications**: Real-time notifications for collaboration requests, follows, song reactions, and more.
+- **Profile Management**: Manage musician profiles, including bio, avatar, and role.
 
-## How can I edit this code?
+## Setup
+To set up and run the ONUS Cloud Connection app, follow these steps:
 
-There are several ways of editing your application.
+1. **Clone the Repository**:
+   ```sh
+   git clone https://github.com/your-repo/onus-cloud-connection.git
+   cd onus-cloud-connection
+   ```
 
-**Use Lovable**
+2. **Install Dependencies**:
+   ```sh
+   npm install
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/40561ec8-ee30-4a72-994d-3a178224bbbe) and start prompting.
+3. **Start the Application**:
+   ```sh
+   docker-compose down && docker-compose up -d
+   npx supabase start
+   npm run dev
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+## Database Migrations
+The application uses Supabase for its database. The following migrations are applied to the `profiles` table:
 
-**Use your preferred IDE**
+- **Add `username` Column**:
+  ```sql
+  ALTER TABLE profiles
+  ADD COLUMN username TEXT UNIQUE NOT NULL;
+  ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Add `role` Column**:
+  ```sql
+  ALTER TABLE profiles
+  ADD COLUMN role TEXT NOT NULL DEFAULT 'user';
+  ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Seed Data**:
+  ```sql
+  INSERT INTO profiles (username, email, role) VALUES
+  ('user1', 'user1@example.com', 'user'),
+  ('user2', 'user2@example.com', 'user'),
+  ('user3', 'user3@example.com', 'admin');
+  ```
 
-Follow these steps:
+## Data Update Flow Chart
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```mermaid
+graph TD;
+    A[Local Database Update] --> B[Supabase Push];
+    B --> C[Supabase Apply Migrations];
+    C --> D[Supabase Pull Schema];
+    D --> E[Verify Data];
+    E --> F[Local Database Reflects Changes];
+    G[Supabase Database Update] --> H[Supabase Push];
+    H --> I[Supabase Apply Migrations];
+    I --> J[Supabase Pull Schema];
+    J --> K[Verify Data];
+    K --> L[Local Database Reflects Changes];
 ```
 
-**Edit a file directly in GitHub**
+## Commands Used Today
+- **Create Migration for `username` Column**:
+  ```sh
+  npx supabase migration new add_username_to_profiles
+  ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Add `username` Column to Migration File**:
+  ```sh
+  mv supabase/migrations/20250312170827_add_username_to_profiles.sql supabase/migrations/20250312080001_add_username_to_profiles.sql
+  ```
 
-**Use GitHub Codespaces**
+- **Create Migration for `role` Column**:
+  ```sh
+  npx supabase migration new add_role_to_profiles
+  ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Add `role` Column to Migration File**:
+  ```sh
+  mv supabase/migrations/20250312171202_add_role_to_profiles.sql supabase/migrations/20250312080002_add_role_to_profiles.sql
+  ```
 
-## What technologies are used for this project?
+- **Rename `seed_data` Migration File**:
+  ```sh
+  mv supabase/migrations/20250312080000_seed_data.sql supabase/migrations/20250312080003_seed_data.sql
+  ```
 
-This project is built with .
+- **Push Migrations to Remote Database**:
+  ```sh
+  npx supabase db push --include-all
+  ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Pull Schema from Remote Database**:
+  ```sh
+  npx supabase db pull
+  ```
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/40561ec8-ee30-4a72-994d-3a178224bbbe) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- **Verify `role` Column in Migration File**:
+  ```sh
+  npx supabase db exec "SELECT column_name FROM information_schema.columns WHERE table_name='profiles' AND column_name='role';"

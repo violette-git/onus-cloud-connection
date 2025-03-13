@@ -1,0 +1,9 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { Button } from "@/components/ui/button";
+import { Music2, Share2, MessageCircle } from "lucide-react";
+import { SocialLinksSection } from "./SocialLinks";
+import { CollaborationRequests } from "./CollaborationRequests";
+import { MessageDialog } from "../profile/musician-actions/MessageDialog";
+export const ProfileActions = ({ profile, isOwner, onBecomeMusicianClick, onSocialLinksUpdate }) => {
+    return (_jsxs("div", { className: "mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8", children: [_jsxs("div", { className: "flex flex-col sm:flex-row items-center justify-center gap-4", children: [_jsxs("div", { className: "flex flex-wrap items-center justify-center gap-2", children: [profile.role === 'observer' && isOwner && (_jsxs(Button, { onClick: onBecomeMusicianClick, className: "bg-onus-purple hover:bg-onus-purple/90", children: [_jsx(Music2, { className: "mr-2 h-4 w-4" }), "Become a Musician"] })), profile.role === 'musician' && !isOwner && (_jsxs(_Fragment, { children: [_jsxs(Button, { className: "gradient-border", children: [_jsx(Music2, { className: "mr-2 h-4 w-4" }), "Follow"] }), _jsxs(Button, { variant: "outline", children: [_jsx(Share2, { className: "mr-2 h-4 w-4" }), "Share"] }), _jsx(MessageDialog, { recipientId: profile.id, children: _jsxs(Button, { variant: "secondary", children: [_jsx(MessageCircle, { className: "mr-2 h-4 w-4" }), "Message"] }) })] }))] }), _jsx(SocialLinksSection, { initialLinks: profile.social_links || { instagram: "", youtube: "", linkedin: "" }, isOwner: isOwner, onSave: onSocialLinksUpdate })] }), isOwner && profile.role === 'musician' && (_jsx("div", { className: "mt-8", children: _jsx(CollaborationRequests, { musicianId: profile.id }) }))] }));
+};

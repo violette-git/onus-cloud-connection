@@ -5,7 +5,7 @@
 - [x] Implement proper error handling for account linking process
 - [x] Replace polling mechanism with WebSockets for real-time linking code status updates
 - [x] Add comprehensive loading states for asynchronous operations
-- [ ] Install Docker Desktop for local Supabase development
+- [x] Install Docker Desktop for local Supabase development
 
 ## Medium Priority
 - [x] Enhance form validation throughout the application

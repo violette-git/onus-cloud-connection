@@ -1,19 +1,25 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SupabaseError } from "@/types/supabaseError";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { CommentSection } from "@/components/profile/comments/CommentSection";
 import { useAuth } from "@/contexts/AuthContext";
+import { ForumTopicWithComments } from "@/types/forumTopic";
 
 export const ForumTopicView = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: topic, isLoading } = useQuery({
+  const { data: rawTopic, isLoading, isError, error } = useQuery<ForumTopicWithComments | null, SupabaseError>({
     queryKey: ['forum-topic', id],
-    queryFn: async () => {
+    queryFn: async (): Promise<ForumTopicWithComments | null> => {
+      if (!id) {
+        throw new Error('Topic ID is undefined');
+      }
+
       const { data, error } = await supabase
         .from('forum_topics')
         .select(`
@@ -27,9 +33,18 @@ export const ForumTopicView = () => {
         .eq('id', id)
         .single();
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        return null;
+      }
+
+      return data as ForumTopicWithComments;
     },
+    enabled: !!id, // Only run the query if id is defined
   });
 
   const updateCommentSection = () => {
@@ -48,7 +63,15 @@ export const ForumTopicView = () => {
     );
   }
 
-  if (!topic) {
+  if (isError) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        Failed to load the topic: {error?.message}
+      </div>
+    );
+  }
+
+  if (!rawTopic) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         Topic not found
@@ -68,13 +91,13 @@ export const ForumTopicView = () => {
       <div className="border rounded-lg p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
+            <h1 className="text-2xl font-bold mb-2">{rawTopic?.title}</h1>
             <div className="text-sm text-muted-foreground">
-              Posted by {topic.user?.full_name || 'Anonymous'} • 
-              {new Date(topic.created_at).toLocaleDateString()}
+              Posted by {rawTopic?.user?.full_name || 'Anonymous'} • 
+              {rawTopic?.created_at ? new Date(rawTopic.created_at).toLocaleDateString() : ''}
             </div>
           </div>
-          {user?.id === topic.user_id && (
+          {user?.id === rawTopic?.user_id && (
             <Button variant="outline" size="sm">
               Edit Topic
             </Button>
@@ -82,11 +105,11 @@ export const ForumTopicView = () => {
         </div>
 
         <div className="prose dark:prose-invert mb-8">
-          {topic.content}
+          {rawTopic?.content}
         </div>
 
         <CommentSection 
-          contentId={topic.id}
+          contentId={rawTopic?.id || ''}
           contentType="forum"
         />
       </div>

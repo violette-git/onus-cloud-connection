@@ -1,9 +1,12 @@
-import { ForumTopicList } from "@/components/forum/ForumTopicList";
+import React from 'react';
 
-export const ForumPage = () => {
+const Forum: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <ForumTopicList />
+    <div>
+      <h1>Forum</h1>
+      <p>Welcome to the forum page.</p>
     </div>
   );
 };
+
+export default Forum;

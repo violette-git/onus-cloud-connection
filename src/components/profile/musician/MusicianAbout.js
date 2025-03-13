@@ -1,0 +1,5 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { Card, CardContent } from "@/components/ui/card";
+export const MusicianAbout = ({ musician }) => {
+    return (_jsx(Card, { children: _jsxs(CardContent, { className: "p-6", children: [_jsx("h3", { className: "font-semibold mb-4", children: "About" }), musician?.bio ? (_jsx("p", { className: "text-muted-foreground", children: musician.bio })) : (_jsx("p", { className: "text-muted-foreground italic", children: "No bio available" })), musician?.musician_genres && musician.musician_genres.length > 0 && (_jsxs(_Fragment, { children: [_jsx("div", { className: "my-4 border-t" }), _jsxs("div", { children: [_jsx("h3", { className: "font-semibold mb-3", children: "Genres" }), _jsx("div", { className: "flex flex-wrap gap-2", children: musician.musician_genres.map((mg, index) => (_jsx("span", { className: "px-3 py-1 bg-secondary rounded-full text-sm", children: mg.genre.name }, index))) })] })] }))] }) }));
+};

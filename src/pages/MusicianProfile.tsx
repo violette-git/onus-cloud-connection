@@ -13,6 +13,35 @@ import { useToast } from "@/hooks/use-toast";
 import { MusicianProfileSkeleton } from "@/components/profile/musician/MusicianProfileSkeleton";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+interface MusicianProfile {
+  avatar_url: string | null;
+  username: string | null;
+  full_name: string | null;
+}
+
+interface Video {
+  id: string;
+  title: string;
+  url: string;
+  platform: VideoPlatform;
+  created_at: string;
+  updated_at: string;
+}
+
+type VideoPlatform = 'youtube' | 'vimeo' | 'other'; // Define the possible platforms
+
+interface Musician {
+  profile: MusicianProfile | undefined;
+  avatar_url: string | null;
+  bio: string | null;
+  created_at: string;
+  genre_id: string | null;
+  id: string;
+  user_id: string;
+  songs: { id: string; title: string; url: string; created_at: string; updated_at: string; }[];
+  videos: Video[];
+}
+
 export const MusicianProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -25,9 +54,8 @@ export const MusicianProfile = () => {
       if (!id) return null;
       const { data, error } = await supabase
         .from('musicians')
-        .select(`
-          *,
-          profile:profiles!musicians_user_id_fkey (
+        .select(`*,
+          profile:profiles!musicians_profile_id_fkey (
             avatar_url,
             username,
             full_name
@@ -63,7 +91,17 @@ export const MusicianProfile = () => {
         throw new Error('Musician not found');
       }
       
-      return data;
+      // Ensure the profile is a single object
+      const musicianWithProfile: Musician = {
+        ...data,
+        profile: data.profile.length > 0 ? data.profile[0] : undefined,
+        videos: data.videos.map(video => ({
+          ...video,
+          platform: video.platform as VideoPlatform
+        }))
+      };
+      
+      return musicianWithProfile;
     },
     meta: {
       onError: () => {

@@ -1,4 +1,3 @@
-import { BaseRecord } from './database';
 
 export interface MusicianProfile {
   avatar_url: string | null;
@@ -6,7 +5,7 @@ export interface MusicianProfile {
   full_name: string | null;
 }
 
-export interface Musician extends BaseRecord {
+export interface Musician {
   id: string;
   user_id: string | null;
   name: string;
@@ -23,7 +22,7 @@ export interface Musician extends BaseRecord {
   videos?: Video[];
 }
 
-export interface Song extends BaseRecord {
+export interface Song {
   id: string;
   title: string;
   url: string;
@@ -31,9 +30,11 @@ export interface Song extends BaseRecord {
 
 export type VideoPlatform = 'youtube' | 'tiktok';
 
-export interface Video extends BaseRecord {
+export interface Video {
   id: string;
   title: string;
   url: string;
-  platform: string;
+  platform: VideoPlatform;
+  created_at: string;
+  updated_at: string;
 }

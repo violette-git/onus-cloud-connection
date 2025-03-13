@@ -1,0 +1,9 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+export const VideoForm = ({ isSubmitting, newVideo, onSubmit, onChange, onCancel }) => {
+    return (_jsxs("form", { onSubmit: onSubmit, className: "space-y-4", children: [_jsxs("div", { className: "space-y-2", children: [_jsx("label", { htmlFor: "title", className: "text-sm font-medium", children: "Title" }), _jsx(Input, { id: "title", value: newVideo.title, onChange: (e) => onChange('title', e.target.value), required: true })] }), _jsxs("div", { className: "space-y-2", children: [_jsx("label", { htmlFor: "platform", className: "text-sm font-medium", children: "Platform" }), _jsxs(Select, { value: newVideo.platform, onValueChange: (value) => onChange('platform', value), required: true, children: [_jsx(SelectTrigger, { children: _jsx(SelectValue, { placeholder: "Select platform" }) }), _jsxs(SelectContent, { children: [_jsx(SelectItem, { value: "youtube", children: "YouTube" }), _jsx(SelectItem, { value: "tiktok", children: "TikTok" })] })] })] }), _jsxs("div", { className: "space-y-2", children: [_jsx("label", { htmlFor: "url", className: "text-sm font-medium", children: "Video URL" }), _jsx(Input, { id: "url", type: "url", value: newVideo.url, onChange: (e) => onChange('url', e.target.value), placeholder: newVideo.platform === 'youtube' ?
+                            "https://www.youtube.com/watch?v=..." :
+                            "https://www.tiktok.com/@username/video/...", required: true })] }), _jsxs("div", { className: "flex space-x-2", children: [_jsx(Button, { type: "submit", disabled: isSubmitting, children: isSubmitting ? "Adding..." : "Add Video" }), _jsx(Button, { type: "button", variant: "outline", onClick: onCancel, children: "Cancel" })] })] }));
+};

@@ -13,8 +13,8 @@ export const mockUser: User = {
   email_confirmed_at: '',
   last_sign_in_at: '',
   updated_at: '',
-  identities: null,
-  factors: null,
+  identities: undefined,
+  factors: undefined,
 };
 
 export const mockSession: Session = {

@@ -2,20 +2,15 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://hfzdbtmmvlvnxtvcgxui.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmemRidG1tdmx2bnh0dmNneHVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE3NTI1MjEsImV4cCI6MjA1NzMyODUyMX0.T4n85VG-mfMHYK3mtDXs2-WLhBBuJuvMBCYLrgSRlPc";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: {
-      getItem: (key) => localStorage.getItem(key),
-      setItem: (key, value) => localStorage.setItem(key, value),
-      removeItem: (key) => localStorage.removeItem(key)
+const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  global: {
+    headers: {
+      'Accept': 'application/json',
     },
-    autoRefreshToken: true,
-    persistSession: true
-  }
+  },
 });
+
+export { supabase };

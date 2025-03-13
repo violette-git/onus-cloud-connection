@@ -71,14 +71,23 @@ export const NudgeList = () => {
         const threadId = [user.id, otherUserId].sort().join('-');
         
         if (!threadMap.has(threadId)) {
-          threadMap.set(threadId, {
-            id: threadId,
-            other_user_id: otherUserId,
-            last_message: message.message,
-            last_message_time: message.created_at,
-            is_read: message.is_read,
-            other_user: message.sender_id === user.id ? message.recipient : message.sender,
-          });
+if (user) {
+  const otherUser = message.sender_id === user.id ? message.recipient : message.sender;
+  threadMap.set(threadId, {
+    id: threadId,
+    other_user_id: otherUserId,
+    last_message: message.message,
+    last_message_time: message.created_at,
+    is_read: message.is_read,
+    other_user: {
+      username: otherUser.username || "",
+      full_name: otherUser.full_name || "",
+      avatar_url: otherUser.avatar_url || "",
+    },
+  });
+} else {
+  console.error("User is not authenticated.");
+}
         }
       });
 
@@ -108,9 +117,13 @@ export const NudgeList = () => {
     };
   }, [user, toast]);
 
-  const handleThreadClick = (otherUserId: string) => {
+const handleThreadClick = (otherUserId: string) => {
+  if (user) {
     navigate(`/messages/${otherUserId}`);
-  };
+  } else {
+    console.error("User is not authenticated.");
+  }
+};
 
   if (isLoading) {
     return (
@@ -165,7 +178,7 @@ export const NudgeList = () => {
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {thread.last_message}
                     </p>
-                    {!thread.is_read && thread.other_user_id !== user.id && (
+{user && !thread.is_read && thread.other_user_id !== user.id && (
                       <div className="mt-2">
                         <span className="inline-block w-2 h-2 bg-primary rounded-full" />
                       </div>

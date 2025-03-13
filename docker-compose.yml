@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: supabase-postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./supabase/data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+      - ./supabase/migrations/20250312080000_seed_data.sql:/docker-entrypoint-initdb.d/20250312080000_seed_data.sql
